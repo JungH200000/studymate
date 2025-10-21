@@ -13,10 +13,7 @@ export default function Write({ setTab }) {
 
   const handlePost = () => {
     if (!title) return alert("챌린지 제목을 입력하세요.");
-    if (!content) return alert("목표 내용을 입력하세요.");
     if (window.confirm("게시하시겠습니까?")) {
-      // 실제 게시 로직 (API 호출) 추가 가능
-      console.log({ title, frequency, content });
       navigate("/home");
     }
   };
