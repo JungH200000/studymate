@@ -2,6 +2,7 @@
 // 서버 시작점
 import express from 'express';
 import { query } from './db/pool.js';
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
@@ -19,6 +20,17 @@ try {
 app.get('/connect', async (req, res) => {
   const result = await query('SELECT now()');
   res.json({ ok: true, time: result.rows[0].now });
+});
+
+/* ===== api 동작 테스트 ===== */
+
+/* ===== 라우터 등록 ===== */
+app.use('/api/auth', authRoutes);
+
+/* ===== Error ===== */
+app.use((error, req, res, next) => {
+  console.error('Error 발생 !!!\n', error);
+  res.status(error.status).json({ message: error.message });
 });
 
 app.listen(3000, () => {
