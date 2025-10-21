@@ -1,3 +1,4 @@
+// src/utils/auth.validators.js
 export const isEmail = (email) => typeof email === 'string' && email.includes('@') && email.length <= 254;
 
 export const isUsername = (username) =>
