@@ -1,6 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+
 import "./Profile.css";
 
 export default function Profile({ setTab }) {
@@ -18,9 +21,10 @@ export default function Profile({ setTab }) {
   return (
     <div className="profile-container">
       {/* 상단 로그아웃 버튼 */}
-      <button className="logout-btn" onClick={handleLogout}>
-        로그아웃
-      </button>
+      <span className="logout-btn" onClick={handleLogout}>
+        <FontAwesomeIcon icon={faArrowRightFromBracket} size="lg" />
+      </span>
+
 
       {/* 프로필 영역 */}
       <div className="profile-content">
