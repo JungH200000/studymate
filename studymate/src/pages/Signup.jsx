@@ -59,7 +59,7 @@ export default function Signup() {
         />
         <button type="submit">가입하기</button>
       </form>
-      <p onClick={() => navigate("/")} className="link">
+      <p onClick={() => navigate("/login")} className="link">
         로그인으로 돌아가기
       </p>
     </div>
