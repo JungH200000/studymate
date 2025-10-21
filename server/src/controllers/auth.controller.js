@@ -9,12 +9,13 @@ export const register = async (req, res) => {
   let { email, password, username } = req.body;
 
   if (!isEmail(email) || !isUsername(username) || !isPassword(password)) {
-    console.log('email 또는 username이 잘못 입력됨');
-    return res.status(400).json({ message: '잘못된 입력 형식입니다.' });
+    const err = new Error('잘못된 입력 형식입니다.');
+    err.status = 400;
+    throw err;
   }
 
   const user = await authService.register({ email, password, username });
 
   console.log('✅ Register Success');
-  return res.status(201).json({ message: '✅ Register Success', user });
+  return res.status(201).json({ ok: true, message: '✅ Register Success', user });
 };
