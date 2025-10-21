@@ -31,7 +31,7 @@ app.get('/connect', async (req, res) => {
 /* ===== 라우터 등록 ===== */
 app.use('/api/auth', authRoutes);
 
-/* ===== Error ===== */
+/* ===== 전역 Error ===== */
 app.use((error, req, res, next) => {
   const status = error?.status || 500;
   const message = status === 500 ? '서버에 오류가 발생했습니다.' : error.message || '요청을 처리할 수 없습니다.';
