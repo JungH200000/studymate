@@ -1,0 +1,32 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+.intro-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f6fa;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.intro-container h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.intro-container p {
+  font-size: 18px;
+}
