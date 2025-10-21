@@ -1,10 +1,7 @@
 // src/services/auth.service.js
 // 비지니스 로직
-import express from 'express';
 import bcrypt from 'bcrypt';
 import * as userRepo from '../db/user.repo.js';
-
-const app = express();
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {
