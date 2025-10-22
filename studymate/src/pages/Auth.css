@@ -46,3 +46,29 @@
   margin-top: 15px;
   text-decoration: underline;
 }
+
+/* 이모지 애니메이션 */
+.falling-emoji {
+  position: absolute;
+  top: -2em;
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 0;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(120vh);
+    opacity: 0.3;
+  }
+}

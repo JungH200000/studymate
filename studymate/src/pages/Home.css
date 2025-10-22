@@ -1,17 +1,19 @@
+/* 전체 컨테이너 */
 .home-container {
   display: flex;
   flex-direction: column;
+  width: 100vw;
   height: 100vh;
   background-color: #f5f6fa;
   position: relative;
-  width: 100vw;
-  height: 100vh;
 }
 
+/* 상단 헤더 */
 .home-header {
   width: 100%;
-  height: 70px;
+  height: 100px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: white;
@@ -20,38 +22,128 @@
   top: 0;
   left: 0;
   z-index: 10;
+  padding-top: 10px;
 }
 
+/* 새로고침 버튼 */
 .refresh-emoji {
   font-size: 30px;
   cursor: pointer;
 }
 
-.home-content {
-  flex: 1;
-  padding-top: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
+/* 작성탭 이동 버튼 */
 .challenge-question {
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 40px;
+  font-size: 16px;
+  color: #007bff;
+  margin-top: 8px;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .challenge-question:hover {
-  color: #007bff;
+  color: #0056b3;
+}
+
+/* 메인 콘텐츠 */
+.home-content {
+  flex: 1;
+  padding-top: 120px;
+  padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f6fa;
 }
 
 .post-list {
   width: 90%;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #f5f6fa;
+  padding-bottom: 16px;
 }
 
+/* 챌린지 카드 */
+.challenge-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 카드 상단: 프로필 + 이름 + 제목 */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 사용자 이름 */
+.card-username {
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* 제목 */
+/* 카드 제목 */
+.card-title {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+
+/* 프로필 아이콘 */
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+
+/* 카드 내용 */
+.card-content {
+  margin-top: 8px;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+/* 카드 정보: 빈도, 날짜 */
+.card-info {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #777;
+  display: flex;
+  gap: 12px;
+}
+
+/* 빈도별 색상 표시 */
+.frequency-daily {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.frequency-weekly {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+/* 하단 탭 안내 메시지 */
 .tab-message {
   text-align: center;
   color: #555;
