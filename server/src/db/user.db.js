@@ -1,4 +1,4 @@
-// src/db/user.repo.js
+// src/db/user.db.js
 // db 쿼리 처리
 import { query } from './pool.js';
 
