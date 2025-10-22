@@ -8,6 +8,7 @@ const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  //테스트용 로컬 db로 해서 아래 ssl 주석해둠
   //ssl: {rejectUnauthorized: false },
 });
 
