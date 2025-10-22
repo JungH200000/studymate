@@ -13,3 +13,25 @@ export async function createUser({ email, password_hash, username }) {
 
   return rows[0];
 }
+
+export async function searchUser(email) {
+  const sql = `
+    SELECT user_id, email, password_hash
+    FROM users
+    WHERE lower(email) = lower($1)
+    LIMIT 1`;
+  const params = [email];
+
+  const { rows } = await query(sql, params);
+
+  return rows[0];
+}
+
+export async function createJwt({ jti, user_id, tokenHash, expiresAt }) {
+  const sql = `
+    INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at)
+    VALUES ($1, $2, $3, $4)`;
+  const params = [jti, user_id, tokenHash, expiresAt];
+
+  await query(sql, params);
+}

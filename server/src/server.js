@@ -2,12 +2,20 @@
 // 서버 시작점
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
+import bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser()); // refresh 쿠키용
 app.use(cors({ origin: true, credentials: true }));
 // origin : 다른 출처(origin)에서 오는 요청을 서버가 허용할지 결정
 // credentials : req에 쿠키, 인증 헤더 등 자격 증명이 포함된 요청을 할 수 있도록 허용

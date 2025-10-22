@@ -1,7 +1,10 @@
 // src/services/auth.service.js
 // 비지니스 로직
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import * as authDB from '../db/auth.db.js';
+import { signAccess, signRefresh } from '../utils/jwt.js';
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {
@@ -27,6 +30,51 @@ export async function register({ email, password, username }) {
       err.status = 409;
       throw err;
     }
+    throw error;
+  }
+}
+
+/* ===== Login ===== */
+export async function login({ email, password }) {
+  const normalizedEmail = String(email).toLowerCase().trim();
+
+  try {
+    // 1) email db에 조회
+    const user = await authDB.searchUser(normalizedEmail);
+    if (!user) {
+      const err = new Error('Invalid credentials');
+      err.status = 409;
+      throw err;
+    }
+
+    // 2) password 비교
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) {
+      const err = new Error('Invalid credentials');
+      err.status = 409;
+      throw err;
+    }
+
+    // 3) JWT 발급
+    const jti = randomUUID();
+    const accessToken = signAccess({ user_id: user.user_id, email: user.email });
+    const refreshToken = signRefresh({ user_id: user.user_id, jti });
+
+    // 4) expiresAt(만료 시간) 계산
+    const decoded = jwt.decode(refreshToken); // 서명 검증 x, 디코딩만
+    //exp(만료 시간) -> 밀리초 단위로 변환
+    const expMs = decoded?.exp ? decoded.exp * 1000 : Date.now() + 7 * 24 * 60 * 60 * 1000;
+    const expiresAt = new Date(expMs);
+
+    // 5) refresh token hash
+    const tokenHash = await bcrypt.hash(refreshToken, 10);
+
+    // 6) refresh token db에 저장
+    authDB.createJwt({ jti, user_id: user.user_id, tokenHash, expiresAt });
+
+    return { user, accessToken, refreshToken, expMs };
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 }

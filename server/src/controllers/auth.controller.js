@@ -21,3 +21,35 @@ export const register = async (req, res) => {
   console.log('✅ Register Success');
   return res.status(201).json({ ok: true, message: '✅ Register Success', user });
 };
+
+/* ===== Login ===== */
+export const login = async (req, res) => {
+  // 1) request에서 email, password, username 꺼냄
+  const { email, password } = req.body;
+
+  // 2) email, password를 입력했는지 검증
+  if (!email || !password) {
+    const err = new Error('email이나 password를 입력하지 않았습니다.');
+    err.status = 400;
+    throw err;
+  }
+
+  // 3) email, password 검증 및 query 처리
+  const { user, accessToken, refreshToken, expMs } = await authService.login({ email, password });
+
+  // 4) cookie로 refresh token 전달 (매번 DB에 조회하지 않기 위해)
+  res.cookie('refresh_token', refreshToken, {
+    httpOnly: true, // js로 cookie 접근 불가
+    sameSite: 'lax', // 다른 사이트에서 해당 사이트로 HTTP 요청 방지
+    secure: false, // https만 허용
+    maxAge: Number(expMs) - Date.now(), // JWT 만료
+  });
+
+  // 5) 관련 정보(access token 포함) Frontend로 전송
+  return res.status(200).json({
+    ok: true,
+    message: '로그인에 성공했습니다.',
+    accessToken,
+    user: { id: user.user_id, email: user.email },
+  });
+};
