@@ -5,10 +5,12 @@ import * as userRepo from '../db/user.repo.js';
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {
+  // 1) 정규화
   const normalizedEmail = email.toLowerCase().trim();
   const normalizedUsername = username.trim();
   const password_hash = await bcrypt.hash(password, 10);
 
+  // 2) query 처리
   try {
     const user = await userRepo.createUser({ email: normalizedEmail, password_hash, username: normalizedUsername });
     return user;
