@@ -17,7 +17,7 @@ html, body, #root {
   width: 100vw;
   height: 100vh;
   background-color: #f5f6fa;
-  padding-bottom: 60px; /* BottomNav 높이 확보 */
+  padding-bottom: 60px;
 }
 
 /* 로그아웃 버튼 fixed */
@@ -42,7 +42,7 @@ html, body, #root {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 80px 24px 0 24px; /* 상단 80px */
+  padding: 80px 24px 0 24px;
 }
 
 /* 이름 */
@@ -53,12 +53,14 @@ html, body, #root {
   margin-top: 20px;
 }
 
-/* 프로필 이미지 */
-.profile-image {
-  width: 100px;
-  height: 100px;
+.profile-icon {
+  color: #555;
+  background-color: #f0f0f0;
+  border: 2px solid #888;
   border-radius: 50%;
-  border: 2px solid #ccc;
-  object-fit: cover;
-  margin-top: 10px;
+  padding: 10px;
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  display: inline-block;
 }

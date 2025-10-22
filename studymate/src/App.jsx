@@ -6,6 +6,7 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Write from "./pages/Write";
 import Profile from "./pages/Profile";
+import ChallengeDetail from "./pages/ChallengeDetail";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/write" element={<Write />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/challenge/:id" element={<ChallengeDetail />} />
       </Routes>
     </Router>
   );

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import bcrypt from "bcryptjs"; // bcrypt import
 import "./Auth.css";
 
 const emojis = ["✏️", "📚", "📝", "📖", "🖍️"];
@@ -27,29 +26,36 @@ export default function Signup() {
     setFallingEmojis(ems);
   }, []);
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (!username || !email || !password) {
       return alert("모든 항목을 입력하세요.");
     }
 
-    const salt = bcrypt.genSaltSync(10);
-    const password_hash = bcrypt.hashSync(password, salt);
+    try {
+      const res = await fetch("http://localhost:3000/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-    const userData = {
-      username: username,
-      email: email,
-      password_hash: password_hash,
-    };
+      const data = await res.json();
 
-    localStorage.setItem("user", JSON.stringify(userData));
-    alert("회원가입 완료!");
-    navigate("/home");
+      if (data.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        alert("회원가입 완료!");
+        navigate("/home");
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
   };
 
   return (
     <div className="auth-container">
-      {/* 이모지 애니메이션 */}
       {fallingEmojis.map((em) => (
         <span
           key={em.id}

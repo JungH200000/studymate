@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons"; // faUser 추가
 
 import "./Profile.css";
 
@@ -16,7 +16,18 @@ export default function Profile({ setTab }) {
     }
   };
 
-  const nickname = localStorage.getItem("user") || "닉네임";
+  // localStorage에서 user 정보 가져오기
+  const userData = localStorage.getItem("user");
+  let nickname = "닉네임";
+
+  if (userData) {
+    try {
+      const user = JSON.parse(userData);
+      nickname = user.username;
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <div className="profile-container">
@@ -25,13 +36,13 @@ export default function Profile({ setTab }) {
         <FontAwesomeIcon icon={faArrowRightFromBracket} size="lg" />
       </span>
 
-
       {/* 프로필 영역 */}
       <div className="profile-content">
         <span className="profile-name">{nickname}</span>
-        <img
-          src="https://via.placeholder.com/100"
-          className="profile-image"
+        <FontAwesomeIcon
+          icon={faUser}
+          size="6x"
+          className="profile-icon"
         />
       </div>
 

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-const emojis = ["✏️", "📚", "📝", "📖", "🖍️"]; // 원하는 이모지 배열
-const NUM_EMOJIS = 10; // 동시에 화면에 떨어지는 이모지 수
+const emojis = ["✏️", "📚", "📝", "📖", "🖍️"];
+const NUM_EMOJIS = 10;
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,21 +17,42 @@ export default function Login() {
       ems.push({
         id: i,
         emoji: emojis[Math.floor(Math.random() * emojis.length)],
-        left: Math.random() * 90 + "%", // 랜덤 가로 위치
-        duration: 5 + Math.random() * 5, // 5~10초 사이 속도
-        delay: Math.random() * 5, // 랜덤 딜레이
+        left: Math.random() * 90 + "%",
+        duration: 5 + Math.random() * 5,
+        delay: Math.random() * 5,
       });
     }
     setFallingEmojis(ems);
   }, []);
 
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      localStorage.setItem("user", email);
-      navigate("/home");
-    } else {
+
+    if (!email || !password) {
       alert("이메일과 비밀번호를 입력하세요");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        // 로그인 성공 시 사용자 정보 localStorage 저장
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/home");
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("로그인 중 오류가 발생했습니다.");
     }
   };
 
