@@ -1,7 +1,7 @@
 // src/services/auth.service.js
 // 비지니스 로직
 import bcrypt from 'bcrypt';
-import * as userRepo from '../db/user.repo.js';
+import * as userDB from '../db/user.db.js';
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {
@@ -12,7 +12,7 @@ export async function register({ email, password, username }) {
 
   // 2) query 처리
   try {
-    const user = await userRepo.createUser({ email: normalizedEmail, password_hash, username: normalizedUsername });
+    const user = await userDB.createUser({ email: normalizedEmail, password_hash, username: normalizedUsername });
     return user;
   } catch (error) {
     // 중복(unique) 오류 처리
