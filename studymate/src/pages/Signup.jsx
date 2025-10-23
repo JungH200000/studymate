@@ -33,7 +33,7 @@ export default function Signup() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/signup", {
+      const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
@@ -44,7 +44,7 @@ export default function Signup() {
       if (data.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
         alert("회원가입 완료!");
-        navigate("/home");
+        navigate("/login");
       } else {
         alert(data.error);
       }

@@ -8,7 +8,7 @@
   min-height: 100vh;
   background-color: #f5f6fa;
   position: relative;
-  padding-bottom: 80px; /* 하단탭 공간 확보 */
+  padding-bottom: 80px;
   box-sizing: border-box;
 }
 
@@ -36,7 +36,7 @@
 /* 내용 영역 */
 .detail-content {
   flex: 1;
-  margin-top: 80px; /* 헤더 높이만큼 */
+  margin-top: 80px;
   padding: 16px;
 }
 
@@ -56,4 +56,109 @@
 .detail-content span {
   font-size: 0.9rem;
   color: #777;
+}
+
+.icon-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.like-icon,
+.cheer-icon,
+.join-icon {
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.2s, color 0.2s;
+  margin-right: 5px;
+}
+
+.like-icon:hover,
+.cheer-icon:hover,
+.join-icon:hover {
+  transform: scale(1.2);
+}
+
+.like-icon.liked {
+  color: blue;
+}
+
+.cheer-icon.cheered {
+  color: orange;
+}
+
+.join-icon.joined {
+  color: green;
+}
+
+.like-count,
+.cheer-count,
+.join-count {
+  font-size: 14px;
+  color: #555;
+}
+
+/* 인증 글 폼 */
+.post-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post-form textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.post-form button {
+  align-self: flex-end;
+  padding: 6px 12px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.post-form button:hover {
+  background-color: #357ab7;
+}
+
+/* 인증 글 카드 */
+.posts-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-card {
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.post-user {
+  display: block;
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+.post-date {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
 }

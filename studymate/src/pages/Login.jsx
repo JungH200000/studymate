@@ -11,6 +11,7 @@ export default function Login() {
   const [fallingEmojis, setFallingEmojis] = useState([]);
   const navigate = useNavigate();
 
+  // 이모지 떨어지는 애니메이션
   useEffect(() => {
     const ems = [];
     for (let i = 0; i < NUM_EMOJIS; i++) {
@@ -25,7 +26,6 @@ export default function Login() {
     setFallingEmojis(ems);
   }, []);
 
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -35,24 +35,32 @@ export default function Login() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/login", {
+      const res = await fetch("http://127.0.0.1:3000/api/auth/login", {
+        // 🔹 백엔드 라우트에 맞게 수정됨
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // 쿠키 포함
         body: JSON.stringify({ email, password }),
       });
+
+      if (!res.ok) {
+        // HTTP 에러 응답 처리
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "로그인 실패");
+      }
 
       const data = await res.json();
 
       if (data.ok) {
-        // 로그인 성공 시 사용자 정보 localStorage 저장
+        // 로그인 성공 시 사용자 정보 저장
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/home");
       } else {
-        alert(data.error);
+        alert(data.message || "이메일 또는 비밀번호를 확인하세요");
       }
     } catch (err) {
-      console.error(err);
-      alert("로그인 중 오류가 발생했습니다.");
+      console.error("❌ 로그인 요청 실패:", err);
+      alert("로그인 중 오류가 발생했습니다. " + err.message);
     }
   };
 
@@ -76,7 +84,13 @@ export default function Login() {
       <h2>로그인</h2>
       <form
         onSubmit={handleLogin}
-        style={{ display: "flex", flexDirection: "column", alignItems: "center", zIndex: 1, position: "relative" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          zIndex: 1,
+          position: "relative",
+        }}
       >
         <input
           type="email"

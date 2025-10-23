@@ -8,8 +8,7 @@ const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  //테스트용 로컬 db로 해서 아래 ssl 주석해둠
-  //ssl: {rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false },
 });
 
 export const query = (text, params) => pool.query(text, params);
@@ -17,5 +16,3 @@ export const query = (text, params) => pool.query(text, params);
 // text: SQL 문 (`SELECT * FROM users WHERE id=$1`)
 // params: SQL에 들어갈 값 배열 (`[user_id]`)
 export default pool;
-console.log("📦 DATABASE_URL:", process.env.DATABASE_URL);
-

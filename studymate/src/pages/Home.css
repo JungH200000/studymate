@@ -143,13 +143,50 @@
   font-weight: bold;
 }
 
-.like-icon {
-  transition: transform 0.2s;
+.delete-icon {
+  color: red;        /* 아이콘 색상 */
+  cursor: pointer;   /* 마우스 커서 포인터 */
+  margin-left: auto; /* 오른쪽 끝으로 */
+  font-size: 18px;   /* 적당한 크기 */
 }
-.like-icon:hover {
+
+.delete-icon:hover {
   transform: scale(1.2);
 }
-.like-count {
+
+
+.like-icon,
+.cheer-icon,
+.join-icon {
+  transition: transform 0.2s, color 0.2s;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 15px; /* 기본 간격 */
+}
+
+.like-icon:hover,
+.cheer-icon:hover,
+.join-icon:hover {
+  transform: scale(1.2);
+}
+
+/* 상태별 색상 */
+.like-icon.liked {
+  color: blue;
+}
+
+.cheer-icon.cheered {
+  color: orange;
+}
+
+.join-icon.joined {
+  color: green;
+}
+
+/* 카운트 */
+.like-count,
+.cheer-count,
+.join-count {
   margin-left: 4px;
   font-size: 14px;
   color: #555;
