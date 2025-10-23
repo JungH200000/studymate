@@ -5,6 +5,9 @@ import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import * as authDB from '../db/auth.db.js';
 import { signAccess, signRefresh } from '../utils/jwt.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {
@@ -77,4 +80,77 @@ export async function login({ email, password }) {
     console.log(error);
     throw error;
   }
+}
+
+/* ===== Refresh ===== */
+export async function refresh({ refreshToken }) {
+  // 1) 서명/만료 검증
+  const { sub: user_id, jti } = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+  // 2) DB 세션 조회
+  const session = await authDB.findRefreshById(jti);
+  if (!session || session.user_id !== user_id) {
+    const error = new Error('세션을 찾을 수 없습니다.');
+    error.status = 401;
+    throw error;
+  }
+
+  // 3) 만료/폐기 여부 확인
+  if (session.revoked_at) {
+    const error = new Error('이미 만료된 세션입니다.');
+    error.status = 401;
+    throw error;
+  }
+  if (new Date(session.expires_at).getTime() <= Date.now()) {
+    await authDB.revokeRefreshById(session.id);
+
+    const error = new Error('세션이 만료되었습니다.');
+    error.status = 401;
+    throw error;
+  }
+
+  // 4) token hash 일치 확인
+  const same = await bcrypt.compare(refreshToken, session.token_hash);
+  if (!same) {
+    await authDB.revokeRefreshById(session.id);
+
+    const error = new Error('유효하지 않는 세션입니다.');
+    error.status = 401;
+    throw error;
+  }
+
+  // 5) JWT 발급
+  const user = await authDB.findUserById(session.user_id);
+  if (!user) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 401;
+    throw error;
+  }
+
+  const newJti = randomUUID();
+  const newAccessToken = signAccess({ sub: user.user_id, email: user.email });
+  const newRefreshToken = signRefresh({ sub: user.user_id, jti: newJti });
+
+  // 6) expiresAt(만료 시간) 계산
+  const newDecoded = jwt.decode(newRefreshToken);
+  const expMs = newDecoded?.exp ? newDecoded.exp * 1000 : Date.now() + 7 * 24 * 60 * 60 * 1000;
+  const expiresAt = new Date(expMs);
+
+  // 7) refresh token hash
+  const newTokenHash = await bcrypt.hash(newRefreshToken, 10);
+
+  // 8) db 저장 및 이전 세션 폐기
+  await authDB.createJwt({ jti: newJti, user_id: user.user_id, tokenHash: newTokenHash, expiresAt });
+  await authDB.revokeRefreshById(jti);
+
+  return { user, accessToken: newAccessToken, refreshToken: newRefreshToken, expMs };
+}
+
+/* ===== Logout ===== */
+export async function logout({ refreshToken }) {
+  try {
+    const { jti } = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    await authDB.revokeRefreshById(jti);
+  } catch (error) {}
+  return true;
 }
