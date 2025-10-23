@@ -14,7 +14,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser()); // refresh 쿠키용
-app.use(cors({ origin: 'http://127.0.0.1:5173', withCredentials: true }));
+app.use(cors({ origin: 'http://127.0.0.1:5173', credentials: 'include' }));
 // origin : 다른 출처(origin)에서 오는 요청을 서버가 허용할지 결정
 // credentials : req에 쿠키, 인증 헤더 등 자격 증명이 포함된 요청을 할 수 있도록 허용
 // 실제 기기 : http://127.0.0.1:5173 / AVD : http://10.0.2.2:5173 / PC : http://localhost:5173
