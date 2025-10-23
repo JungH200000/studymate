@@ -2,6 +2,7 @@
 // db 쿼리 처리
 import { query } from './pool.js';
 
+/* ===== Register ===== */
 export async function createUser({ email, password_hash, username }) {
   const sql = `
       INSERT INTO users (email, password_hash, username) 
@@ -14,6 +15,7 @@ export async function createUser({ email, password_hash, username }) {
   return rows[0];
 }
 
+/* ===== Login ===== */
 export async function findUserByEmail(email) {
   const sql = `
     SELECT user_id, email, password_hash, username
