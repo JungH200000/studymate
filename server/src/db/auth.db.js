@@ -14,7 +14,7 @@ export async function createUser({ email, password_hash, username }) {
   return rows[0];
 }
 
-export async function searchUser(email) {
+export async function findUserByEmail(email) {
   const sql = `
     SELECT user_id, email, password_hash, username
     FROM users

@@ -40,7 +40,7 @@ export async function login({ email, password }) {
 
   try {
     // 1) email db에 조회
-    const user = await authDB.searchUser(normalizedEmail);
+    const user = await authDB.findUserByEmail(normalizedEmail);
     if (!user) {
       const err = new Error('Invalid credentials');
       err.status = 401;
