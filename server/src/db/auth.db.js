@@ -16,7 +16,7 @@ export async function createUser({ email, password_hash, username }) {
 
 export async function searchUser(email) {
   const sql = `
-    SELECT user_id, email, password_hash
+    SELECT user_id, email, password_hash, username
     FROM users
     WHERE lower(email) = lower($1)
     LIMIT 1`;
