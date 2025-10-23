@@ -1,4 +1,4 @@
-// src/middleware/auth.middleware.js
+// src/middleware/requireAuth.js
 // 검증된 사용자인지 인증하는 미들웨어
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -44,5 +44,10 @@ export const requireAuth = async (req, res, next) => {
         message: 'Access Token이 만료되었습니다.',
       });
     }
+    return res.status(401).json({
+      ok: false,
+      code: 'AUTH_ERROR',
+      message: '인증에 실패했습니다.',
+    });
   }
 };
