@@ -43,7 +43,7 @@ export async function login({ email, password }) {
     const user = await authDB.searchUser(normalizedEmail);
     if (!user) {
       const err = new Error('Invalid credentials');
-      err.status = 409;
+      err.status = 401;
       throw err;
     }
 
@@ -51,14 +51,14 @@ export async function login({ email, password }) {
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) {
       const err = new Error('Invalid credentials');
-      err.status = 409;
+      err.status = 401;
       throw err;
     }
 
     // 3) JWT 발급
     const jti = randomUUID();
-    const accessToken = signAccess({ user_id: user.user_id, email: user.email });
-    const refreshToken = signRefresh({ user_id: user.user_id, jti });
+    const accessToken = signAccess({ sub: user.user_id, email: user.email });
+    const refreshToken = signRefresh({ sub: user.user_id, jti });
 
     // 4) expiresAt(만료 시간) 계산
     const decoded = jwt.decode(refreshToken); // 서명 검증 x, 디코딩만
@@ -70,7 +70,7 @@ export async function login({ email, password }) {
     const tokenHash = await bcrypt.hash(refreshToken, 10);
 
     // 6) refresh token db에 저장
-    authDB.createJwt({ jti, user_id: user.user_id, tokenHash, expiresAt });
+    await authDB.createJwt({ jti, user_id: user.user_id, tokenHash, expiresAt });
 
     return { user, accessToken, refreshToken, expMs };
   } catch (error) {
