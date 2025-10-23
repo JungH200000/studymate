@@ -1,10 +1,13 @@
 # Register
 
+- request
+  - 헤더: Content-Type: application/json
+
 ## 성공
 
 - request
 
-```json
+```http
 {
   "email": "jungjung@naver.com",
   "password": "1234",
