@@ -43,6 +43,7 @@ export const login = async (req, res) => {
     sameSite: 'lax', // 다른 사이트에서 해당 사이트로 HTTP 요청 방지 기능
     secure: false, // true -> https만 허용
     expires: new Date(expMs), // JWT 만료
+    path: '/api/auth',
   });
 
   // 5) 관련 정보(access token 포함) Frontend로 전송
@@ -72,6 +73,7 @@ export const refresh = async (req, res) => {
     sameSite: 'lax',
     secure: false,
     expires: new Date(expMs),
+    path: '/api/auth',
   });
 
   return res.status(200).json({
@@ -94,6 +96,7 @@ export const logout = async (req, res) => {
     httpOnly: true,
     sameSite: 'lax',
     secure: false,
+    path: '/api/auth',
   });
 
   return res.status(200).json({ ok: true, message: '로그아웃 되었습니다.' });
