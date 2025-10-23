@@ -5,9 +5,6 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
-import bcrypt from 'bcrypt';
-import { randomUUID } from 'crypto';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,9 +13,10 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser()); // refresh 쿠키용
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: 'http://127.0.0.1:5173', credentials: true }));
 // origin : 다른 출처(origin)에서 오는 요청을 서버가 허용할지 결정
 // credentials : req에 쿠키, 인증 헤더 등 자격 증명이 포함된 요청을 할 수 있도록 허용
+// 실제 기기 : http://127.0.0.1:5173 / AVD : http://10.0.2.2:5173 / PC : http://localhost:5173
 
 /* ===== DB 연결 확인 ===== */
 try {
@@ -29,9 +27,17 @@ try {
 }
 
 /* ===== 서버 연결 확인 ===== */
-app.get('/connect', async (req, res) => {
-  const result = await query('SELECT now()');
-  res.json({ ok: true, time: result.rows[0].now });
+app.get('/api/connect', async (req, res, next) => {
+  try {
+    const { rows } = await query('SELECT now()');
+    console.log('✅ Connected to DB:', rows[0].now);
+    res.status(200).json({ ok: true, time: rows[0].now });
+  } catch (error) {
+    console.error('❌ DB connection failed: ', error);
+    error.status = 500;
+    error.message = 'DB 연결에 실패했습니다.';
+    return next(error);
+  }
 });
 
 /* ===== api 동작 테스트 ===== */
