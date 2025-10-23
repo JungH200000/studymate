@@ -41,8 +41,8 @@ export const login = async (req, res) => {
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true, // js로 cookie 접근 불가
     sameSite: 'lax', // 다른 사이트에서 해당 사이트로 HTTP 요청 방지
-    secure: false, // https만 허용
-    maxAge: Number(expMs) - Date.now(), // JWT 만료
+    secure: false, // true -> https만 허용
+    expires: new Date(expMs), // JWT 만료
   });
 
   // 5) 관련 정보(access token 포함) Frontend로 전송
@@ -50,6 +50,6 @@ export const login = async (req, res) => {
     ok: true,
     message: '로그인에 성공했습니다.',
     accessToken,
-    user: { id: user.user_id, email: user.email },
+    user: { id: user.user_id, email: user.email, username: user.username },
   });
 };
