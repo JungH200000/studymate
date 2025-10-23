@@ -3,9 +3,10 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
-import dotenv from 'dotenv';
+import testRoutes from './routes/test.routes.js';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.get('/api/connect', async (req, res, next) => {
 
 /* ===== 라우터 등록 ===== */
 app.use('/api/auth', authRoutes);
+app.use('/api/test', testRoutes);
 
 /* ===== 전역 Error ===== */
 app.use((error, req, res, next) => {
