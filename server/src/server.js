@@ -7,12 +7,15 @@ import cookieParser from 'cookie-parser';
 import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
 import testRoutes from './routes/test.routes.js';
+import challengeRoutes from './routes/challenge.routes.js';
+import { requireAuth } from './middleware/requireAuth.js';
+import { validateCreateChallenges } from './middleware/challenge.validators.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser()); // refresh 쿠키용
-app.use(cors({ origin: 'http://127.0.0.1:5173', credentials: 'include' }));
+app.use(cors({ origin: 'http://127.0.0.1:5173', credentials: true }));
 // origin : 다른 출처(origin)에서 오는 요청을 서버가 허용할지 결정
 // credentials : req에 쿠키, 인증 헤더 등 자격 증명이 포함된 요청을 할 수 있도록 허용
 // 실제 기기 : http://127.0.0.1:5173 / AVD : http://10.0.2.2:5173 / PC : http://localhost:5173
@@ -43,6 +46,7 @@ app.get('/api/connect', async (req, res, next) => {
 
 /* ===== 라우터 등록 ===== */
 app.use('/api/auth', authRoutes);
+app.use('/api/challenges', challengeRoutes);
 app.use('/api/test', testRoutes);
 
 /* ===== 전역 Error ===== */
