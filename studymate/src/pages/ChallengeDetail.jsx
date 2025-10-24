@@ -1,6 +1,7 @@
 // src/pages/ChallengeDetail.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./ChallengeDetail.css";
 import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,16 +24,14 @@ export default function ChallengeDetail() {
 
   const handleCancel = () => navigate("/home");
 
-  // 챌린지 + 상태 초기화
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     if (storedUser.user_id) setUserId(storedUser.user_id);
 
     const fetchChallenge = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/challenges/${id}`);
-        if (!res.ok) return setChallenge(null);
-        const data = await res.json();
+        const res = await axios.get(`http://localhost:3000/api/challenges/${id}`);
+        const data = res.data;
         if (data.ok) setChallenge(data.challenge);
       } catch {
         setChallenge(null);
@@ -44,9 +43,10 @@ export default function ChallengeDetail() {
     const fetchLikes = async () => {
       if (!id) return;
       try {
-        const queryString = userId ? `?userId=${userId}` : "";
-        const res = await fetch(`http://localhost:3000/api/challenges/${id}/likes${queryString}`);
-        const data = await res.json();
+        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/likes`, {
+          params: { userId: userId || "" },
+        });
+        const data = res.data;
         if (data.ok) setLikes({ liked: data.liked, count: data.count });
       } catch {}
     };
@@ -54,9 +54,10 @@ export default function ChallengeDetail() {
     const fetchParticipants = async () => {
       if (!id) return;
       try {
-        const queryString = userId ? `?userId=${userId}` : "";
-        const res = await fetch(`http://localhost:3000/api/challenges/${id}/participants${queryString}`);
-        const data = await res.json();
+        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/participants`, {
+          params: { userId: userId || "" },
+        });
+        const data = res.data;
         if (data.ok) setParticipants({ joined: data.joined, count: data.count });
       } catch {}
     };
@@ -64,9 +65,10 @@ export default function ChallengeDetail() {
     const fetchCheers = async () => {
       if (!id) return;
       try {
-        const queryString = userId ? `?userId=${userId}` : "";
-        const res = await fetch(`http://localhost:3000/api/challenges/${id}/cheers${queryString}`);
-        const data = await res.json();
+        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/cheers`, {
+          params: { userId: userId || "" },
+        });
+        const data = res.data;
         if (data.ok) setCheers({ cheered: data.cheered, count: data.count });
       } catch {}
     };
@@ -74,8 +76,8 @@ export default function ChallengeDetail() {
     const fetchPosts = async () => {
       if (!id) return;
       try {
-        const res = await fetch(`http://localhost:3000/api/challenges/${id}/posts`);
-        const data = await res.json();
+        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/posts`);
+        const data = res.data;
         if (data.ok) setPosts(data.posts);
       } catch {}
     };
@@ -87,61 +89,50 @@ export default function ChallengeDetail() {
     fetchPosts();
   }, [id, userId]);
 
-  // 좋아요 토글
   const toggleLike = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
     try {
-      const res = await fetch(`http://localhost:3000/api/challenges/${id}/like`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
+      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/like`, {
+        userId,
       });
-      const data = await res.json();
+      const data = res.data;
       if (data.ok) setLikes({ liked: data.liked, count: data.count });
     } catch {}
   };
 
-  // 참가 토글
   const toggleParticipation = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
     try {
-      const res = await fetch(`http://localhost:3000/api/challenges/${id}/participants`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
+      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/participants`, {
+        userId,
       });
-      const data = await res.json();
+      const data = res.data;
       if (data.ok) setParticipants({ joined: data.joined, count: data.count });
     } catch {}
   };
 
-  // 응원 토글
   const toggleCheer = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
     try {
-      const res = await fetch(`http://localhost:3000/api/challenges/${id}/cheers`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
+      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/cheers`, {
+        userId,
       });
-      const data = await res.json();
+      const data = res.data;
       if (data.ok) setCheers({ cheered: data.cheered, count: data.count });
     } catch {}
   };
 
-  // 인증 글 작성
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (!userId) return alert("로그인이 필요합니다.");
     if (!newPost.trim()) return alert("내용을 입력해주세요.");
 
     try {
-      const res = await fetch(`http://localhost:3000/api/challenges/${id}/posts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, content: { text: newPost } }),
+      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/posts`, {
+        userId,
+        content: { text: newPost },
       });
-      const data = await res.json();
+      const data = res.data;
       if (data.ok) {
         setPosts((prev) => [data.post, ...prev]);
         setNewPost("");
@@ -171,7 +162,6 @@ export default function ChallengeDetail() {
         <p>기간: {challenge.start_date}{challenge.end_date ? ` ~ ${challenge.end_date}` : ""}</p>
 
         <div className="icon-section">
-          {/* 좋아요 */}
           <div className="icon-wrapper">
             <FontAwesomeIcon
               icon={likes.liked ? solidThumb : regularThumb}
@@ -181,7 +171,6 @@ export default function ChallengeDetail() {
             <span className="like-count">{likes.count}</span>
           </div>
 
-          {/* 응원 */}
           <div className="icon-wrapper">
             <FontAwesomeIcon
               icon={faHandsClapping}
@@ -191,7 +180,6 @@ export default function ChallengeDetail() {
             <span className="cheer-count">{cheers.count}</span>
           </div>
 
-          {/* 참가 */}
           <div className="icon-wrapper">
             <FontAwesomeIcon
               icon={participants.joined ? faUserCheck : faUserPlus}
@@ -202,7 +190,6 @@ export default function ChallengeDetail() {
           </div>
         </div>
 
-        {/* 인증 글 작성 폼 */}
         {participants.joined && (
           <form className="post-form" onSubmit={handlePostSubmit}>
             <textarea
@@ -214,7 +201,6 @@ export default function ChallengeDetail() {
           </form>
         )}
 
-        {/* 인증 글 목록 */}
         <div className="posts-list">
           {posts.length === 0 && <p>아직 인증 글이 없습니다.</p>}
           {posts.map((post) => (

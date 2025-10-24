@@ -156,7 +156,6 @@
 
 
 .like-icon,
-.cheer-icon,
 .join-icon {
   transition: transform 0.2s, color 0.2s;
   cursor: pointer;
@@ -165,7 +164,6 @@
 }
 
 .like-icon:hover,
-.cheer-icon:hover,
 .join-icon:hover {
   transform: scale(1.2);
 }
@@ -175,17 +173,12 @@
   color: blue;
 }
 
-.cheer-icon.cheered {
-  color: orange;
-}
-
 .join-icon.joined {
   color: green;
 }
 
 /* 카운트 */
 .like-count,
-.cheer-count,
 .join-count {
   margin-left: 4px;
   font-size: 14px;

@@ -1,6 +1,7 @@
 // src/pages/Home.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -13,6 +14,8 @@ import {
 import { faThumbsUp as regularThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import "./Home.css";
 
+const API_BASE = "http://127.0.0.1:3000/api";
+
 export default function Home() {
   const [tab, setTab] = useState("home");
   const [challenges, setChallenges] = useState([]);
@@ -23,20 +26,23 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // read stored user once on mount
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     if (storedUser.user_id) setUserId(storedUser.user_id);
 
+    // fetch challenges regardless of auth state (shows public list)
     const fetchChallenges = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/challenges");
-        if (!res.ok) return console.error("서버 오류:", res.status);
-
-        const data = await res.json();
-        if (data.ok) {
-          setChallenges(data.challenges);
-          fetchLikesStatus(data.challenges, storedUser.user_id);
-          fetchParticipants(data.challenges, storedUser.user_id);
-          fetchCheers(data.challenges, storedUser.user_id);
+        const res = await axios.get(`${API_BASE}/challenges`, { withCredentials: true });
+        if (res.data && res.data.ok) {
+          const list = Array.isArray(res.data.challenges) ? res.data.challenges : [];
+          setChallenges(list);
+          // fetch extra statuses; pass storedUser.user_id (may be undefined)
+          fetchLikesStatus(list, storedUser.user_id);
+          fetchParticipants(list, storedUser.user_id);
+          fetchCheers(list, storedUser.user_id);
+        } else {
+          console.error("챌린지 응답 형식 오류:", res.data);
         }
       } catch (err) {
         console.error("챌린지 가져오기 실패:", err);
@@ -45,60 +51,66 @@ export default function Home() {
     fetchChallenges();
   }, []);
 
-  const fetchLikesStatus = async (challenges, userId) => {
+  const fetchLikesStatus = async (challengesList, uid) => {
     const likesData = {};
-    for (const c of challenges) {
-      try {
-        const res = await fetch(
-          `http://localhost:3000/api/challenges/${c.challenge_id}/likes?userId=${userId || ""}`
-        );
-        const data = await res.json();
-        likesData[c.challenge_id] = {
-          liked: data.ok ? data.liked : false,
-          count: data.ok ? data.count : 0,
-        };
-      } catch {
-        likesData[c.challenge_id] = { liked: false, count: 0 };
-      }
-    }
+    await Promise.all(
+      challengesList.map(async (c) => {
+        try {
+          const res = await axios.get(`${API_BASE}/challenges/${c.challenge_id}/likes`, {
+            params: { userId: uid || "" },
+            withCredentials: true,
+          });
+          likesData[c.challenge_id] = {
+            liked: res.data?.ok ? !!res.data.liked : false,
+            count: res.data?.ok ? Number(res.data.count || 0) : 0,
+          };
+        } catch (e) {
+          likesData[c.challenge_id] = { liked: false, count: 0 };
+        }
+      })
+    );
     setLikes(likesData);
   };
 
-  const fetchCheers = async (challenges, userId) => {
+  const fetchCheers = async (challengesList, uid) => {
     const cheerData = {};
-    for (const c of challenges) {
-      try {
-        const res = await fetch(
-          `http://localhost:3000/api/challenges/${c.challenge_id}/cheers?userId=${userId || ""}`
-        );
-        const data = await res.json();
-        cheerData[c.challenge_id] = {
-          cheered: data.ok ? data.cheered : false,
-          count: data.ok ? data.count : 0,
-        };
-      } catch {
-        cheerData[c.challenge_id] = { cheered: false, count: 0 };
-      }
-    }
+    await Promise.all(
+      challengesList.map(async (c) => {
+        try {
+          const res = await axios.get(`${API_BASE}/challenges/${c.challenge_id}/cheers`, {
+            params: { userId: uid || "" },
+            withCredentials: true,
+          });
+          cheerData[c.challenge_id] = {
+            cheered: res.data?.ok ? !!res.data.cheered : false,
+            count: res.data?.ok ? Number(res.data.count || 0) : 0,
+          };
+        } catch {
+          cheerData[c.challenge_id] = { cheered: false, count: 0 };
+        }
+      })
+    );
     setCheers(cheerData);
   };
 
-  const fetchParticipants = async (challenges, userId) => {
+  const fetchParticipants = async (challengesList, uid) => {
     const partData = {};
-    for (const c of challenges) {
-      try {
-        const res = await fetch(
-          `http://localhost:3000/api/challenges/${c.challenge_id}/participants?userId=${userId || ""}`
-        );
-        const data = await res.json();
-        partData[c.challenge_id] = {
-          joined: data.ok ? data.joined : false,
-          count: data.ok ? data.count : 0,
-        };
-      } catch {
-        partData[c.challenge_id] = { joined: false, count: 0 };
-      }
-    }
+    await Promise.all(
+      challengesList.map(async (c) => {
+        try {
+          const res = await axios.get(`${API_BASE}/challenges/${c.challenge_id}/participants`, {
+            params: { userId: uid || "" },
+            withCredentials: true,
+          });
+          partData[c.challenge_id] = {
+            joined: res.data?.ok ? !!res.data.joined : false,
+            count: res.data?.ok ? Number(res.data.count || 0) : 0,
+          };
+        } catch {
+          partData[c.challenge_id] = { joined: false, count: 0 };
+        }
+      })
+    );
     setParticipants(partData);
   };
 
@@ -109,25 +121,23 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/challenges/${challengeId}/like`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId }),
-        }
+      const res = await axios.post(
+        `${API_BASE}/challenges/${challengeId}/like`,
+        { userId },
+        { withCredentials: true }
       );
-      const data = await res.json();
-      if (data.ok) {
+      if (res.data?.ok) {
         setLikes((prev) => ({
           ...prev,
           [challengeId]: {
-            liked: data.liked,
-            count: data.liked
-              ? prev[challengeId].count + 1
-              : prev[challengeId].count - 1,
+            liked: !!res.data.liked,
+            count: res.data.liked
+              ? (prev[challengeId]?.count ?? 0) + 1
+              : Math.max(0, (prev[challengeId]?.count ?? 0) - 1),
           },
         }));
+      } else {
+        console.warn("좋아요 응답 오류:", res.data);
       }
     } catch (err) {
       console.error("좋아요 처리 실패:", err);
@@ -139,25 +149,23 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/challenges/${challengeId}/participants`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId }),
-        }
+      const res = await axios.post(
+        `${API_BASE}/challenges/${challengeId}/participants`,
+        { userId },
+        { withCredentials: true }
       );
-      const data = await res.json();
-      if (data.ok) {
+      if (res.data?.ok) {
         setParticipants((prev) => ({
           ...prev,
           [challengeId]: {
-            joined: data.joined,
-            count: data.joined
-              ? prev[challengeId].count + 1
-              : prev[challengeId].count - 1,
+            joined: !!res.data.joined,
+            count: res.data.joined
+              ? (prev[challengeId]?.count ?? 0) + 1
+              : Math.max(0, (prev[challengeId]?.count ?? 0) - 1),
           },
         }));
+      } else {
+        console.warn("참가 응답 오류:", res.data);
       }
     } catch (err) {
       console.error("참가 처리 실패:", err);
@@ -169,71 +177,57 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/challenges/${challengeId}/cheers`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId }),
-        }
+      const res = await axios.post(
+        `${API_BASE}/challenges/${challengeId}/cheers`,
+        { userId },
+        { withCredentials: true }
       );
-      const data = await res.json();
-      if (data.ok) {
+      if (res.data?.ok) {
         setCheers((prev) => ({
           ...prev,
           [challengeId]: {
-            cheered: data.cheered,
-            count: data.cheered
-              ? prev[challengeId].count + 1
-              : prev[challengeId].count - 1,
+            cheered: !!res.data.cheered,
+            count: res.data.cheered
+              ? (prev[challengeId]?.count ?? 0) + 1
+              : Math.max(0, (prev[challengeId]?.count ?? 0) - 1),
           },
         }));
+      } else {
+        console.warn("응원 응답 오류:", res.data);
       }
     } catch (err) {
       console.error("응원 처리 실패:", err);
     }
   };
 
-const handleDelete = async (challengeId, e) => {
-  e.stopPropagation();
-  if (!window.confirm("정말 이 글을 삭제하시겠습니까?")) return;
+  const handleDelete = async (challengeId, e) => {
+    e.stopPropagation();
+    if (!window.confirm("정말 이 글을 삭제하시겠습니까?")) return;
+    if (!userId) return alert("로그인이 필요합니다.");
 
-  if (!userId) return alert("로그인이 필요합니다.");
-
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/challenges/${challengeId}?userId=${userId}`,
-      {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    let data;
     try {
-      data = await res.json();
-    } catch {
-      data = { ok: false, message: "서버에서 올바른 JSON을 반환하지 않음" };
-    }
-    console.log("Parsed JSON:", data);
+      const res = await axios.delete(`${API_BASE}/challenges/${challengeId}`, {
+        params: { userId },
+        withCredentials: true,
+      });
 
-    if (data.ok) {
-      setChallenges(prev => prev.filter(c => c.challenge_id !== challengeId));
-      const { [challengeId]: _, ...restLikes } = likes;
-      setLikes(restLikes);
-      const { [challengeId]: __, ...restCheers } = cheers;
-      setCheers(restCheers);
-      const { [challengeId]: ___, ...restParticipants } = participants;
-      setParticipants(restParticipants);
-    } else {
-      alert("삭제 실패: " + (data.message || "알 수 없는 오류"));
+      const data = res.data || { ok: false, message: "서버에서 올바른 JSON을 반환하지 않음" };
+      if (data.ok) {
+        setChallenges((prev) => prev.filter((c) => c.challenge_id !== challengeId));
+        const { [challengeId]: _, ...restLikes } = likes;
+        setLikes(restLikes);
+        const { [challengeId]: __, ...restCheers } = cheers;
+        setCheers(restCheers);
+        const { [challengeId]: ___, ...restParticipants } = participants;
+        setParticipants(restParticipants);
+      } else {
+        alert("삭제 실패: " + (data.message || "알 수 없는 오류"));
+      }
+    } catch (err) {
+      console.error("삭제 처리 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
     }
-  } catch (err) {
-    console.error("삭제 처리 실패:", err);
-    alert("삭제 중 오류가 발생했습니다.");
-  }
-};
-
+  };
 
   return (
     <div className="home-container">

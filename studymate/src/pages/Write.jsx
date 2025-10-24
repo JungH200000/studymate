@@ -22,28 +22,35 @@ export default function Write() {
       return alert("주간 빈도를 1회 이상으로 입력하세요.");
     if (!startDate) return alert("시작일을 입력하세요.");
 
-    const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    if (!userData.user_id) return alert("로그인이 필요합니다.");
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) return alert("로그인이 필요합니다.");
 
     const payload = {
       title,
       content,
-      frequencyType,
-      targetPerWeek: frequencyType === "weekly" ? targetPerWeek : null,
-      startDate,
-      endDate: endDate || null,
-      creatorId: userData.user_id,
+      frequency_type: frequencyType,
+      target_per_week: frequencyType === "weekly" ? targetPerWeek : null,
+      start_date: startDate,
+      end_date: endDate || null,
     };
 
     try {
-      const res = await axios.post("http://localhost:3000/api/challenges", payload);
+      const res = await axios.post("http://localhost:3000/api/challenges", payload, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      });
+
       if (res.data.ok) {
         alert("챌린지 등록 완료!");
         navigate("/home");
+      } else {
+        alert(res.data.message || "챌린지 등록 실패");
       }
     } catch (err) {
-      console.error(err);
-      alert("챌린지 등록 실패");
+      console.error("등록 오류:", err);
+      alert(err.response?.data?.message || "챌린지 등록 중 오류가 발생했습니다.");
     }
   };
 

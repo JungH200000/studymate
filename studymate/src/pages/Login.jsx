@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Auth.css";
 
 const emojis = ["✏️", "📚", "📝", "📖", "🖍️"];
@@ -35,25 +36,23 @@ export default function Login() {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:3000/api/auth/login", {
-        // 🔹 백엔드 라우트에 맞게 수정됨
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // 쿠키 포함
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await axios.post(
+        "http://127.0.0.1:3000/api/auth/login",
+        { email, password },
+        { withCredentials: true }
+      );
 
-      if (!res.ok) {
-        // HTTP 에러 응답 처리
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "로그인 실패");
-      }
-
-      const data = await res.json();
+      const data = res.data;
 
       if (data.ok) {
-        // 로그인 성공 시 사용자 정보 저장
-        localStorage.setItem("user", JSON.stringify(data.user));
+        console.log("✅ 저장할 유저 정보:", data.user);
+        localStorage.setItem("user", JSON.stringify({
+          user_id: data.user.id,
+          email: data.user.email,
+          username: data.user.username,
+        }));
+        localStorage.setItem("accessToken", data.accessToken); // 선택
+
         navigate("/home");
       } else {
         alert(data.message || "이메일 또는 비밀번호를 확인하세요");
@@ -106,7 +105,7 @@ export default function Login() {
         />
         <button type="submit">로그인</button>
       </form>
-      <p onClick={() => navigate("/signup")} className="link">
+      <p onClick={() => navigate("/register")} className="link">
         회원가입하기
       </p>
     </div>

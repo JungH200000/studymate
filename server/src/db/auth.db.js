@@ -1,5 +1,5 @@
 // src/db/auth.db.js
-// db 쿼리 처리
+// db query 처리
 import { query } from './pool.js';
 
 export async function createUser({ email, password_hash, username }) {
