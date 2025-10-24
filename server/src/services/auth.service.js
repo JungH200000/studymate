@@ -5,9 +5,6 @@ import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import * as authDB from '../db/auth.db.js';
 import { signAccess, signRefresh } from '../utils/jwt.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {

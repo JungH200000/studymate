@@ -1,14 +1,12 @@
 // src/server.js
 // 서버 시작점
+import './env.js';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
 import testRoutes from './routes/test.routes.js';
-
-dotenv.config();
 
 const app = express();
 

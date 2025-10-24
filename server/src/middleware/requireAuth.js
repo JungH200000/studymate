@@ -1,9 +1,6 @@
 // src/middleware/requireAuth.js
 // 검증된 사용자인지 인증하는 미들웨어
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export const requireAuth = async (req, res, next) => {
   const auth = req.headers.authorization;

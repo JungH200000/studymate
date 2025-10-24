@@ -1,9 +1,6 @@
 // src/utils/jwt.js
 // JWT token 생성 함수
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-
-dotenv.config();
 
 export const signAccess = ({ sub, email }) => {
   const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
