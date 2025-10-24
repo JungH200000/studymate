@@ -8,26 +8,35 @@ dotenv.config();
 export const requireAuth = async (req, res, next) => {
   const auth = req.headers.authorization;
   if (!auth) {
-    const error = new Error('Authorization 헤더가 없습니다.');
-    error.status = 401;
-    throw error;
+    return res.status(401).json({
+      ok: false,
+      message: 'Authorization 헤더가 없습니다.',
+    });
   }
 
-  // Bearer로 시작 -> startsWith가 true 반환
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  const [type, token] = auth.split(' ');
   if (!token) {
-    const error = new Error('Access Token이 없습니다.');
-    error.status = 401;
-    throw error;
+    return res.status(401).json({
+      ok: false,
+      message: 'Access Token이 없습니다.',
+    });
   }
 
   try {
     // Access Token 검증
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    if (!decoded?.sub || !decoded?.email) {
+      return res.status(401).json({
+        ok: false,
+        code: 'INVALID_TOKEN',
+        message: '유효하지 않은 토큰입니다.',
+      });
+    }
+
     // payload(토큰에 담긴 실제 데이터 부분)-> 여기서는 decoded를 말함: { sub(user_id), email }
     req.user = { id: decoded.sub, email: decoded.email };
 
-    next();
+    return next();
   } catch (error) {
     // console.log('requireAuth Error!', error.name, error.code, error.message);
     if (error.name === 'JsonWebTokenError') {
