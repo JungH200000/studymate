@@ -1,5 +1,5 @@
 // src/server.js
-// 서버 시작점
+// 서버 시작
 import './env.js';
 import express from 'express';
 import cors from 'cors';

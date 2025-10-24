@@ -1,5 +1,5 @@
 // src/middleware/requireAuth.js
-// 검증된 사용자인지 인증하는 미들웨어
+// 검증된 사용자 인증 미들웨어
 import jwt from 'jsonwebtoken';
 
 export const requireAuth = async (req, res, next) => {

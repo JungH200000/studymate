@@ -14,7 +14,6 @@ export const signAccess = ({ sub, email }) => {
 export const signRefresh = ({ sub, jti }) => {
   const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
   const REFRESH_EXPIRES = process.env.REFRESH_TOKEN_EXPIRES_IN;
-
   const refreshToken = jwt.sign({ sub, jti }, REFRESH_SECRET, { expiresIn: REFRESH_EXPIRES });
 
   return refreshToken;
