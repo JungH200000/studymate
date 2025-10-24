@@ -11,8 +11,8 @@ export const requireAuth = async (req, res, next) => {
     });
   }
 
-  const [type, token] = auth.split(' ');
-  if (!token) {
+  const [scheme, token] = auth.split(' ');
+  if (scheme.toLowerCase() !== 'bearer' || !token) {
     return res.status(401).json({
       ok: false,
       message: 'Access Token이 없습니다.',
