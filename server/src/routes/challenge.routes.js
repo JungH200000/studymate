@@ -10,5 +10,6 @@ import * as challengeController from '../controllers/challenge.controller.js';
 const router = express.Router();
 
 router.post('/', requireAuth, validateCreateChallenges, asyncHandler(challengeController.createChallenge));
+router.get('/', requireAuth, asyncHandler(challengeController.getChallenges));
 
 export default router;
