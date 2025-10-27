@@ -45,13 +45,12 @@ export default function Login() {
       const data = res.data;
 
       if (data.ok) {
-        console.log("✅ 저장할 유저 정보:", data.user);
         localStorage.setItem("user", JSON.stringify({
           user_id: data.user.id,
           email: data.user.email,
           username: data.user.username,
         }));
-        localStorage.setItem("accessToken", data.accessToken); // 선택
+        localStorage.setItem("accessToken", data.accessToken);
 
         navigate("/home");
       } else {

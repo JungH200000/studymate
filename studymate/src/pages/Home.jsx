@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { fetchWithAuth } from "../api/auth";
 import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -26,21 +27,18 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // read stored user once on mount
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     if (storedUser.user_id) setUserId(storedUser.user_id);
 
-    // fetch challenges regardless of auth state (shows public list)
-    const fetchChallenges = async () => {
+    const loadChallenges = async () => {
       try {
         const res = await axios.get(`${API_BASE}/challenges`, { withCredentials: true });
         if (res.data && res.data.ok) {
           const list = Array.isArray(res.data.challenges) ? res.data.challenges : [];
           setChallenges(list);
-          // fetch extra statuses; pass storedUser.user_id (may be undefined)
-          fetchLikesStatus(list, storedUser.user_id);
-          fetchParticipants(list, storedUser.user_id);
-          fetchCheers(list, storedUser.user_id);
+          loadLikesStatus(list, storedUser.user_id);
+          loadParticipantsStatus(list, storedUser.user_id);
+          loadCheersStatus(list, storedUser.user_id);
         } else {
           console.error("챌린지 응답 형식 오류:", res.data);
         }
@@ -48,10 +46,10 @@ export default function Home() {
         console.error("챌린지 가져오기 실패:", err);
       }
     };
-    fetchChallenges();
+    loadChallenges();
   }, []);
 
-  const fetchLikesStatus = async (challengesList, uid) => {
+  const loadLikesStatus = async (challengesList, uid) => {
     const likesData = {};
     await Promise.all(
       challengesList.map(async (c) => {
@@ -72,7 +70,7 @@ export default function Home() {
     setLikes(likesData);
   };
 
-  const fetchCheers = async (challengesList, uid) => {
+  const loadCheersStatus = async (challengesList, uid) => {
     const cheerData = {};
     await Promise.all(
       challengesList.map(async (c) => {
@@ -93,7 +91,7 @@ export default function Home() {
     setCheers(cheerData);
   };
 
-  const fetchParticipants = async (challengesList, uid) => {
+  const loadParticipantsStatus = async (challengesList, uid) => {
     const partData = {};
     await Promise.all(
       challengesList.map(async (c) => {
@@ -121,23 +119,23 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await axios.post(
-        `${API_BASE}/challenges/${challengeId}/like`,
-        { userId },
-        { withCredentials: true }
-      );
-      if (res.data?.ok) {
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/like`, {
+        method: "POST",
+        body: { userId },
+      });
+
+      if (res?.ok) {
         setLikes((prev) => ({
           ...prev,
           [challengeId]: {
-            liked: !!res.data.liked,
-            count: res.data.liked
+            liked: !!res.liked,
+            count: res.liked
               ? (prev[challengeId]?.count ?? 0) + 1
               : Math.max(0, (prev[challengeId]?.count ?? 0) - 1),
           },
         }));
       } else {
-        console.warn("좋아요 응답 오류:", res.data);
+        console.warn("좋아요 응답 오류:", res);
       }
     } catch (err) {
       console.error("좋아요 처리 실패:", err);
@@ -149,23 +147,23 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await axios.post(
-        `${API_BASE}/challenges/${challengeId}/participants`,
-        { userId },
-        { withCredentials: true }
-      );
-      if (res.data?.ok) {
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+        method: "POST",
+        body: { userId },
+      });
+
+      if (res?.ok) {
         setParticipants((prev) => ({
           ...prev,
           [challengeId]: {
-            joined: !!res.data.joined,
-            count: res.data.joined
+            joined: !!res.joined,
+            count: res.joined
               ? (prev[challengeId]?.count ?? 0) + 1
               : Math.max(0, (prev[challengeId]?.count ?? 0) - 1),
           },
         }));
       } else {
-        console.warn("참가 응답 오류:", res.data);
+        console.warn("참가 응답 오류:", res);
       }
     } catch (err) {
       console.error("참가 처리 실패:", err);
@@ -177,23 +175,23 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await axios.post(
-        `${API_BASE}/challenges/${challengeId}/cheers`,
-        { userId },
-        { withCredentials: true }
-      );
-      if (res.data?.ok) {
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/cheers`, {
+        method: "POST",
+        body: { userId },
+      });
+
+      if (res?.ok) {
         setCheers((prev) => ({
           ...prev,
           [challengeId]: {
-            cheered: !!res.data.cheered,
-            count: res.data.cheered
+            cheered: !!res.cheered,
+            count: res.cheered
               ? (prev[challengeId]?.count ?? 0) + 1
               : Math.max(0, (prev[challengeId]?.count ?? 0) - 1),
           },
         }));
       } else {
-        console.warn("응원 응답 오류:", res.data);
+        console.warn("응원 응답 오류:", res);
       }
     } catch (err) {
       console.error("응원 처리 실패:", err);
@@ -206,13 +204,12 @@ export default function Home() {
     if (!userId) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await axios.delete(`${API_BASE}/challenges/${challengeId}`, {
-        params: { userId },
-        withCredentials: true,
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}`, {
+        method: "DELETE",
+        body: { userId },
       });
 
-      const data = res.data || { ok: false, message: "서버에서 올바른 JSON을 반환하지 않음" };
-      if (data.ok) {
+      if (res?.ok) {
         setChallenges((prev) => prev.filter((c) => c.challenge_id !== challengeId));
         const { [challengeId]: _, ...restLikes } = likes;
         setLikes(restLikes);
@@ -221,7 +218,7 @@ export default function Home() {
         const { [challengeId]: ___, ...restParticipants } = participants;
         setParticipants(restParticipants);
       } else {
-        alert("삭제 실패: " + (data.message || "알 수 없는 오류"));
+        alert("삭제 실패: " + (res?.message || "알 수 없는 오류"));
       }
     } catch (err) {
       console.error("삭제 처리 실패:", err);

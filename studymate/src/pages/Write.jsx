@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Write.css";
+import { fetchWithAuth } from "../api/auth";
+
 
 export default function Write() {
   const navigate = useNavigate();
@@ -22,9 +24,6 @@ export default function Write() {
       return alert("주간 빈도를 1회 이상으로 입력하세요.");
     if (!startDate) return alert("시작일을 입력하세요.");
 
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) return alert("로그인이 필요합니다.");
-
     const payload = {
       title,
       content,
@@ -35,24 +34,23 @@ export default function Write() {
     };
 
     try {
-      const res = await axios.post("http://localhost:3000/api/challenges", payload, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
+      const res = await fetchWithAuth("http://localhost:3000/api/challenges", {
+        method: "POST",
+        body: payload,
       });
 
-      if (res.data.ok) {
+      if (res?.ok) {
         alert("챌린지 등록 완료!");
         navigate("/home");
       } else {
-        alert(res.data.message || "챌린지 등록 실패");
+        alert(res?.message || "챌린지 등록 실패");
       }
     } catch (err) {
       console.error("등록 오류:", err);
-      alert(err.response?.data?.message || "챌린지 등록 중 오류가 발생했습니다.");
+      alert("챌린지 등록 중 오류가 발생했습니다.");
     }
   };
+
 
   return (
     <div className="write-container">
