@@ -5,9 +5,6 @@ import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import * as authDB from '../db/auth.db.js';
 import { signAccess, signRefresh } from '../utils/jwt.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 /* ===== Register ===== */
 export async function register({ email, password, username }) {
@@ -63,7 +60,7 @@ export async function login({ email, password }) {
     const accessToken = signAccess({ sub: user.user_id, email: user.email });
     const refreshToken = signRefresh({ sub: user.user_id, jti });
 
-    // 4) expiresAt(만료 시간) 계산
+    // 4) expiresAt (만료 시간) 계산
     const decoded = jwt.decode(refreshToken); // 서명 검증 x, 디코딩만
     //exp(만료 시간) -> 밀리초 단위로 변환
     const expMs = decoded?.exp ? decoded.exp * 1000 : Date.now() + 7 * 24 * 60 * 60 * 1000;

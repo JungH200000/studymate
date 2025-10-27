@@ -2,7 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Intro from "./pages/Intro";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import Signup from "./pages/Register";
+import RequireAuth from "./components/RequireAuth";
 import Home from "./pages/Home";
 import Write from "./pages/Write";
 import Profile from "./pages/Profile";
@@ -14,11 +15,39 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Intro />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/write" element={<Write />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/challenge/:id" element={<ChallengeDetail />} />
+        <Route path="/register" element={<Signup />} />
+        <Route
+          path="/home"
+          element={
+            <RequireAuth>
+              <Home />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/write"
+          element={
+            <RequireAuth>
+              <Write />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/challenge/:id"
+          element={
+            <RequireAuth>
+              <ChallengeDetail />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </Router>
   );

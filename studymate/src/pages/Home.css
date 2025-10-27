@@ -1,273 +1,194 @@
+/* 전체 컨테이너 */
 .home-container {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    min-height: 100vh;
-    background-color: #f5f6fa;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f5f6fa;
+  position: relative;
 }
 
-/* 헤더 */
+/* 상단 헤더 */
 .home-header {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: white;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    padding: 10px 0 15px 0;
+  width: 100%;
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  padding-top: 10px;
 }
 
-.header-bar {
-    width: 90%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* 새로고침 버튼 */
+.refresh-emoji {
+  font-size: 30px;
+  cursor: pointer;
 }
 
-.icon-left,
-.icon-right {
-    cursor: pointer;
-    padding: 5px;
-}
-
-.hamburger-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    width: 20px;
-    height: 18px;
-}
-
-.hamburger-menu .line {
-    display: block;
-    width: 100%;
-    height: 2px;
-    background-color: #333;
-    border-radius: 1px;
-}
-
-.header-logo {
-    display: flex;
-    align-items: center;
-}
-
-.logo-text {
-    font-size: 28px;
-    font-weight: 900;
-    color: #333;
-    font-family: 'serif';
-    font-style: italic;
-    transform: skewX(-10deg);
-}
-
-.search-icon {
-    font-size: 20px;
-    color: #333;
-}
-
+/* 작성탭 이동 버튼 */
 .challenge-question {
-    font-size: 17px;
-    color: #333;
-    font-weight: 500;
-    margin-top: 15px;
-    cursor: default;
+  font-size: 16px;
+  color: #007bff;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
+.challenge-question:hover {
+  color: #0056b3;
+}
+
+/* 메인 콘텐츠 */
 .home-content {
-    flex: 1;
-    padding-top: 140px;
-    padding-bottom: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  flex: 1;
+  padding-top: 120px;
+  padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f6fa;
 }
 
 .post-list {
-    width: 90%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #f5f6fa;
+  padding-bottom: 16px;
 }
 
-/* 카드 */
+/* 챌린지 카드 */
 .challenge-card {
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* 카드 상단 */
-.card-top-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.card-top-left {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+/* 카드 상단: 프로필 + 이름 + 제목 */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .user-info {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-.card-username-line {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+/* 사용자 이름 */
 .card-username {
-    font-weight: 600;
-    font-size: 1rem;
-    color: #333;
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #333;
 }
 
-.card-date {
-    font-size: 0.8rem;
-    color: #888;
+/* 제목 */
+/* 카드 제목 */
+.card-title {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #333;
 }
 
-.card-completion-rate {
-    font-size: 0.85rem;
-    color: #28a745;
-    font-weight: 500;
-    margin-top: 2px;
-}
 
-.report-button {
-    cursor: pointer;
-    color: #ff4d4f;
-    padding: 5px;
-}
-
-.report-icon {
-    font-size: 16px;
-}
-
-/* 제목/내용 */
-.card-title-main {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: #333;
-}
-
-.card-title-prefix {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: #333;
-}
-
-.card-title-content {
-    margin-top: 5px;
-    font-size: 1rem;
-    color: #444;
-}
-
-.card-subtitle {
-    margin-top: 5px;
-    color: #555;
-    font-size: 0.95rem;
-}
-
-.challenge-frequency {
-    margin-top: 8px;
-}
-
-.frequency-daily,
-.frequency-weekly {
-    font-size: 0.85rem;
-    font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 4px;
-    display: inline-block;
-    color: white;
-}
-
-.frequency-daily {
-    background-color: #28a745;
-}
-.frequency-weekly {
-    background-color: #ffc107;
-}
-
-/* 하단 액션 */
-.card-bottom-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
-}
-
-.action-stats {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
-    color: #777;
-}
-
-.stat-icon-like {
-    color: #007bff;
-}
-.stat-icon-group {
-    color: #9c27b0;
-}
-
-.stat-icon-cheer {
-    font-size: 16px;
-}
-
-.join-button {
-    background-color: #6a5acd;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.join-button:hover {
-    background-color: #5345b5;
-}
-
+/* 프로필 아이콘 */
 .profile-icon {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    border-radius: 50%;
-    background-color: #007bff;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
 }
 
+/* 카드 내용 */
+.card-content {
+  margin-top: 8px;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+/* 카드 정보: 빈도, 날짜 */
+.card-info {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #777;
+  display: flex;
+  gap: 12px;
+}
+
+/* 빈도별 색상 표시 */
+.frequency-daily {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.frequency-weekly {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.delete-icon {
+  color: red;        /* 아이콘 색상 */
+  cursor: pointer;   /* 마우스 커서 포인터 */
+  margin-left: auto; /* 오른쪽 끝으로 */
+  font-size: 18px;   /* 적당한 크기 */
+}
+
+.delete-icon:hover {
+  transform: scale(1.2);
+}
+
+
+.like-icon,
+.join-icon {
+  transition: transform 0.2s, color 0.2s;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 15px; /* 기본 간격 */
+}
+
+.like-icon:hover,
+.join-icon:hover {
+  transform: scale(1.2);
+}
+
+/* 상태별 색상 */
+.like-icon.liked {
+  color: blue;
+}
+
+.join-icon.joined {
+  color: green;
+}
+
+/* 카운트 */
+.like-count,
+.join-count {
+  margin-left: 4px;
+  font-size: 14px;
+  color: #555;
+}
+
+
+/* 하단 탭 안내 메시지 */
 .tab-message {
-    text-align: center;
-    color: #555;
-    margin-top: 30px;
+  text-align: center;
+  color: #555;
+  margin-bottom: 80px;
 }
