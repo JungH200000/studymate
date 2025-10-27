@@ -8,8 +8,6 @@ import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
 import testRoutes from './routes/test.routes.js';
 import challengeRoutes from './routes/challenge.routes.js';
-import { requireAuth } from './middleware/requireAuth.js';
-import { validateCreateChallenges } from './middleware/challenge.validators.js';
 
 const app = express();
 
@@ -52,9 +50,10 @@ app.use('/api/test', testRoutes);
 /* ===== 전역 Error ===== */
 app.use((error, req, res, next) => {
   const status = error?.status || 500;
+  const code = error?.code || (status >= 500 ? 'INTERNAL_ERROR' : 'BAD_REQUEST');
   const message = status === 500 ? '서버에 오류가 발생했습니다.' : error.message || '요청을 처리할 수 없습니다.';
   console.error('Error 발생 !!!\n', error);
-  res.status(status).json({ ok: false, message });
+  res.status(status).json({ ok: false, code, message });
 });
 
 app.listen(3000, () => {
