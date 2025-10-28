@@ -38,7 +38,7 @@
 
 ### POST: 부적절한 챌린지 신고
 
-- `/api/reports`
+- `/api/reports/:challenge_id`
 
 `{ target_type`: "challenge", `target_id: <challenge_id>, content: string }`
 
@@ -47,10 +47,6 @@
 ### POST: 챌린지 title, content 작성 및 기간 설정하여 게시
 
 - `/api/challenges`
-
-### GET : 챌린지 작성자 정보 가져오기
-
-- `/api/me`
 
 ## 4. 인증글 피드
 
@@ -99,12 +95,11 @@ author_progress: { achieved_this_week, target_per_week }
 
 참여자만 게시 가능하도록 `joined_by_me` 체크
 
-### POST: 부적절한 챌린지 신고
+### POST: 부적절한 인증글 신고
 
-- `/api/reports`
+- `/api/reports/:post_id`
 
 `{ target_type`: "post", `target_id: <post_id>, content: string }`
-`{ target_type`: "challenge", `target_id: <challenge_id>, content: string }`
 
 ## 사용자 페이지
 
