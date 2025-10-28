@@ -76,6 +76,12 @@ export const getParticipation = async (req, res, next) => {
       participationApplyInfo,
     });
   } catch (error) {
+    if (error.code === '22P02') {
+      const error = new Error('정확하지 않은 challenge_id 입니다.');
+      error.code = '22P02';
+      error.status = 400;
+      throw error;
+    }
     throw next(error);
   }
 };

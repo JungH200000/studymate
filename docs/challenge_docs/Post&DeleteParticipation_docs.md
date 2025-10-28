@@ -22,6 +22,18 @@
 }
 ```
 
+### 실패
+
+- 제대로된 challenge_id가 입력되지 않는다면
+
+```json
+{
+  "ok": false,
+  "code": "22P02",
+  "message": "정확하지 않은 challenge_id 입니다."
+}
+```
+
 ## / `DELETE /api/challenges/:id/participants`
 
 - `:id`에 `challenge_id`가 들어감
@@ -37,5 +49,17 @@
   "user_id": "9c2b7aaf-3b3d-426c-a8d6-efe1f3dca7e0",
   "challenge_id": "2c657b10-c5c9-4dd9-82e0-f3e9ae8c28d5",
   "message": "챌린지 참여 취소되었습니다."
+}
+```
+
+### 실패
+
+- 제대로된 challenge_id가 입력되지 않는다면
+
+```json
+{
+  "ok": false,
+  "code": "22P02",
+  "message": "정확하지 않은 challenge_id 입니다."
 }
 ```
