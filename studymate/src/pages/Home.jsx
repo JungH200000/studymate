@@ -22,7 +22,6 @@ export default function Home() {
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ 날짜 포맷 함수 추가
   const formatDate = (isoString) => {
     if (!isoString) return "";
     const date = new Date(isoString);
@@ -67,38 +66,68 @@ export default function Home() {
 
   const handleRefresh = () => window.location.reload();
 
-  const toggleLike = (challengeId, e) => {
+  const toggleLike = async (challengeId, e) => {
     e.stopPropagation();
     if (!userId) return alert("로그인이 필요합니다.");
 
-    setLikes((prev) => {
-      const current = prev[challengeId];
-      const newLiked = !current.liked;
-      return {
-        ...prev,
-        [challengeId]: {
-          liked: newLiked,
-          count: current.count + (newLiked ? 1 : -1),
-        },
-      };
-    });
+    const liked = likes[challengeId]?.liked;
+
+    try {
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+        method: liked ? "DELETE" : "POST",
+      });
+
+      if (res?.ok) {
+        setLikes((prev) => {
+          const current = prev[challengeId];
+          const newLiked = !current.liked;
+          return {
+            ...prev,
+            [challengeId]: {
+              liked: newLiked,
+              count: current.count + (newLiked ? 1 : -1),
+            },
+          };
+        });
+      } else {
+        alert("좋아요 처리 실패: " + (res?.message || "알 수 없는 오류"));
+      }
+    } catch (err) {
+      console.error("좋아요 처리 실패:", err);
+      alert("좋아요 중 오류가 발생했습니다.");
+    }
   };
 
-  const toggleParticipation = (challengeId, e) => {
+  const toggleParticipation = async (challengeId, e) => {
     e.stopPropagation();
     if (!userId) return alert("로그인이 필요합니다.");
 
-    setParticipants((prev) => {
-      const current = prev[challengeId];
-      const newJoined = !current.joined;
-      return {
-        ...prev,
-        [challengeId]: {
-          joined: newJoined,
-          count: current.count + (newJoined ? 1 : -1),
-        },
-      };
-    });
+    const joined = participants[challengeId]?.joined;
+
+    try {
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+        method: joined ? "DELETE" : "POST",
+      });
+
+      if (res?.ok) {
+        setParticipants((prev) => {
+          const current = prev[challengeId];
+          const newJoined = !current.joined;
+          return {
+            ...prev,
+            [challengeId]: {
+              joined: newJoined,
+              count: current.count + (newJoined ? 1 : -1),
+            },
+          };
+        });
+      } else {
+        alert("참가 처리 실패: " + (res?.message || "알 수 없는 오류"));
+      }
+    } catch (err) {
+      console.error("참가 처리 실패:", err);
+      alert("참가 중 오류가 발생했습니다.");
+    }
   };
 
   const handleDelete = async (challengeId, e) => {

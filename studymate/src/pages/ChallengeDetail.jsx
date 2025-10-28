@@ -7,7 +7,7 @@ import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp as solidThumb } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
-import { faUserPlus, faUserCheck, faHandsClapping } from "@fortawesome/free-solid-svg-icons";
+import { faUserPlus, faUserCheck } from "@fortawesome/free-solid-svg-icons";
 
 export default function ChallengeDetail() {
   const { id } = useParams();
@@ -17,7 +17,6 @@ export default function ChallengeDetail() {
   const [tab, setTab] = useState("detail");
   const [likes, setLikes] = useState({ liked: false, count: 0 });
   const [participants, setParticipants] = useState({ joined: false, count: 0 });
-  const [cheers, setCheers] = useState({ cheered: false, count: 0 });
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [userId, setUserId] = useState(null);
@@ -29,16 +28,27 @@ export default function ChallengeDetail() {
     if (storedUser.user_id) setUserId(storedUser.user_id);
 
     const fetchChallenge = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3000/api/challenges/${id}`);
-        const data = res.data;
-        if (data.ok) setChallenge(data.challenge);
-      } catch {
-        setChallenge(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+  try {
+    const res = await axios.get("http://localhost:3000/api/challenges", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    });
+    const data = res.data;
+    if (data.ok) {
+      const found = data.challengesList.find(
+        (c) => c.challenge_id === id
+      );
+      if (found) setChallenge(found);
+      else setChallenge(null);
+    }
+  } catch {
+    setChallenge(null);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     const fetchLikes = async () => {
       if (!id) return;
@@ -62,17 +72,6 @@ export default function ChallengeDetail() {
       } catch {}
     };
 
-    const fetchCheers = async () => {
-      if (!id) return;
-      try {
-        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/cheers`, {
-          params: { userId: userId || "" },
-        });
-        const data = res.data;
-        if (data.ok) setCheers({ cheered: data.cheered, count: data.count });
-      } catch {}
-    };
-
     const fetchPosts = async () => {
       if (!id) return;
       try {
@@ -85,7 +84,6 @@ export default function ChallengeDetail() {
     fetchChallenge();
     fetchLikes();
     fetchParticipants();
-    fetchCheers();
     fetchPosts();
   }, [id, userId]);
 
@@ -108,17 +106,6 @@ export default function ChallengeDetail() {
       });
       const data = res.data;
       if (data.ok) setParticipants({ joined: data.joined, count: data.count });
-    } catch {}
-  };
-
-  const toggleCheer = async () => {
-    if (!userId) return alert("로그인이 필요합니다.");
-    try {
-      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/cheers`, {
-        userId,
-      });
-      const data = res.data;
-      if (data.ok) setCheers({ cheered: data.cheered, count: data.count });
     } catch {}
   };
 
@@ -169,15 +156,6 @@ export default function ChallengeDetail() {
               className={`like-icon ${likes.liked ? "liked" : ""}`}
             />
             <span className="like-count">{likes.count}</span>
-          </div>
-
-          <div className="icon-wrapper">
-            <FontAwesomeIcon
-              icon={faHandsClapping}
-              onClick={toggleCheer}
-              className={`cheer-icon ${cheers.cheered ? "cheered" : ""}`}
-            />
-            <span className="cheer-count">{cheers.count}</span>
           </div>
 
           <div className="icon-wrapper">

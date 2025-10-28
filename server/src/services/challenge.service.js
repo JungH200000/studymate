@@ -50,6 +50,12 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
   const likeChallenge_ids = await challengeDB.getLike({ user_id, challenges_ids });
   const likedSet = new Set(likeChallenge_ids.map((challenge) => challenge.challenge_id));
 
+  /** 챌린지에 참여한 유저 목록 가져오기 */
+  const participantUserLists = await challengeDB.getParticipationUserList({ challenges_ids });
+
+  /** 챌린지에 좋아요한 유저 목록 가져오기 */
+  const likeUserLists = await challengeDB.getLikeUserList({ challenges_ids });
+
   /** 챌린지 참여 수 가져오기 */
   const countParticipations = await challengeDB.countParticipation({ challenges_ids });
   const countParticipationMap = {};
@@ -79,7 +85,49 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
     liked_by_me: likedSet.has(challenge.challenge_id),
     like_count: countLikeMap[challenge.challenge_id] || 0,
     post_count: countPostMap[challenge.challenge_id] || 0,
+    participant_user: participantUserLists
+      .map((r) => {
+        if (challenge.challenge_id === r.challenge_id) {
+          return { participant_user_id: r.participant_user_id, participant_username: r.participant_username };
+        } else {
+          return;
+        }
+      })
+      .filter(Boolean),
+    like_user: likeUserLists
+      .map((r) => {
+        if (challenge.challenge_id === r.challenge_id) {
+          return { like_user_id: r.like_user_id, like_username: r.like_username };
+        } else {
+          return;
+        }
+      })
+      .filter(Boolean),
   }));
 
   return totalChallengesList;
+}
+
+/** 챌린지 참여 신청 */
+export async function postParticipation({ user_id, challenge_id }) {
+  const participationApplyInfo = await challengeDB.postParticipation({ user_id, challenge_id });
+
+  return participationApplyInfo;
+}
+
+/** 챌린지 참여 취소 */
+export async function deleteParticipation({ user_id, challenge_id }) {
+  await challengeDB.deleteParticipation({ user_id, challenge_id });
+}
+
+/** 챌린지 좋아요 */
+export async function postLike({ user_id, challenge_id }) {
+  const likeApplyInfo = await challengeDB.postLike({ user_id, challenge_id });
+
+  return likeApplyInfo;
+}
+
+/** 챌린지 좋아요 취소 */
+export async function deleteLike({ user_id, challenge_id }) {
+  await challengeDB.deleteLike({ user_id, challenge_id });
 }
