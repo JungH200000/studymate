@@ -26,18 +26,23 @@ export const fetchWithAuth = async (url, options = {}) => {
   let token = localStorage.getItem("accessToken");
 
   try {
-    const res = await axios({
+    const config = {
       url,
       method: options.method || "GET",
-      data: options.body || null,
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         ...options.headers,
       },
       withCredentials: true,
-    });
+    };
 
+    // body가 있을 때만 data 추가
+    if (options.body !== undefined && options.body !== null) {
+      config.data = options.body;
+    }
+
+    const res = await axios(config);
     return res.data;
   } catch (err) {
     if (err.response?.status === 401) {
@@ -45,18 +50,22 @@ export const fetchWithAuth = async (url, options = {}) => {
       if (!token) return null;
 
       try {
-        const retryRes = await axios({
+        const retryConfig = {
           url,
           method: options.method || "GET",
-          data: options.body || null,
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
             ...options.headers,
           },
           withCredentials: true,
-        });
+        };
 
+        if (options.body !== undefined && options.body !== null) {
+          retryConfig.data = options.body;
+        }
+
+        const retryRes = await axios(retryConfig);
         return retryRes.data;
       } catch (retryErr) {
         console.error("❌ 재시도 실패:", retryErr);
@@ -68,3 +77,4 @@ export const fetchWithAuth = async (url, options = {}) => {
     }
   }
 };
+
