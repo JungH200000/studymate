@@ -95,3 +95,15 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
 
   return totalChallengesList;
 }
+
+/** 챌린지 참여 신청 */
+export async function postParticipation({ user_id, challenge_id }) {
+  const participationApplyInfo = await challengeDB.postParticipation({ user_id, challenge_id });
+
+  return participationApplyInfo;
+}
+
+/** 챌린지 참여 취소 */
+export async function deleteParticipation({ user_id, challenge_id }) {
+  await challengeDB.deleteParticipation({ user_id, challenge_id });
+}

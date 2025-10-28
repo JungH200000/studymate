@@ -127,3 +127,26 @@ export async function getParticipationUserList({ challenges_ids }) {
 
   return rows;
 }
+
+/** POST 참여 */
+export async function postParticipation({ user_id, challenge_id }) {
+  const sql = `
+    INSERT INTO participation (user_id, challenge_id)
+    VALUES ($1, $2)
+    RETURNING user_id, challenge_id`;
+  const params = [user_id, challenge_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows[0];
+}
+
+/** DELETE 참여 */
+export async function deleteParticipation({ user_id, challenge_id }) {
+  const sql = `
+    DELETE FROM participation
+    WHERE user_id = $1 AND challenge_id = $2`;
+  const params = [user_id, challenge_id];
+
+  await query(sql, params);
+}

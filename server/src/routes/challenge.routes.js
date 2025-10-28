@@ -11,5 +11,6 @@ const router = express.Router();
 
 router.post('/', requireAuth, validateCreateChallenges, asyncHandler(challengeController.createChallenge));
 router.get('/', requireAuth, asyncHandler(challengeController.getChallenges));
-
+router.post('/:id/participants', requireAuth, asyncHandler(challengeController.getParticipation));
+router.delete('/:id/participants', requireAuth, asyncHandler(challengeController.deleteParticipation));
 export default router;
