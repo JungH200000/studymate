@@ -150,3 +150,26 @@ export async function deleteParticipation({ user_id, challenge_id }) {
 
   await query(sql, params);
 }
+
+/** POST 좋아요 */
+export async function postLike({ user_id, challenge_id }) {
+  const sql = `
+    INSERT INTO challenge_likes (user_id, challenge_id)
+    VALUES ($1, $2)
+    RETURNING user_id, challenge_id`;
+  const params = [user_id, challenge_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows[0];
+}
+
+/** Delete 좋아요 */
+export async function deleteLike({ user_id, challenge_id }) {
+  const sql = `
+    DELETE FROM challenge_likes
+    WHERE user_id = $1 AND challenge_id = $2`;
+  const params = [user_id, challenge_id];
+
+  await query(sql, params);
+}

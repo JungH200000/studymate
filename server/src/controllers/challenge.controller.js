@@ -63,7 +63,7 @@ export const getChallenges = async (req, res, next) => {
 };
 
 /** 챌린지 참여 신청 */
-export const getParticipation = async (req, res, next) => {
+export const postParticipation = async (req, res, next) => {
   try {
     const challenge_id = req.params.id;
     const { id: user_id } = req.user;
@@ -94,11 +94,60 @@ export const deleteParticipation = async (req, res, next) => {
 
     await challengeService.deleteParticipation({ user_id, challenge_id });
 
-    return res.status(201).json({
+    return res.status(200).json({
       ok: true,
       user_id,
       challenge_id,
       message: '챌린지 참여 취소되었습니다.',
+    });
+  } catch (error) {
+    if (error.code === '22P02') {
+      const error = new Error('정확하지 않은 challenge_id 입니다.');
+      error.code = '22P02';
+      error.status = 400;
+      throw error;
+    }
+    throw next(error);
+  }
+};
+
+/** 챌린지 좋아요 */
+export const postLike = async (req, res, next) => {
+  try {
+    const challenge_id = req.params.id;
+    const { id: user_id } = req.user;
+
+    /** 좋아요한 챌린지와 사용자 ID */
+    const likeApplyInfo = await challengeService.postLike({ user_id, challenge_id });
+
+    return res.status(201).json({
+      ok: true,
+      likeApplyInfo,
+    });
+  } catch (error) {
+    if (error.code === '22P02') {
+      const error = new Error('정확하지 않은 challenge_id 입니다.');
+      error.code = '22P02';
+      error.status = 400;
+      throw error;
+    }
+    throw next(error);
+  }
+};
+
+/** 챌린지 좋아요 취소 */
+export const deleteLike = async (req, res, next) => {
+  try {
+    const challenge_id = req.params.id;
+    const { id: user_id } = req.user;
+
+    await challengeService.deleteLike({ user_id, challenge_id });
+
+    return res.status(200).json({
+      ok: true,
+      user_id,
+      challenge_id,
+      message: '좋아요가 취소되었습니다.',
     });
   } catch (error) {
     if (error.code === '22P02') {

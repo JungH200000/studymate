@@ -107,3 +107,15 @@ export async function postParticipation({ user_id, challenge_id }) {
 export async function deleteParticipation({ user_id, challenge_id }) {
   await challengeDB.deleteParticipation({ user_id, challenge_id });
 }
+
+/** 챌린지 좋아요 */
+export async function postLike({ user_id, challenge_id }) {
+  const likeApplyInfo = await challengeDB.postLike({ user_id, challenge_id });
+
+  return likeApplyInfo;
+}
+
+/** 챌린지 좋아요 취소 */
+export async function deleteLike({ user_id, challenge_id }) {
+  await challengeDB.deleteLike({ user_id, challenge_id });
+}
