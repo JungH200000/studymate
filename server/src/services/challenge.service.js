@@ -53,6 +53,9 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
   /** 챌린지에 참여한 유저 목록 가져오기 */
   const participantUserLists = await challengeDB.getParticipationUserList({ challenges_ids });
 
+  /** 챌린지에 좋아요한 유저 목록 가져오기 */
+  const likeUserLists = await challengeDB.getLikeUserList({ challenges_ids });
+
   /** 챌린지 참여 수 가져오기 */
   const countParticipations = await challengeDB.countParticipation({ challenges_ids });
   const countParticipationMap = {};
@@ -86,6 +89,15 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
       .map((r) => {
         if (challenge.challenge_id === r.challenge_id) {
           return { participant_user_id: r.participant_user_id, participant_username: r.participant_username };
+        } else {
+          return;
+        }
+      })
+      .filter(Boolean),
+    like_user: likeUserLists
+      .map((r) => {
+        if (challenge.challenge_id === r.challenge_id) {
+          return { like_user_id: r.like_user_id, like_username: r.like_username };
         } else {
           return;
         }

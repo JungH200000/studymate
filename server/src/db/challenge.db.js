@@ -128,6 +128,20 @@ export async function getParticipationUserList({ challenges_ids }) {
   return rows;
 }
 
+/** 챌린지에 좋아요한 유저 목록 가져오기 */
+export async function getLikeUserList({ challenges_ids }) {
+  const sql = `
+    SELECT cl.challenge_id, u.user_id AS like_user_id, u.username AS like_username
+    FROM challenge_likes cl
+    LEFT JOIN users u ON cl.user_id = u.user_id
+    WHERE cl.challenge_id = ANY($1::uuid[]);`;
+  const params = [challenges_ids];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
 /** POST 참여 신청 */
 export async function postParticipation({ user_id, challenge_id }) {
   const sql = `
