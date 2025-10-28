@@ -1,140 +1,206 @@
 /* 전체 초기화 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* ⚠️ 중요: html, body, #root의 높이를 100%로 설정하여 vh 단위가 정상적으로 작동하도록 지원 */
 html,
 body,
 #root {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* -------------------- 전체 컨테이너 (화면 꽉 차게) -------------------- */
+/* -------------------- 전체 컨테이너 -------------------- */
 .profile-container {
-    /* ⚠️ 화면 전체 높이를 최소 기준으로 설정 */
     min-height: 100vh;
     width: 100vw;
-    background-color: #f5f6fa;
-
-    /* 하단 네비게이션을 제외한 나머지 영역을 flex로 채우기 위해 설정 */
+    background: linear-gradient(to bottom right, #fff6f7, #ffeef0);
     display: flex;
     flex-direction: column;
-
-    /* BottomNav 높이만큼 하단 패딩 (BottomNav가 absolute/fixed가 아닌 경우) */
-    /* 만약 BottomNav가 fixed라면 이 패딩은 필요 없습니다. */
-    /* 현재 코드는 BottomNav가 일반적인 흐름에 있다고 가정하고 padding을 유지합니다. */
-    padding-bottom: 60px;
-
-    position: relative; /* 로그아웃 버튼 위치 기준 */
+    align-items: center;
+    position: relative;
+    padding-bottom: 70px; /* 하단 네비게이션 공간 확보 (BottomNav 높이보다 크게) */
 }
 
 /* -------------------- 로그아웃 버튼 -------------------- */
 .logout-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 18px;
+    right: 20px;
     cursor: pointer;
-    font-size: 24px;
-    color: #333;
+    font-size: 26px; /* FontAwesomeIcon 크기는 여기서 제어 */
+    color: #ff6b6b;
+    transition: transform 0.2s, color 0.2s;
     z-index: 10;
-    transition: color 0.2s;
 }
 
 .logout-btn:hover {
-    color: #007bff;
+    transform: rotate(90deg);
+    color: #ff4d4d;
 }
 
 /* -------------------- 프로필 영역 -------------------- */
 .profile-content {
+    width: 90%;
+    max-width: 600px;
+    background: white;
+    margin-top: 80px;
+    padding: 24px 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 24px rgba(255, 123, 123, 0.15);
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 80px 24px 20px 24px;
+    justify-content: space-between; /* 좌/우 분리 */
+    align-items: center;
+    transition: all 0.3s ease;
 }
 
+.profile-content:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(255, 123, 123, 0.25);
+}
+
+/* 프로필 아이콘 (원형 배경) */
+.profile-icon {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: white;
+    border-radius: 50%;
+    width: 68px; /* 이미지와 동일한 크기 */
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px; /* 원형 내부 아이콘 크기 제어 */
+    box-shadow: 0 3px 10px rgba(255, 123, 123, 0.3);
+}
+
+/* 프로필 정보 (이름/통계) */
 .profile-info {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    margin-right: 16px; /* 아이콘과의 간격 */
 }
 
-/* 이름 */
 .profile-name {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     color: #333;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
-/* 달성률/팔로워 영역 */
 .profile-stats {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
 .stat-item {
     font-size: 14px;
     color: #666;
-    margin-bottom: 4px;
 }
 
-/* 프로필 아이콘 */
-.profile-icon {
-    color: #fff;
-    background-color: #007bff;
-    border: 1px solid #007bff;
-    border-radius: 50%;
-    padding: 8px;
-    width: 60px;
-    height: 60px;
-    min-width: 60px;
-    min-height: 60px;
-}
-
-/* -------------------- 챌린지 탭 내비게이션 -------------------- */
+/* -------------------- 챌린지 탭 -------------------- */
 .challenge-tabs {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 20px;
     display: flex;
-    border-bottom: 1px solid #ddd;
-    background-color: #fff;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(255, 123, 123, 0.1);
 }
 
 .tab-item {
     flex: 1;
     text-align: center;
-    padding: 12px 0;
+    padding: 14px 0;
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
-    color: #888;
+    color: #999;
     border-bottom: 3px solid transparent;
-    transition: all 0.2s;
+    transition: all 0.25s;
 }
 
 .tab-item.active {
-    color: #333;
-    border-bottom: 3px solid #007bff;
-    font-weight: 600;
+    color: #ff6b6b;
+    font-weight: 700;
+    border-bottom: 3px solid #ff7b7b;
+    background: linear-gradient(to bottom, #fff7f7, #fff);
 }
 
-/* -------------------- 챌린지 목록 컨테이너 (남은 공간 채우기) -------------------- */
+/* -------------------- 챌린지 목록 컨테이너 -------------------- */
 .challenge-list-container {
-    width: 100%;
-    background-color: #fff;
-    /* ⚠️ flex: 1을 적용하여 프로필 영역과 탭을 제외한 남은 공간을 모두 채움 */
+    width: 90%;
+    max-width: 600px;
+    margin-top: 20px;
+    background: transparent;
     flex: 1;
-    border-radius: 0; /* 화면 꽉 채우기 위해 둥근 모서리 제거 */
-    /* 챌린지 목록 컨테이너 내부 스크롤이 필요할 수 있으므로 overflow: auto; */
     overflow-y: auto;
+    padding-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 }
 
-/* 챌린지 목록 내부 텍스트 스타일 */
+/* 챌린지 카드 (예시 스타일) */
+.challenge-card {
+    width: 100%;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(255, 123, 123, 0.15);
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.25s ease;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 빈 목록 안내 */
 .challenge-list-container > p {
-    padding: 20px;
     text-align: center;
-    color: #666;
+    color: #aaa;
+    font-weight: 500;
+    padding: 24px;
+}
+
+/* 등장 애니메이션 (활용하지 않을 경우 제거 가능) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* -------------------- 반응형 -------------------- */
+@media (max-width: 480px) {
+    /* 모바일에서도 가로 배열을 유지하도록 flex-direction: column; 을 제거하거나 주석 처리 */
+    /* .profile-content {
+        flex-direction: column; 
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    } */
+
+    .profile-info {
+        /* margin-left: 0;
+        margin-top: 12px; */
+    }
+
+    .challenge-tabs {
+        border-radius: 10px;
+    }
 }
