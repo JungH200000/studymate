@@ -128,7 +128,7 @@ export async function getParticipationUserList({ challenges_ids }) {
   return rows;
 }
 
-/** POST 참여 */
+/** POST 참여 신청 */
 export async function postParticipation({ user_id, challenge_id }) {
   const sql = `
     INSERT INTO participation (user_id, challenge_id)
@@ -141,7 +141,7 @@ export async function postParticipation({ user_id, challenge_id }) {
   return rows[0];
 }
 
-/** DELETE 참여 */
+/** DELETE 참여 취소 */
 export async function deleteParticipation({ user_id, challenge_id }) {
   const sql = `
     DELETE FROM participation
@@ -164,7 +164,7 @@ export async function postLike({ user_id, challenge_id }) {
   return rows[0];
 }
 
-/** Delete 좋아요 */
+/** Delete 좋아요 취소 */
 export async function deleteLike({ user_id, challenge_id }) {
   const sql = `
     DELETE FROM challenge_likes
