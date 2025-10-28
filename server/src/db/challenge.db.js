@@ -113,3 +113,17 @@ export async function countPost({ challenges_ids }) {
 
   return rows;
 }
+
+/** 챌린지 참여 유저 목록 가져오기 */
+export async function getParticipationUserList({ challenges_ids }) {
+  const sql = `
+    SELECT p.challenge_id, u.user_id AS participant_user_id, u.username AS participant_username
+    FROM participation p
+    LEFT JOIN users u ON p.user_id = u.user_id
+    WHERE p.challenge_id = ANY($1::uuid[])`;
+  const params = [challenges_ids];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}

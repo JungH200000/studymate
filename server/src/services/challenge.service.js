@@ -50,6 +50,9 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
   const likeChallenge_ids = await challengeDB.getLike({ user_id, challenges_ids });
   const likedSet = new Set(likeChallenge_ids.map((challenge) => challenge.challenge_id));
 
+  /** 챌린지에 참여한 유저 목록 가져오기 */
+  const participantUserLists = await challengeDB.getParticipationUserList({ challenges_ids });
+
   /** 챌린지 참여 수 가져오기 */
   const countParticipations = await challengeDB.countParticipation({ challenges_ids });
   const countParticipationMap = {};
@@ -79,6 +82,15 @@ export async function getChallenges({ user_id, sort, limit, offset }) {
     liked_by_me: likedSet.has(challenge.challenge_id),
     like_count: countLikeMap[challenge.challenge_id] || 0,
     post_count: countPostMap[challenge.challenge_id] || 0,
+    participant_user: participantUserLists
+      .map((r) => {
+        if (challenge.challenge_id === r.challenge_id) {
+          return { participant_user_id: r.participant_user_id, participant_username: r.participant_username };
+        } else {
+          return;
+        }
+      })
+      .filter(Boolean),
   }));
 
   return totalChallengesList;

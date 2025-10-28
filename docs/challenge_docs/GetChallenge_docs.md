@@ -11,6 +11,10 @@
 - "liked_by_me": 로그인한 사용자의 챌린지 좋아요 여부
 - "like_count": 챌린지 좋아요 수
 - "post_count": 챌린지 인증글 수
+- "participant_user" : 챌린지 참여 유저 목록
+  - 없으면 [](빈 배열) 반환
+  - "participant_user_id" : 챌린지에 참여한 유저의 user_id
+  - "participant_username" : 챌린지에 참여한 유저의 username
 
 ```json
 {
@@ -35,7 +39,8 @@
       "participant_count": 0,
       "liked_by_me": false,
       "like_count": 0,
-      "post_count": 0
+      "post_count": 0,
+      "participant_user": []
     },
     {
       "challenge_id": "ee787c9b-0e79-4daa-b115-550fcba98800",
@@ -53,7 +58,8 @@
       "participant_count": 0,
       "liked_by_me": false,
       "like_count": 0,
-      "post_count": 0
+      "post_count": 0,
+      "participant_user": []
     },
     {
       "challenge_id": "293caa25-4aa4-4cd4-b462-99c71f544039",
@@ -71,7 +77,8 @@
       "participant_count": 0,
       "liked_by_me": false,
       "like_count": 0,
-      "post_count": 0
+      "post_count": 0,
+      "participant_user": []
     },
     {
       "challenge_id": "9cced7c8-ef3b-4ed1-9ec7-379819fb3952",
@@ -89,7 +96,8 @@
       "participant_count": 0,
       "liked_by_me": false,
       "like_count": 0,
-      "post_count": 0
+      "post_count": 0,
+      "participant_user": []
     },
     {
       "challenge_id": "2328b4b5-a3b6-498c-81a0-54013a5a8d05",
@@ -105,9 +113,10 @@
       "author_username": "1234",
       "joined_by_me": false,
       "participant_count": 0,
-      "liked_by_me": true,
-      "like_count": 2,
-      "post_count": 0
+      "liked_by_me": false,
+      "like_count": 1,
+      "post_count": 0,
+      "participant_user": []
     },
     {
       "challenge_id": "e6ee4a78-6bd7-4412-b71d-40ce28cdf886",
@@ -125,7 +134,17 @@
       "participant_count": 2,
       "liked_by_me": true,
       "like_count": 1,
-      "post_count": 0
+      "post_count": 0,
+      "participant_user": [
+        {
+          "participant_user_id": "9c2b7aaf-3b3d-426c-a8d6-efe1f3dca7e0",
+          "participant_username": "1234"
+        },
+        {
+          "participant_user_id": "4b8388bf-281a-4a3f-a5e8-1e4cdb5cc827",
+          "participant_username": "hyun"
+        }
+      ]
     },
     {
       "challenge_id": "113ac2d6-89c9-4411-ad27-ac827d32dd2b",
@@ -143,7 +162,13 @@
       "participant_count": 1,
       "liked_by_me": false,
       "like_count": 0,
-      "post_count": 0
+      "post_count": 0,
+      "participant_user": [
+        {
+          "participant_user_id": "4b8388bf-281a-4a3f-a5e8-1e4cdb5cc827",
+          "participant_username": "hyun"
+        }
+      ]
     },
     {
       "challenge_id": "106a5e7c-2199-458d-bb19-ae3bd117bbfd",
@@ -159,9 +184,10 @@
       "author_username": "jung",
       "joined_by_me": false,
       "participant_count": 0,
-      "liked_by_me": false,
-      "like_count": 1,
-      "post_count": 2
+      "liked_by_me": true,
+      "like_count": 2,
+      "post_count": 2,
+      "participant_user": []
     },
     {
       "challenge_id": "cc45fa5b-dbc1-4f64-9df1-7508dca85dde",
@@ -179,7 +205,13 @@
       "participant_count": 1,
       "liked_by_me": false,
       "like_count": 0,
-      "post_count": 1
+      "post_count": 1,
+      "participant_user": [
+        {
+          "participant_user_id": "9c2b7aaf-3b3d-426c-a8d6-efe1f3dca7e0",
+          "participant_username": "1234"
+        }
+      ]
     }
   ]
 }
