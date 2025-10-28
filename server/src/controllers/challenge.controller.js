@@ -25,7 +25,7 @@ export const createChallenge = async (req, res, next) => {
       challenge: createdChallenge,
     });
   } catch (error) {
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -82,7 +82,7 @@ export const postParticipation = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -107,7 +107,7 @@ export const deleteParticipation = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -131,7 +131,7 @@ export const postLike = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -156,6 +156,6 @@ export const deleteLike = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    throw next(error);
+    return next(error);
   }
 };
