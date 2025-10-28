@@ -19,37 +19,37 @@ export default function Write() {
   };
 
   const handlePost = async () => {
-    if (!title) return alert("챌린지 제목을 입력하세요.");
-    if (frequencyType === "weekly" && (!targetPerWeek || targetPerWeek < 1))
-      return alert("주간 빈도를 1회 이상으로 입력하세요.");
-    if (!startDate) return alert("시작일을 입력하세요.");
+  if (!title) return alert("챌린지 제목을 입력하세요.");
+  if (frequencyType === "weekly" && (!targetPerWeek || targetPerWeek < 1))
+    return alert("주간 빈도를 1회 이상으로 입력하세요.");
+  if (!startDate) return alert("시작일을 입력하세요.");
 
-    const payload = {
-      title,
-      content,
-      frequency_type: frequencyType,
-      target_per_week: frequencyType === "weekly" ? targetPerWeek : null,
-      start_date: startDate,
-      end_date: endDate || null,
-    };
-
-    try {
-      const res = await fetchWithAuth("http://localhost:3000/api/challenges", {
-        method: "POST",
-        body: payload,
-      });
-
-      if (res?.ok) {
-        alert("챌린지 등록 완료!");
-        navigate("/home");
-      } else {
-        alert(res?.message || "챌린지 등록 실패");
-      }
-    } catch (err) {
-      console.error("등록 오류:", err);
-      alert("챌린지 등록 중 오류가 발생했습니다.");
-    }
+  const payload = {
+    title,
+    content,
+    frequency_type: frequencyType,
+    target_per_week: frequencyType === "weekly" ? targetPerWeek : null,
+    start_date: startDate,
+    end_date: endDate || null,
   };
+
+  try {
+    const res = await fetchWithAuth("http://localhost:3000/api/challenges", {
+      method: "POST",
+      body: payload,
+    });
+
+    if (res?.ok) {
+      alert("챌린지 등록 완료!");
+      navigate("/home");
+    } else {
+      alert(res?.message || "챌린지 등록 실패");
+    }
+  } catch (err) {
+    console.error("등록 오류:", err);
+    alert("챌린지 등록 중 오류가 발생했습니다.");
+  }
+};
 
 
   return (

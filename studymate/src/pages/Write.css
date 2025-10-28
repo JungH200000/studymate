@@ -91,15 +91,22 @@ select, input[type="date"] {
 }
 
 .post-btn {
-  margin-top: 24px;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 400px;
   background-color: #007bff;
-  color: white;
-  font-weight: bold;
+  color: #fff;
+  font-weight: 600;
+  font-size: 17px;
   border: none;
-  border-radius: 8px;
-  padding: 12px 0;
+  border-radius: 14px;
+  padding: 14px 0;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.1s;
 }
 
 .post-btn:hover {

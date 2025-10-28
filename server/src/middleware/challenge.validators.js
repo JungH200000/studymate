@@ -1,5 +1,6 @@
 // src/utils/challenge.validators.js
 
+/** title, frequency_type, start_date, target_per_week 검증 미들웨어 */
 export async function validateCreateChallenges(req, res, next) {
   const { title, frequency_type, target_per_week, start_date } = req.body;
 
