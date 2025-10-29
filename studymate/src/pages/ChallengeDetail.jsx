@@ -11,7 +11,7 @@ import {
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
 import "./ChallengeDetail.css";
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "http://127.0.0.1:3000/api";
 
 export default function ChallengeDetail() {
   const { id } = useParams();
@@ -74,32 +74,52 @@ export default function ChallengeDetail() {
   const toggleLike = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
     const method = likes.liked ? "DELETE" : "POST";
+
     try {
       const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/likes`, { method });
-      if (res.ok) {
-        setLikes((prev) => ({
-          liked: !prev.liked,
-          count: prev.count + (prev.liked ? -1 : 1),
-        }));
+
+      if (res?.ok) {
+        const { liked_by_me, like_count, created, deleted, message } = res;
+        setLikes({
+          liked: liked_by_me,
+          count: parseInt(like_count, 10),
+        });
+
+        if (created === false || deleted === false) {
+          alert("이미 처리된 요청입니다.");
+        }
+      } else {
+        alert("좋아요 실패: " + (res?.message || "알 수 없는 오류"));
       }
     } catch (err) {
       console.error("좋아요 실패:", err);
+      alert("좋아요 중 오류가 발생했습니다.");
     }
   };
 
   const toggleParticipation = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
     const method = participants.joined ? "DELETE" : "POST";
+
     try {
       const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/participants`, { method });
-      if (res.ok) {
-        setParticipants((prev) => ({
-          joined: !prev.joined,
-          count: prev.count + (prev.joined ? -1 : 1),
-        }));
+
+      if (res?.ok) {
+        const { joined_by_me, participant_count, created, deleted, message } = res;
+        setParticipants({
+          joined: joined_by_me,
+          count: parseInt(participant_count, 10),
+        });
+
+        if (created === false || deleted === false) {
+          alert("이미 처리된 요청입니다.");
+        }
+      } else {
+        alert("참가 실패: " + (res?.message || "알 수 없는 오류"));
       }
     } catch (err) {
       console.error("참가 실패:", err);
+      alert("참가 중 오류가 발생했습니다.");
     }
   };
 

@@ -56,6 +56,15 @@
   background-color: #f5f6fa;
 }
 
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-size: 2rem;
+  color: #666;
+}
+
 .post-list {
   width: 90%;
   display: flex;

@@ -40,6 +40,15 @@
   padding: 16px;
 }
 
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-size: 2rem;
+  color: #666;
+}
+
 .detail-content h1 {
   font-size: 1.5rem;
   font-weight: bold;
