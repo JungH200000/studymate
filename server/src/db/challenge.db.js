@@ -75,7 +75,7 @@ export async function getLike({ user_id, challenges_ids }) {
 /** 챌린지 참여 수 가져오기 */
 export async function countParticipation({ challenges_ids }) {
   const sql = `
-    SELECT challenge_id, COUNT(*) AS participant_count
+    SELECT challenge_id, COUNT(*)::int AS participant_count
     FROM participation
     WHERE challenge_id = ANY($1::uuid[])
     GROUP BY challenge_id`;
@@ -89,7 +89,7 @@ export async function countParticipation({ challenges_ids }) {
 /** 챌린지 좋아요 수 가져오기 */
 export async function countLike({ challenges_ids }) {
   const sql = `
-    SELECT challenge_id, COUNT(*) as like_count
+    SELECT challenge_id, COUNT(*)::int as like_count
     FROM challenge_likes
     WHERE challenge_id = ANY($1::uuid[])
     GROUP BY challenge_id`;
@@ -103,7 +103,7 @@ export async function countLike({ challenges_ids }) {
 /** 챌린지 인증글 수 가져오기 */
 export async function countPost({ challenges_ids }) {
   const sql = `
-    SELECT challenge_id, COUNT(*) as post_count
+    SELECT challenge_id, COUNT(*)::int as post_count
     FROM posts
     WHERE challenge_id = ANY($1::uuid[])
     GROUP BY challenge_id`;
@@ -120,7 +120,8 @@ export async function getParticipationUserList({ challenges_ids }) {
     SELECT p.challenge_id, u.user_id AS participant_user_id, u.username AS participant_username
     FROM participation p
     LEFT JOIN users u ON p.user_id = u.user_id
-    WHERE p.challenge_id = ANY($1::uuid[])`;
+    WHERE p.challenge_id = ANY($1::uuid[])
+    ORDER BY u.username`;
   const params = [challenges_ids];
 
   const { rows } = await query(sql, params);
@@ -134,7 +135,8 @@ export async function getLikeUserList({ challenges_ids }) {
     SELECT cl.challenge_id, u.user_id AS like_user_id, u.username AS like_username
     FROM challenge_likes cl
     LEFT JOIN users u ON cl.user_id = u.user_id
-    WHERE cl.challenge_id = ANY($1::uuid[]);`;
+    WHERE cl.challenge_id = ANY($1::uuid[])
+    ORDER BY u.username`;
   const params = [challenges_ids];
 
   const { rows } = await query(sql, params);
@@ -147,22 +149,42 @@ export async function postParticipation({ user_id, challenge_id }) {
   const sql = `
     INSERT INTO participation (user_id, challenge_id)
     VALUES ($1, $2)
-    RETURNING user_id, challenge_id`;
+    ON CONFLICT (user_id, challenge_id) DO NOTHING
+    RETURNING 1`;
   const params = [user_id, challenge_id];
 
-  const { rows } = await query(sql, params);
+  const { rowCount } = await query(sql, params);
 
-  return rows[0];
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS participant_count
+    FROM participation
+    WHERE challenge_id = $1`,
+    [challenge_id]
+  );
+
+  return { joined_by_me: true, participant_count: rows[0].participant_count, created: rowCount > 0 };
 }
 
 /** DELETE 참여 취소 */
 export async function deleteParticipation({ user_id, challenge_id }) {
   const sql = `
     DELETE FROM participation
-    WHERE user_id = $1 AND challenge_id = $2`;
+    WHERE user_id = $1 AND challenge_id = $2
+    RETURNING 1`;
   const params = [user_id, challenge_id];
 
-  await query(sql, params);
+  const { rowCount } = await query(sql, params);
+
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int as participant_count
+    FROM participation
+    WHERE challenge_id = $1`,
+    [challenge_id]
+  );
+
+  return { joined_by_me: false, participant_count: rows[0].participant_count, deleted: rowCount > 0 };
 }
 
 /** POST 좋아요 */
@@ -170,20 +192,40 @@ export async function postLike({ user_id, challenge_id }) {
   const sql = `
     INSERT INTO challenge_likes (user_id, challenge_id)
     VALUES ($1, $2)
-    RETURNING user_id, challenge_id`;
+    ON CONFLICT (user_id, challenge_id) DO NOTHING
+    RETURNING 1`;
   const params = [user_id, challenge_id];
 
-  const { rows } = await query(sql, params);
+  const { rowCount } = await query(sql, params);
 
-  return rows[0];
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS like_count
+    FROM challenge_likes
+    WHERE challenge_id = $1`,
+    [challenge_id]
+  );
+
+  return { liked_by_me: true, like_count: rows[0].like_count, created: rowCount > 0 };
 }
 
 /** Delete 좋아요 취소 */
 export async function deleteLike({ user_id, challenge_id }) {
   const sql = `
     DELETE FROM challenge_likes
-    WHERE user_id = $1 AND challenge_id = $2`;
+    WHERE user_id = $1 AND challenge_id = $2
+    RETURNING 1`;
   const params = [user_id, challenge_id];
 
-  await query(sql, params);
+  const { rowCount } = await query(sql, params);
+
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS like_count
+    FROM challenge_likes
+    WHERE challenge_id = $1`,
+    [challenge_id]
+  );
+
+  return { liked_by_me: false, like_count: rows[0].like_count, deleted: rowCount > 0 };
 }

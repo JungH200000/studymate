@@ -1,152 +1,139 @@
-// src/pages/ChallengeDetail.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./ChallengeDetail.css";
+import { fetchWithAuth } from "../api/auth";
 import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp as solidThumb } from "@fortawesome/free-solid-svg-icons";
+import {
+  faThumbsUp as solidThumb,
+  faUserPlus,
+  faUserCheck
+} from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
-import { faUserPlus, faUserCheck } from "@fortawesome/free-solid-svg-icons";
+import "./ChallengeDetail.css";
+
+const API_BASE = "http://localhost:3000/api";
 
 export default function ChallengeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [challenge, setChallenge] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("detail");
   const [likes, setLikes] = useState({ liked: false, count: 0 });
   const [participants, setParticipants] = useState({ joined: false, count: 0 });
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [userId, setUserId] = useState(null);
+  const [tab, setTab] = useState("detail");
 
-  const handleCancel = () => navigate("/home");
+  const formatDate = (isoString) => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     if (storedUser.user_id) setUserId(storedUser.user_id);
 
-    const fetchChallenge = async () => {
-  try {
-    const res = await axios.get("http://localhost:3000/api/challenges", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    });
-    const data = res.data;
-    if (data.ok) {
-      const found = data.challengesList.find(
-        (c) => c.challenge_id === id
-      );
-      if (found) setChallenge(found);
-      else setChallenge(null);
-    }
-  } catch {
-    setChallenge(null);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-    const fetchLikes = async () => {
-      if (!id) return;
+    const loadChallenge = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/likes`, {
-          params: { userId: userId || "" },
-        });
-        const data = res.data;
-        if (data.ok) setLikes({ liked: data.liked, count: data.count });
-      } catch {}
+        const res = await fetchWithAuth(`${API_BASE}/challenges`);
+        const found = res.challengesList.find((c) => c.challenge_id === id);
+        if (found) {
+          setChallenge(found);
+          setLikes({
+            liked: !!found.liked_by_me,
+            count: found.like_count || 0,
+          });
+          setParticipants({
+            joined: !!found.joined_by_me,
+            count: found.participant_count || 0,
+          });
+        }
+      } catch (err) {
+        console.error("챌린지 로딩 실패:", err);
+      }
     };
 
-    const fetchParticipants = async () => {
-      if (!id) return;
+    const loadPosts = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/participants`, {
-          params: { userId: userId || "" },
-        });
-        const data = res.data;
-        if (data.ok) setParticipants({ joined: data.joined, count: data.count });
-      } catch {}
+        const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
+        if (res.ok) setPosts(res.posts || []);
+      } catch (err) {
+        console.error("인증글 로딩 실패:", err);
+      }
     };
 
-    const fetchPosts = async () => {
-      if (!id) return;
-      try {
-        const res = await axios.get(`http://localhost:3000/api/challenges/${id}/posts`);
-        const data = res.data;
-        if (data.ok) setPosts(data.posts);
-      } catch {}
-    };
-
-    fetchChallenge();
-    fetchLikes();
-    fetchParticipants();
-    fetchPosts();
-  }, [id, userId]);
+    loadChallenge();
+    loadPosts();
+  }, [id]);
 
   const toggleLike = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
+    const method = likes.liked ? "DELETE" : "POST";
     try {
-      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/like`, {
-        userId,
-      });
-      const data = res.data;
-      if (data.ok) setLikes({ liked: data.liked, count: data.count });
-    } catch {}
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/likes`, { method });
+      if (res.ok) {
+        setLikes((prev) => ({
+          liked: !prev.liked,
+          count: prev.count + (prev.liked ? -1 : 1),
+        }));
+      }
+    } catch (err) {
+      console.error("좋아요 실패:", err);
+    }
   };
 
   const toggleParticipation = async () => {
     if (!userId) return alert("로그인이 필요합니다.");
+    const method = participants.joined ? "DELETE" : "POST";
     try {
-      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/participants`, {
-        userId,
-      });
-      const data = res.data;
-      if (data.ok) setParticipants({ joined: data.joined, count: data.count });
-    } catch {}
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/participants`, { method });
+      if (res.ok) {
+        setParticipants((prev) => ({
+          joined: !prev.joined,
+          count: prev.count + (prev.joined ? -1 : 1),
+        }));
+      }
+    } catch (err) {
+      console.error("참가 실패:", err);
+    }
   };
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    if (!userId) return alert("로그인이 필요합니다.");
     if (!newPost.trim()) return alert("내용을 입력해주세요.");
-
     try {
-      const res = await axios.post(`http://localhost:3000/api/challenges/${id}/posts`, {
-        userId,
-        content: { text: newPost },
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
+        method: "POST",
+        body: JSON.stringify({ userId, content: { text: newPost } }),
       });
-      const data = res.data;
-      if (data.ok) {
-        setPosts((prev) => [data.post, ...prev]);
+      if (res.ok && res.post) {
+        setPosts((prev) => [res.post, ...prev]);
         setNewPost("");
-      } else {
-        alert("작성 실패: " + (data.message || "알 수 없는 오류"));
       }
     } catch (err) {
-      console.error(err);
-      alert("작성 중 오류가 발생했습니다.");
+      console.error("작성 실패:", err);
     }
   };
 
-  if (loading) return <div>로딩 중...</div>;
   if (!challenge) return <div>챌린지를 찾을 수 없습니다.</div>;
 
   return (
     <div className="challenge-detail-container">
       <header className="write-header">
-        <span className="cancel-btn" onClick={handleCancel}>❌</span>
+        <span className="cancel-btn" onClick={() => navigate("/home")}>❌</span>
       </header>
 
       <div className="detail-content">
         <h1>{challenge.title}</h1>
-        {challenge.content && <p>{challenge.content}</p>}
-        <p>작성자: {challenge.username}</p>
+        <p>{challenge.content}</p>
+        <p>작성자: {challenge.author_username}</p>
         <p>빈도: {challenge.frequency_type === "daily" ? "일일" : `주 ${challenge.target_per_week}회`}</p>
-        <p>기간: {challenge.start_date}{challenge.end_date ? ` ~ ${challenge.end_date}` : ""}</p>
+        <p>기간: {formatDate(challenge.start_date)}{challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ""}</p>
 
         <div className="icon-section">
           <div className="icon-wrapper">

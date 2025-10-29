@@ -48,10 +48,24 @@ app.use('/api/challenges', challengeRoutes);
 app.use('/api/test', testRoutes);
 
 /* ===== 전역 Error ===== */
+const pgCodeError = (error) => {
+  switch (error.code) {
+    case '22P02':
+      return { status: 400, code: 'INVALID_UUID', message: '정확하지 않은 UUID입니다.' };
+    case '23503':
+      return { status: 404, code: 'FOREIGN_KEY_NOT_FOUND', message: '대상 리소스를 찾을 수 없습니다.' };
+    case '23505':
+      return { status: 409, code: 'ALREADY_EXISTS', message: '이미 처리된 요청입니다.' };
+    default:
+      return null;
+  }
+};
 app.use((error, req, res, next) => {
-  const status = error?.status || 500;
-  const code = error?.code || (status >= 500 ? 'INTERNAL_ERROR' : 'BAD_REQUEST');
-  const message = status === 500 ? '서버에 오류가 발생했습니다.' : error.message || '요청을 처리할 수 없습니다.';
+  const mapped = error.code ? pgCodeError(error) : null;
+  const status = mapped?.status || error?.status || 500;
+  const code = mapped?.code || error?.code || (status >= 500 ? 'INTERNAL_ERROR' : 'BAD_REQUEST');
+  const message =
+    mapped?.message || (status === 500 ? '서버에 오류가 발생했습니다.' : error.message || '요청을 처리할 수 없습니다.');
   console.error('Error 발생 !!!\n', error);
   res.status(status).json({ ok: false, code, message });
 });

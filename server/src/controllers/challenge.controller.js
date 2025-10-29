@@ -1,4 +1,4 @@
-// src/controller/challenge.controller.js
+// src/controllers/challenge.controller.js
 // 요청-응답 처리
 import * as challengeService from '../services/challenge.service.js';
 
@@ -25,7 +25,7 @@ export const createChallenge = async (req, res, next) => {
       challenge: createdChallenge,
     });
   } catch (error) {
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -68,21 +68,16 @@ export const postParticipation = async (req, res, next) => {
     const challenge_id = req.params.id;
     const { id: user_id } = req.user;
 
-    /** 챌린지 참여자 ID + 챌린지 ID */
-    const participationApplyInfo = await challengeService.postParticipation({ user_id, challenge_id });
-
-    return res.status(201).json({
+    const participation = await challengeService.postParticipation({ user_id, challenge_id });
+    const status = participation.created ? 201 : 200;
+    return res.status(status).json({
       ok: true,
-      participationApplyInfo,
+      user_id,
+      challenge_id,
+      ...participation,
     });
   } catch (error) {
-    if (error.code === '22P02') {
-      const error = new Error('정확하지 않은 challenge_id 입니다.');
-      error.code = '22P02';
-      error.status = 400;
-      throw error;
-    }
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -92,22 +87,17 @@ export const deleteParticipation = async (req, res, next) => {
     const challenge_id = req.params.id;
     const { id: user_id } = req.user;
 
-    await challengeService.deleteParticipation({ user_id, challenge_id });
+    const participation = await challengeService.deleteParticipation({ user_id, challenge_id });
 
     return res.status(200).json({
       ok: true,
       user_id,
       challenge_id,
+      ...participation,
       message: '챌린지 참여 취소되었습니다.',
     });
   } catch (error) {
-    if (error.code === '22P02') {
-      const error = new Error('정확하지 않은 challenge_id 입니다.');
-      error.code = '22P02';
-      error.status = 400;
-      throw error;
-    }
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -118,20 +108,16 @@ export const postLike = async (req, res, next) => {
     const { id: user_id } = req.user;
 
     /** 좋아요한 챌린지와 사용자 ID */
-    const likeApplyInfo = await challengeService.postLike({ user_id, challenge_id });
-
-    return res.status(201).json({
+    const like = await challengeService.postLike({ user_id, challenge_id });
+    const status = like.created ? 201 : 200;
+    return res.status(status).json({
       ok: true,
-      likeApplyInfo,
+      user_id,
+      challenge_id,
+      ...like,
     });
   } catch (error) {
-    if (error.code === '22P02') {
-      const error = new Error('정확하지 않은 challenge_id 입니다.');
-      error.code = '22P02';
-      error.status = 400;
-      throw error;
-    }
-    throw next(error);
+    return next(error);
   }
 };
 
@@ -141,21 +127,16 @@ export const deleteLike = async (req, res, next) => {
     const challenge_id = req.params.id;
     const { id: user_id } = req.user;
 
-    await challengeService.deleteLike({ user_id, challenge_id });
+    const like = await challengeService.deleteLike({ user_id, challenge_id });
 
     return res.status(200).json({
       ok: true,
       user_id,
       challenge_id,
+      ...like,
       message: '좋아요가 취소되었습니다.',
     });
   } catch (error) {
-    if (error.code === '22P02') {
-      const error = new Error('정확하지 않은 challenge_id 입니다.');
-      error.code = '22P02';
-      error.status = 400;
-      throw error;
-    }
-    throw next(error);
+    return next(error);
   }
 };
