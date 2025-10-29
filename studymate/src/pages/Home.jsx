@@ -1,3 +1,4 @@
+// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
@@ -67,8 +68,10 @@ export default function Home() {
 
     const handleRefresh = () => window.location.reload();
 
+    // ✅ 좋아요 처리
     const toggleLike = async (challengeId, e) => {
         e.stopPropagation();
+        console.log('좋아요 클릭됨', challengeId);
         if (!userId) return alert('로그인이 필요합니다.');
 
         const liked = likes[challengeId]?.liked;
@@ -78,15 +81,18 @@ export default function Home() {
                 method: liked ? 'DELETE' : 'POST',
             });
 
+            console.log('좋아요 응답:', res);
+
             if (res?.ok) {
                 setLikes((prev) => {
                     const current = prev[challengeId];
-                    const newLiked = !current.liked;
+                    const newLiked = res.liked_by_me ?? !current.liked;
+                    const newCount = Number(res.like_count ?? current.count + (newLiked ? 1 : -1));
                     return {
                         ...prev,
                         [challengeId]: {
                             liked: newLiked,
-                            count: current.count + (newLiked ? 1 : -1),
+                            count: newCount,
                         },
                     };
                 });
@@ -99,8 +105,10 @@ export default function Home() {
         }
     };
 
+    // ✅ 참여 처리
     const toggleParticipation = async (challengeId, e) => {
         e.stopPropagation();
+        console.log('참가 클릭됨', challengeId);
         if (!userId) return alert('로그인이 필요합니다.');
 
         const joined = participants[challengeId]?.joined;
@@ -110,15 +118,18 @@ export default function Home() {
                 method: joined ? 'DELETE' : 'POST',
             });
 
+            console.log('참가 응답:', res);
+
             if (res?.ok) {
                 setParticipants((prev) => {
                     const current = prev[challengeId];
-                    const newJoined = !current.joined;
+                    const newJoined = res.joined_by_me ?? !current.joined;
+                    const newCount = Number(res.participant_count ?? current.count + (newJoined ? 1 : -1));
                     return {
                         ...prev,
                         [challengeId]: {
                             joined: newJoined,
-                            count: current.count + (newJoined ? 1 : -1),
+                            count: newCount,
                         },
                     };
                 });
@@ -220,6 +231,7 @@ export default function Home() {
                             </div>
 
                             <div className="like-section">
+                                {/* 좋아요 */}
                                 <FontAwesomeIcon
                                     icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
                                     onClick={(e) => toggleLike(challenge.challenge_id, e)}
@@ -227,6 +239,7 @@ export default function Home() {
                                 />
                                 <span className="like-count">{likes[challenge.challenge_id]?.count || 0}</span>
 
+                                {/* 참여 */}
                                 <FontAwesomeIcon
                                     icon={faUserPlus}
                                     onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
