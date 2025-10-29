@@ -188,7 +188,7 @@ export default function Home() {
                 <FontAwesomeIcon icon={faUser} className="profile-icon" />
                 <div className="user-info">
                   <div className="card-username">
-                    {challenge.author_username || "익명"}
+                    {challenge.author_username}
                   </div>
                   <div className="card-title">{challenge.title}</div>
                 </div>
