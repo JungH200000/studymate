@@ -14,7 +14,13 @@
 로그인하면 백엔드에서 access token을 생성하고 response로 넘겨주고, access token은 15분, refresh token은 7일로 설정.
 프론트엔드에서 이걸 변수에 저장해서 다른 api 요청할 때 헤더로 넘겨주고, access token이 다 돼서 오류 발생시 `/api/auth/refresh` 호출.
 
-## 2. Home 화면
+## 2. Challenge 등록 화면
+
+### POST: 챌린지 title, content 작성 및 기간 설정하여 게시
+
+- `/api/challenges`
+
+## 3. Home 화면
 
 ### GET : 챌린지 목록, 챌린지별 좋아요/인증글 수/참여자 수, 챌린지 올린 사용자 보여주기
 
@@ -38,19 +44,9 @@
 
 ### POST: 부적절한 챌린지 신고
 
-- `/api/reports`
+- `/api/reports/:challenge_id`
 
 `{ target_type`: "challenge", `target_id: <challenge_id>, content: string }`
-
-## 3. Challenge 등록 화면
-
-### POST: 챌린지 title, content 작성 및 기간 설정하여 게시
-
-- `/api/challenges`
-
-### GET : 챌린지 작성자 정보 가져오기
-
-- `/api/me`
 
 ## 4. 인증글 피드
 
@@ -99,12 +95,11 @@ author_progress: { achieved_this_week, target_per_week }
 
 참여자만 게시 가능하도록 `joined_by_me` 체크
 
-### POST: 부적절한 챌린지 신고
+### POST: 부적절한 인증글 신고
 
-- `/api/reports`
+- `/api/reports/:post_id`
 
 `{ target_type`: "post", `target_id: <post_id>, content: string }`
-`{ target_type`: "challenge", `target_id: <challenge_id>, content: string }`
 
 ## 사용자 페이지
 
