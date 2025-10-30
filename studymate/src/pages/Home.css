@@ -164,6 +164,19 @@
   transform: scale(1.2);
 }
 
+.report-button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: auto;
+}
+.report-button:hover {
+  text-decoration: underline;
+}
+
+
 
 .like-icon,
 .join-icon,

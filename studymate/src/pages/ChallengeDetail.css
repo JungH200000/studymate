@@ -267,3 +267,26 @@
   font-size: 0.75rem;
   color: #888;
 }
+
+.delete-icon {
+  color: red;        /* 아이콘 색상 */
+  cursor: pointer;   /* 마우스 커서 포인터 */
+  margin-left: auto; /* 오른쪽 끝으로 */
+  font-size: 18px;   /* 적당한 크기 */
+}
+
+.delete-icon:hover {
+  transform: scale(1.2);
+}
+
+.report-button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: auto;
+}
+.report-button:hover {
+  text-decoration: underline;
+}

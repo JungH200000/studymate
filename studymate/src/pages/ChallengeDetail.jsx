@@ -8,7 +8,8 @@ import {
   faUserPlus,
   faUserCheck,
   faSpinner,
-  faFileAlt
+  faFileAlt,
+  faTrash
 } from "@fortawesome/free-solid-svg-icons";
 
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
@@ -268,6 +269,69 @@ export default function ChallengeDetail() {
     }
   };
 
+  const handleReportChallenge = async (challengeId) => {
+    const reason = prompt("챌린지를 신고하는 이유를 입력해주세요 (5~500자)");
+    if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
+      return alert("신고 사유는 5~500자여야 합니다.");
+    }
+    
+    try {
+      const res = await fetchWithAuth(`${API_BASE}/reports/challenges/${challengeId}`, {
+        method: "POST",
+        body: JSON.stringify({ content: reason.trim() }),
+      });
+
+      if (res.ok) {
+        alert("챌린지가 신고되었습니다.");
+      } else {
+        switch (res.code) {
+          case "ERR_ALREADY_REPORTED":
+            alert("이미 신고한 챌린지입니다.");
+            break;
+          case "INVALID_REPORT_INPUT":
+            alert("신고 사유는 5~500자여야 합니다.");
+            break;
+          default:
+            alert(res.message || "신고 처리 중 오류가 발생했습니다.");
+        }
+      }
+    } catch (err) {
+      console.error("챌린지 신고 실패:", err);
+      alert("신고 요청 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleReportPost = async (postId) => {
+    const reason = prompt("인증글을 신고하는 이유를 입력해주세요 (5~500자)");
+    if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
+      return alert("신고 사유는 5~500자여야 합니다.");
+    }
+
+    try {
+      const res = await fetchWithAuth(`${API_BASE}/reports/posts/${postId}`, {
+        method: "POST",
+        body: JSON.stringify({ content: reason.trim() }),
+      });
+
+      if (res.ok) {
+        alert("인증글이 신고되었습니다.");
+      } else {
+        switch (res.code) {
+          case "ERR_ALREADY_REPORTED":
+            alert("이미 신고한 인증글입니다.");
+            break;
+          case "INVALID_REPORT_INPUT":
+            alert("신고 사유는 5~500자여야 합니다.");
+            break;
+          default:
+            alert(res.message || "신고 처리 중 오류가 발생했습니다.");
+        }
+      }
+    } catch (err) {
+      console.error("인증글 신고 실패:", err);
+      alert("신고 요청 중 오류가 발생했습니다.");
+    }
+  };
 
   const handleAddLink = () => {
     const v = formData.linkInput?.trim();
@@ -357,6 +421,18 @@ export default function ChallengeDetail() {
       </header>
 
       <div className="detail-content">
+        {userId && challenge.creator_id === userId ? (
+          <FontAwesomeIcon
+            icon={faTrash}
+            className="delete-icon"
+            onClick={(e) => handleDelete(challenge.challenge_id, e)}
+          />
+          ) : (
+            <button
+              className="report-button"
+              onClick={(e) => handleReportChallenge(challenge.challenge_id, e)}
+            >🚨</button>
+          )}
         <h1>{challenge.title}</h1>
         <p>{challenge.content}</p>
         <p>작성자: {challenge.author_username}</p>
@@ -541,6 +617,20 @@ export default function ChallengeDetail() {
           {posts.length === 0 && <p>아직 인증 글이 없습니다.</p>}
           {posts.map((post) => (
             <div key={post.post_id} className="post-card">
+              {userId && post.user_id === userId ? (
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  className="delete-icon"
+                  onClick={() => handleDeletePost(post.post_id)}
+                />
+              ) : (
+                <button
+                  className="report-button"
+                  onClick={() => handleReportPost(post.post_id)}
+                >
+                  🚨
+                </button>
+              )}
               <h4>{post.content?.title || ""}</h4>
               {post.content?.goals && (
                 <ul>

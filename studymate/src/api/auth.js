@@ -71,4 +71,3 @@ export const fetchWithAuth = async (url, options = {}) => {
     }
   }
 };
-

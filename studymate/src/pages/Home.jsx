@@ -178,6 +178,41 @@ export default function Home() {
     }
   };
 
+  const handleReportChallenge = async (challengeId, e) => {
+    e.stopPropagation();
+    const reason = prompt("신고 사유를 입력해주세요 (5~500자)");
+    if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
+      return alert("신고 사유는 5~500자여야 합니다.");
+    }
+
+    try {
+      const res = await fetchWithAuth(`${API_BASE}/reports/challenges/${challengeId}`, {
+        method: "POST",
+        body: JSON.stringify({ content: reason.trim() }),
+      });
+      console.log("res: ",res)
+
+      if (res.ok) {
+        alert("신고되었습니다.");
+      } else {
+        switch (res.code) {
+          case "ERR_ALREADY_REPORTED":
+            alert("이미 신고한 챌린지입니다.");
+            break;
+          case "INVALID_REPORT_INPUT":
+            alert("신고 사유는 5~500자여야 합니다.");
+            break;
+          default:
+            alert(res.message || "신고 처리 중 오류가 발생했습니다.");
+        }
+      }
+    } catch (err) {
+      console.error("신고 실패:", err);
+      alert("신고 요청 중 오류가 발생했습니다.");
+    }
+  };
+
+
   return (
     <div className="home-container">
       <header className="home-header">
@@ -215,13 +250,19 @@ export default function Home() {
                       <div className="card-title">{challenge.title}</div>
                     </div>
 
-                    {userId && challenge.creator_id === userId && (
+                    {userId && challenge.creator_id === userId ? (
                       <FontAwesomeIcon
                         icon={faTrash}
                         className="delete-icon"
                         onClick={(e) => handleDelete(challenge.challenge_id, e)}
                       />
+                    ) : (
+                      <button
+                        className="report-button"
+                        onClick={(e) => handleReportChallenge(challenge.challenge_id, e)}
+                      >🚨</button>
                     )}
+
                   </div>
 
                   {challenge.content && (
