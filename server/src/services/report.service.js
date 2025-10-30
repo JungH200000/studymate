@@ -13,24 +13,23 @@ export async function createChallengeReport({ user_id, target_type, challenge_id
     throw error;
   }
 
-  const isDuplicated = await reportDB.duplicatedReport({ reporter_id: user_id, target_id: challenge_id });
-  if (!isDuplicated) {
+  const report = await reportDB.createReport({
+    reporter_id: user_id,
+    target_type,
+    target_id: challenge_id,
+    content,
+  });
+  if (!report) {
     /** 부적절한 챌린지글 신고 */
-    return await reportDB.createReport({
-      reporter_id: user_id,
-      target_type,
-      target_id: challenge_id,
-      content,
-    });
-  } else {
     const error = new Error('이미 신고한 챌린지입니다.');
     error.status = 409;
     error.code = 'ERR_ALREADY_REPORTED';
     throw error;
   }
+  return report;
 }
 
-/** 부적절한 챌린지글 신고 */
+/** 부적절한 인증글 신고 */
 export async function createPostReport({ user_id, target_type, post_id, content }) {
   const post = await reportDB.verifyPost({ post_id });
   if (!post) {
@@ -40,19 +39,18 @@ export async function createPostReport({ user_id, target_type, post_id, content 
     throw error;
   }
 
-  const isDuplicated = await reportDB.duplicatedReport({ reporter_id: user_id, target_id: post_id });
-  if (!isDuplicated) {
+  const report = await reportDB.createReport({
+    reporter_id: user_id,
+    target_type,
+    target_id: post_id,
+    content,
+  });
+  if (!report) {
     /** 부적절한 인증글 신고 */
-    return await reportDB.createReport({
-      reporter_id: user_id,
-      target_type,
-      target_id: post_id,
-      content,
-    });
-  } else {
     const error = new Error('이미 신고한 인증글입니다.');
     error.status = 409;
     error.code = 'ERR_ALREADY_REPORTED';
     throw error;
   }
+  return report;
 }
