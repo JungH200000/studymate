@@ -72,3 +72,72 @@ export async function countPost({ challenge_id }) {
 
   return rows[0].post_count;
 }
+
+/** 인증글 목록 가져오기 */
+export async function getPosts({ sort, limit, offset, challenge_id }) {
+  let sql;
+  if (sort === 'newest') {
+    sql = `
+      SELECT p.*, u.user_id, u.username
+      FROM posts p
+      LEFT JOIN users u ON p.user_id = u.user_id
+      WHERE p.challenge_id = $1
+      ORDER BY p.created_at DESC
+      LIMIT $2 OFFSET $3`;
+  } else {
+    sql = `
+      SELECT p.*, u.user_id, u.username
+      FROM posts p
+      LEFT JOIN users u ON p.user_id = u.user_id
+      WHERE p.challenge_id = $1
+      ORDER BY p.created_at DESC
+      LIMIT $2 OFFSET $3`;
+  }
+
+  const params = [challenge_id, limit, offset];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
+/** 사용자가 응원한 post의 post_id 가져오기 */
+export async function getPostCheer({ user_id, post_ids }) {
+  const sql = `
+    SELECT post_id FROM post_cheers
+    WHERE user_id = $1 AND post_id = ANY($2::uuid[])`;
+  const params = [user_id, post_ids];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
+/** 인증글 응원 수 가져오기 */
+export async function getCheerCount({ post_ids }) {
+  const sql = `
+    SELECT post_id, COUNT(*) as cheer_count
+    FROM post_cheers
+    WHERE post_id = ANY($1::uuid[])
+    GROUP BY post_id;`;
+  const params = [post_ids];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
+/** 인증글별 응원한 유저 목록 가져오기 */
+export async function getCheerUserList({ post_ids }) {
+  const sql = `
+    SELECT pc.post_id, u.user_id AS cheer_user_id, u.username AS cheer_username
+    FROM post_cheers pc
+    LEFT JOIN users u ON pc.user_id = u.user_id
+    WHERE pc.post_id = ANY($1::uuid[])
+    ORDER BY u.username`;
+  const params = [post_ids];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
