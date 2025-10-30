@@ -81,7 +81,8 @@
 
 .like-icon,
 .cheer-icon,
-.join-icon {
+.join-icon,
+.stat-icon {
   cursor: pointer;
   font-size: 20px;
   transition: transform 0.2s, color 0.2s;
@@ -108,7 +109,8 @@
 
 .like-count,
 .cheer-count,
-.join-count {
+.join-count,
+.stat-count {
   font-size: 14px;
   color: #555;
 }

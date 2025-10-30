@@ -166,7 +166,8 @@
 
 
 .like-icon,
-.join-icon {
+.join-icon,
+.stat-icon {
   transition: transform 0.2s, color 0.2s;
   cursor: pointer;
   font-size: 20px;
@@ -189,7 +190,8 @@
 
 /* 카운트 */
 .like-count,
-.join-count {
+.join-count,
+.stat-count {
   margin-left: 4px;
   font-size: 14px;
   color: #555;

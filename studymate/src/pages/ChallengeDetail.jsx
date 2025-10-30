@@ -7,8 +7,10 @@ import {
   faThumbsUp as solidThumb,
   faUserPlus,
   faUserCheck,
-  faSpinner
+  faSpinner,
+  faFileAlt
 } from "@fortawesome/free-solid-svg-icons";
+
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
 import "./ChallengeDetail.css";
 
@@ -85,7 +87,22 @@ export default function ChallengeDetail() {
       }
     };
 
+    const loadPosts = async () => {
+      try {
+        const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
+        
+        if (res.ok && Array.isArray(res.postsList)) {
+          setPosts(res.postsList);
+        } else {
+          console.warn("인증글 배열이 없습니다:", res);
+        }
+      } catch (err) {
+        console.error("인증글 로딩 실패:", err);
+      }
+    };
+
     loadChallenge();
+    loadPosts();
   }, [id]);
 
   const convertToMinutes = (hours, minutes) => {
@@ -216,6 +233,42 @@ export default function ChallengeDetail() {
     }
   };
 
+  const toggleCheer = async (postId, cheerByMe) => {
+    const method = cheerByMe ? "DELETE" : "POST";
+
+    try {
+      const data = await fetchWithAuth(`${API_BASE}/challenges/posts/${postId}/cheers`, { method });
+
+      // 응답이 없거나 cheer_by_me가 boolean이 아니면 실패 처리
+      if (!data || typeof data.cheer_by_me !== "boolean") {
+        alert(data?.message || "응원 요청에 실패했습니다.");
+        return;
+      }
+
+      // 응원 상태 업데이트
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.post_id === postId
+            ? {
+                ...p,
+                cheer_by_me: data.cheer_by_me,
+                cheer_count: data.cheer_count,
+              }
+            : p
+        )
+      );
+
+      // 중복 응원/취소 안내 메시지 (선택)
+      if (data.created === false) {
+        alert("이미 처리된 요청입니다.");
+      }
+    } catch (err) {
+      console.error("응원 처리 실패:", err);
+      alert("응원 중 오류가 발생했습니다.");
+    }
+  };
+
+
   const handleAddLink = () => {
     const v = formData.linkInput?.trim();
     if (!v) return;
@@ -227,61 +280,71 @@ export default function ChallengeDetail() {
   };
 
   const handlePostSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const content = buildContentPayload();
-    if (!Object.keys(content).length) {
-      return alert("content를 하나 이상 입력해주세요.");
-    }
+  const content = buildContentPayload();
+  if (!Object.keys(content).length) {
+    return alert("content를 하나 이상 입력해주세요.");
+  }
 
-    try {
-      const payload = {
-        content,
-        user_id: userId,
-        challenge_id: id,
-      };
+  try {
+    const payload = {
+      content,
+      user_id: userId,
+      challenge_id: id,
+    };
 
-      const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
-        method: "POST",
-        body: JSON.stringify(payload),
+    const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok && res.post) {
+      // 인증글 목록에 추가
+      setPosts((prev) => [res.post, ...prev]);
+
+      // ✅ 전체 인증글 수만 업데이트
+      setChallenge((prev) => ({
+        ...prev,
+        post_count: res.post_count,
+      }));
+
+      // 폼 초기화
+      setFormData({
+        title: "",
+        goalsText: "",
+        summary: "",
+        takeaways: "",
+        textbookName: "",
+        textbookPageStart: "",
+        textbookPageEnd: "",
+        lectureTeacher: "",
+        lectureSeries: "",
+        lectureStart: "",
+        lectureEnd: "",
+        linkInput: "",
+        links: [],
+        studyHours: "",
+        studyMinutesInput: "",
+        nextStepsText: "",
+        tagsText: "",
       });
 
-      if (res.ok && res.post) {
-        setPosts((prev) => [res.post, ...prev]);
-        setFormData({
-          title: "",
-          goalsText: "",
-          summary: "",
-          takeaways: "",
-          textbookName: "",
-          textbookPageStart: "",
-          textbookPageEnd: "",
-          lectureTeacher: "",
-          lectureSeries: "",
-          lectureStart: "",
-          lectureEnd: "",
-          linkInput: "",
-          links: [],
-          studyHours: "",
-          studyMinutesInput: "",
-          nextStepsText: "",
-          tagsText: "",
-        });
-        alert("인증글이 등록되었습니다.");
-      } else {
-        alert(res.message || "작성 실패");
-      }
-    } catch (err) {
-      console.error("작성 실패:", err);
-      alert("인증글 작성 중 오류가 발생했습니다.");
+      alert("인증글이 등록되었습니다.");
+    } else {
+      alert(res.message || "작성 실패");
     }
-  };
+  } catch (err) {
+    console.error("작성 실패:", err);
+    alert("인증글 작성 중 오류가 발생했습니다.");
+  }
+};
+
 
   if (isLoading)
     return (
       <div className="loading-spinner">
         <FontAwesomeIcon icon={faSpinner} spin />
-        <span style={{ marginLeft: 10 }}>챌린지를 불러오는 중...</span>
       </div>
     );
 
@@ -322,6 +385,12 @@ export default function ChallengeDetail() {
               className={`join-icon ${participants.joined ? "joined" : ""}`}
             />
             <span className="join-count">{participants.count}</span>
+          </div>
+
+            {/* 전체 인증글 수 */}
+          <div className="icon-wrapper">
+            <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
+            <span className="stat-count">{challenge.post_count}</span>
           </div>
         </div>
 
@@ -519,6 +588,14 @@ export default function ChallengeDetail() {
               )}
               <span className="post-user">{post.username}</span>
               <span className="post-date">{new Date(post.created_at).toLocaleString()}</span>
+              <div className="icon-wrapper">
+                <FontAwesomeIcon
+                  icon={post.cheer_by_me ? solidThumb : regularThumb}
+                  onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
+                  className={`cheer-icon ${post.cheer_by_me ? "cheered" : ""}`}
+                />
+                <span className="cheer-count">{post.cheer_count}</span>
+              </div>
             </div>
           ))}
         </div>

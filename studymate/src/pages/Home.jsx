@@ -8,7 +8,8 @@ import {
   faThumbsUp as solidThumbsUp,
   faUserPlus,
   faTrash,
-  faSpinner 
+  faSpinner ,
+  faFileAlt
 } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp as regularThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import "./Home.css";
@@ -17,7 +18,6 @@ const API_BASE = "http://127.0.0.1:3000/api";
 
 export default function Home() {
   const [tab, setTab] = useState("home");
-  const [loading, setLoading] = useState(true);
   const [challenges, setChallenges] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [likes, setLikes] = useState({});
@@ -272,6 +272,8 @@ export default function Home() {
                     <span className="join-count">
                       {participants[challenge.challenge_id]?.count || 0}
                     </span>
+                      <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
+                      <span className="stat-count">{challenge.post_count || 0}</span>
                   </div>
                 </div>
               ))
