@@ -1,3 +1,4 @@
+-- 003_postsAddColumn.sql
 -- post table에 posted_date_kst column 추가 (25-10-29)
 
 BEGIN;
