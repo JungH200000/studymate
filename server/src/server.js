@@ -8,6 +8,7 @@ import { query } from './db/pool.js';
 import authRoutes from './routes/auth.routes.js';
 import testRoutes from './routes/test.routes.js';
 import challengeRoutes from './routes/challenge.routes.js';
+import postRoutes from './routes/post.routes.js';
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.get('/api/connect', async (req, res, next) => {
 /* ===== 라우터 등록 ===== */
 app.use('/api/auth', authRoutes);
 app.use('/api/challenges', challengeRoutes);
+app.use('/api/challenges', postRoutes);
 app.use('/api/test', testRoutes);
 
 /* ===== 전역 Error ===== */
@@ -61,7 +63,8 @@ const pgCodeError = (error) => {
   }
 };
 app.use((error, req, res, next) => {
-  const mapped = error.code ? pgCodeError(error) : null;
+  const isPgCode = /^[0-9A-Z]{5}$/.test(error.code || '');
+  const mapped = isPgCode ? pgCodeError(error) : null;
   const status = mapped?.status || error?.status || 500;
   const code = mapped?.code || error?.code || (status >= 500 ? 'INTERNAL_ERROR' : 'BAD_REQUEST');
   const message =

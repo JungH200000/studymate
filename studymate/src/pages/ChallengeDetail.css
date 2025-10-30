@@ -1,5 +1,3 @@
-/* ChallengeDetail.css */
-
 /* 전체 컨테이너 */
 .challenge-detail-container {
     display: flex;
@@ -49,7 +47,7 @@
 
 /* 메인 카드 스타일 */
 .detail-content {
-    width: 90%;
+    width: 100%;
     max-width: 500px;
     background: white;
     border-radius: 20px;
@@ -63,6 +61,7 @@
     flex-grow: 1;
     box-sizing: border-box;
     overflow-y: auto;
+    margin-bottom: 80px;
 }
 
 /* 애니메이션 */
@@ -144,89 +143,146 @@
     margin-top: 14px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 18px;
-    background: linear-gradient(135deg, #fff9f7 0%, #fef5f5 100%);
+    gap: 14px;
+    padding: 20px;
+    background: white;
     border-radius: 14px;
     border: 1px solid #ffebe6;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
 }
 
-.post-form textarea {
+/* 폼 인풋 공통 스타일 */
+.form-input,
+.form-textarea,
+.form-input-small,
+.form-input-time {
     width: 100%;
-    min-height: 70px;
-    border-radius: 14px;
+    max-width: 500px;
+    border-radius: 10px;
     border: 2px solid #f0f0f0;
-    padding: 12px 14px;
-    font-size: 15px;
+    padding: 10px 12px;
+    font-size: 13px;
     font-family: 'Noto Sans KR', sans-serif;
     outline: none;
-    resize: none;
     transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-.post-form textarea:focus {
+.form-textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-input-small:focus,
+.form-input-time:focus {
     border-color: #ff7b7b;
     box-shadow: 0 4px 12px rgba(255, 123, 123, 0.15);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
-.post-form button {
-    align-self: flex-end;
+/* 참고자료 필드셋 */
+.materials-fieldset {
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    padding: 14px;
+    background: #fafafa;
+}
+
+.materials-fieldset legend {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    padding: 0 6px;
+}
+
+.material-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.material-section label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.page-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-range span {
+    color: #999;
+    font-weight: 600;
+}
+
+/* 시간 섹션 */
+.time-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    background: #fafafa;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+}
+
+.time-section label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+.time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.time-inputs span {
+    color: #999;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* 제출 버튼 */
+.submit-btn {
+    align-self: center;
+    width: 100%;
+    max-width: 500px;
     background: linear-gradient(135deg, #ff7b7b 0%, #ffb199 100%);
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 10px 22px;
+    border-radius: 10px;
+    padding: 10px 24px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 6px 16px rgba(255, 123, 123, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 123, 123, 0.25);
     transition: all 0.3s ease;
 }
 
-.post-form button:hover {
+.submit-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 24px rgba(255, 123, 123, 0.4);
 }
 
-/* 인증 글 리스트 */
-.posts-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.post-card {
-    background-color: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transition: transform 0.2s ease;
-}
-
-.post-card:hover {
-    transform: translateY(-2px);
-}
-
-.post-user {
-    font-size: 13px;
-    color: #666;
-    font-weight: 600;
-}
-
-.post-date {
-    font-size: 12px;
-    color: #aaa;
-}
-
 /* 모바일 최적화 */
 @media (max-width: 480px) {
-    .detail-content {
+    .detail-content,
+    .post-form,
+    .form-input,
+    .form-textarea,
+    .submit-btn {
         width: 95%;
-        padding: 24px 20px;
+        max-width: 100%;
+        padding: 16px;
     }
 }
