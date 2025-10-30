@@ -2,22 +2,31 @@
 
 - `Authorization: Bearer <accessToken>`을 헤더로 보내야 함
 - `content`는 JSON 형식으로 작성할 것 => 내부 내용에 따라 여러 확장이 가능
+- 프론트엔드: 사용자가 학습 시간 작성([1]시간 [40]분) -> `studyDurationText`에 보관 -> `studyMinutes`로 포맷해서 보여줌
+  - `studyMinutes`: 정수로 1시간 40분이면 100, 2시간이면 120으로 변환해서 저장
+- request를 보낼 때 빈 값이 있는 경우(property가 없는 경우)가 있다면 생략해서 보내기(request2 참고)
 
 ## 성공
 
-- request
+- request1
 
 ```http
 {
   "content": {
-    "제목": "미적분",
-    "학습 목표": ["평균 변화량", "기울기"],
-    "학습 내용": "간단한 개념~~~~",
-    "오늘 배운 점": "!!!!!",
-    "자료": "수능특강 25P~53P or 현우진 *** 1강~3강"
-  },
-  "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
-  "challenge_id": "433f49ad-e80e-4d60-883c-c747f629f2b7"
+    "title": "제목",
+    "goals": ["학습 목표1", "학습 목표2", "..."],
+    "summary": "학습 요약",
+    "takeaways": "오늘 배운 점/느낀 점",
+    "materials": {
+        "textbook": {"name": "문제집 이름", "pageStart": 25, "pageEnd": 45},
+        "lecture": {"teacher": "강사 이름", "series": "강의 이름", "lessonStart": 1, "lessonEnd": 3},
+        "links": []
+    },
+    "studyMinutes": 100,
+    "studyDurationText": "1시간 40분",
+    "nextSteps": ["다음 학습 목표"],
+    "tags": ["tag1", "tag2"]
+  }
 }
 ```
 
@@ -29,20 +38,57 @@
   "ok": true,
   "message": "인증글이 등록되었습니다.",
   "post": {
-    "post_id": "9497680e-37e8-451d-8591-1a8469758a15",
+    "post_id": "f8063022-4e68-40a8-b3d2-74e452d90099",
     "content": {
-      "자료": "수능특강 25P~53P or 현우진 *** 1강~3강",
-      "제목": "미적분",
-      "학습 내용": "간단한 개념~~~~",
-      "학습 목표": ["평균 변화량", "기울기"],
-      "오늘 배운 점": "!!!!!"
+      "tags": ["tag1", "tag2"],
+      "goals": ["학습 목표1", "학습 목표2", "..."],
+      "title": "제목",
+      "summary": "학습 요약",
+      "materials": {
+        "links": [],
+        "lecture": {
+          "series": "강의 이름",
+          "teacher": "강사 이름",
+          "lessonEnd": 3, // 강의 종료
+          "lessonStart": 1
+        },
+        "textbook": {
+          "name": "문제집 이름",
+          "pageEnd": 45,
+          "pageStart": 25
+        }
+      },
+      "nextSteps": ["다음 학습 목표"],
+      "takeaways": "오늘 배운 점/느낀 점",
+      "studyMinutes": 100,
+      "studyDurationText": "1시간 40분"
     },
     "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
     "challenge_id": "433f49ad-e80e-4d60-883c-c747f629f2b7",
-    "created_at": "2025-10-29T08:03:19.861Z"
+    "created_at": "2025-10-30T00:59:20.007Z"
   },
-  "post_count": 2
+  "post_count": 3
 }
+```
+
+- request2
+
+  - request를 보낼 때 아래 property가 없는 경우가 있다면 생략해서 보내기
+
+```http
+ {
+ "content": {
+   "title": "제목",
+   "goals": ["학습 목표1", "학습 목표2", "..."],
+   "summary": "학습 요약",
+   "takeaways": "오늘 배운 점/느낀 점",
+   "materials": {
+       "textbook": {"name": "문제집 이름", "pageStart": 25, "pageEnd": 45},
+   },
+   "studyMinutes": 100,
+   "studyDurationText": "1시간 40분",
+ }
+ }
 ```
 
 ## 실패
