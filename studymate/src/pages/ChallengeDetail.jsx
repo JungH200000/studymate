@@ -6,7 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faThumbsUp as solidThumb,
   faUserPlus,
-  faUserCheck
+  faUserCheck,
+  faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
 import "./ChallengeDetail.css";
@@ -16,13 +17,21 @@ const API_BASE = "http://127.0.0.1:3000/api";
 export default function ChallengeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const [challenge, setChallenge] = useState(null);
   const [likes, setLikes] = useState({ liked: false, count: 0 });
   const [participants, setParticipants] = useState({ joined: false, count: 0 });
   const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState("");
   const [userId, setUserId] = useState(null);
   const [tab, setTab] = useState("detail");
+
+  const [formData, setFormData] = useState({
+    title: "",
+    goals: "",
+    content: "",
+    learned: "",
+    material: "",
+  });
 
   const formatDate = (isoString) => {
     if (!isoString) return "";
@@ -39,6 +48,7 @@ export default function ChallengeDetail() {
     if (storedUser.user_id) setUserId(storedUser.user_id);
 
     const loadChallenge = async () => {
+      setIsLoading(true);
       try {
         const res = await fetchWithAuth(`${API_BASE}/challenges`);
         const found = res.challengesList.find((c) => c.challenge_id === id);
@@ -55,20 +65,12 @@ export default function ChallengeDetail() {
         }
       } catch (err) {
         console.error("챌린지 로딩 실패:", err);
-      }
-    };
-
-    const loadPosts = async () => {
-      try {
-        const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
-        if (res.ok) setPosts(res.posts || []);
-      } catch (err) {
-        console.error("인증글 로딩 실패:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadChallenge();
-    loadPosts();
   }, [id]);
 
   const toggleLike = async () => {
@@ -79,7 +81,7 @@ export default function ChallengeDetail() {
       const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/likes`, { method });
 
       if (res?.ok) {
-        const { liked_by_me, like_count, created, deleted, message } = res;
+        const { liked_by_me, like_count, created, deleted } = res;
         setLikes({
           liked: liked_by_me,
           count: parseInt(like_count, 10),
@@ -105,7 +107,7 @@ export default function ChallengeDetail() {
       const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/participants`, { method });
 
       if (res?.ok) {
-        const { joined_by_me, participant_count, created, deleted, message } = res;
+        const { joined_by_me, participant_count, created, deleted } = res;
         setParticipants({
           joined: joined_by_me,
           count: parseInt(participant_count, 10),
@@ -125,20 +127,49 @@ export default function ChallengeDetail() {
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    if (!newPost.trim()) return alert("내용을 입력해주세요.");
+
+    if (!formData.content.trim()) return alert("학습 내용을 입력해주세요.");
+
+    const postContent = {
+      "제목": formData.title || challenge.title || "제목 없음",
+      "학습 목표": formData.goals.split(",").map((g) => g.trim()).filter(Boolean),
+      "학습 내용": formData.content,
+      "오늘 배운 점": formData.learned,
+      "자료": formData.material,
+    };
+
     try {
       const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
         method: "POST",
-        body: JSON.stringify({ userId, content: { text: newPost } }),
+        body: JSON.stringify({
+          content: postContent,
+          user_id: userId,
+          challenge_id: id,
+        }),
       });
+
       if (res.ok && res.post) {
         setPosts((prev) => [res.post, ...prev]);
-        setNewPost("");
+        setFormData({
+          title: "",
+          goals: "",
+          content: "",
+          learned: "",
+          material: "",
+        });
+        alert("인증글이 등록되었습니다.");
+      } else {
+        alert(res.message || "작성 실패");
       }
     } catch (err) {
       console.error("작성 실패:", err);
+      alert("인증글 작성 중 오류가 발생했습니다.");
     }
   };
+
+  if(isLoading) return <div className="loading-spinner">
+              <FontAwesomeIcon icon={faSpinner} spin />
+            </div>
 
   if (!challenge) return <div>챌린지를 찾을 수 없습니다.</div>;
 
@@ -176,21 +207,44 @@ export default function ChallengeDetail() {
         </div>
 
         {participants.joined && (
-          <form className="post-form" onSubmit={handlePostSubmit}>
+          <form className="post-form-card" onSubmit={handlePostSubmit}>
+            <input
+              type="text"
+              placeholder="제목"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            />
             <textarea
-              placeholder="챌린지 인증 글을 작성하세요..."
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
+              placeholder="학습 목표 (쉼표로 구분)"
+              value={formData.goals}
+              onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
+            />
+            <textarea
+              placeholder="학습 내용"
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+            />
+            <textarea
+              placeholder="오늘 배운 점"
+              value={formData.learned}
+              onChange={(e) => setFormData({ ...formData, learned: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="참고 자료"
+              value={formData.material}
+              onChange={(e) => setFormData({ ...formData, material: e.target.value })}
             />
             <button type="submit">작성</button>
           </form>
         )}
 
+
         <div className="posts-list">
           {posts.length === 0 && <p>아직 인증 글이 없습니다.</p>}
           {posts.map((post) => (
             <div key={post.post_id} className="post-card">
-              <p>{post.content.text}</p>
+              <p>{post.content["학습 내용"]}</p>
               <span className="post-user">{post.username}</span>
               <span className="post-date">{new Date(post.created_at).toLocaleString()}</span>
             </div>

@@ -17,6 +17,7 @@ const API_BASE = "http://127.0.0.1:3000/api";
 
 export default function Home() {
   const [tab, setTab] = useState("home");
+  const [loading, setLoading] = useState(true);
   const [challenges, setChallenges] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [likes, setLikes] = useState({});
@@ -194,6 +195,7 @@ export default function Home() {
             <FontAwesomeIcon icon={faSpinner} spin />
           </div>
         ) : (
+          
           <div className="post-list">
             {challenges.length === 0 ? (
               <p className="tab-message">등록된 챌린지가 없습니다.</p>
