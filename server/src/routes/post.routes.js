@@ -6,6 +6,13 @@ import * as postController from '../controllers/post.controller.js';
 
 const router = express.Router();
 
-router.post('/:id/posts', requireAuth, asyncHandler(postController.createPost));
+router
+  .route('/:id/posts')
+  .post(requireAuth, asyncHandler(postController.createPost))
+  .get(requireAuth, asyncHandler(postController.getPosts));
+router
+  .route('/posts/:id/cheers')
+  .post(requireAuth, asyncHandler(postController.postCheer))
+  .delete(requireAuth, asyncHandler(postController.deleteCheer));
 
 export default router;

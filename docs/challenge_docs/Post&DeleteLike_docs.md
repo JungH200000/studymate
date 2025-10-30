@@ -43,8 +43,8 @@
 ```json
 {
   "ok": false,
-  "code": "22P02",
-  "message": "정확하지 않은 challenge_id 입니다."
+  "code": "FOREIGN_KEY_NOT_FOUND",
+  "message": "대상 리소스를 찾을 수 없습니다."
 }
 ```
 
@@ -90,7 +90,7 @@
 ```json
 {
   "ok": false,
-  "code": "22P02",
-  "message": "정확하지 않은 challenge_id 입니다."
+  "code": "FOREIGN_KEY_NOT_FOUND",
+  "message": "대상 리소스를 찾을 수 없습니다."
 }
 ```
