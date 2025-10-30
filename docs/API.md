@@ -38,7 +38,7 @@
 
 ### POST: 부적절한 챌린지 신고
 
-- `/api/reports/:challenge_id`
+- `/api/reports/challenges/:id`
 
 `{ target_type`: "challenge", `target_id: <challenge_id>, content: string }`
 
@@ -97,7 +97,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 ### POST: 부적절한 인증글 신고
 
-- `/api/reports/:post_id`
+- `/api/reports/posts/:id`
 
 `{ target_type`: "post", `target_id: <post_id>, content: string }`
 

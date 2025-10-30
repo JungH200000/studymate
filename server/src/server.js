@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.routes.js';
 import testRoutes from './routes/test.routes.js';
 import challengeRoutes from './routes/challenge.routes.js';
 import postRoutes from './routes/post.routes.js';
+import reportRoutes from './routes/report.routes.js';
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.get('/api/connect', async (req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/challenges', postRoutes);
+app.use('/api/reports', reportRoutes);
 app.use('/api/test', testRoutes);
 
 /* ===== 전역 Error ===== */
@@ -57,6 +59,7 @@ const pgCodeError = (error) => {
     case '23503':
       return { status: 404, code: 'FOREIGN_KEY_NOT_FOUND', message: '대상 리소스를 찾을 수 없습니다.' };
     case '23505':
+      console.log(error.constraint);
       return { status: 409, code: 'ALREADY_EXISTS', message: '이미 처리된 요청입니다.' };
     default:
       return null;
