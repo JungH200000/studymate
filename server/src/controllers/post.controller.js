@@ -24,7 +24,7 @@ export const createPost = async (req, res, next) => {
     throw error;
   }
 
-  const { post, postCount, myPostCount, myWeekPostCount } = await postService.createPost({
+  const { post, postCount, myPostCount, myWeekPostCount, getWeeklyTarget } = await postService.createPost({
     content,
     user_id,
     challenge_id,
@@ -37,6 +37,7 @@ export const createPost = async (req, res, next) => {
     post_count: postCount,
     myPostCount,
     myWeekPostCount,
+    getWeeklyTarget,
   });
 };
 

@@ -27,12 +27,16 @@ export async function createPost({ content, user_id, challenge_id }) {
     /** 인증글 등록 */
     const post = await postDB.createPost({ content, user_id, challenge_id });
     /** [총 인증글 수/내가 등록한 모든 인증글 수/내가 일주일간 등록한 인증글 수] */
-    const [postCount, myPostCount, myWeekPostCount] = await Promise.all([
+    const [postCount, myPostCount, myWeekPostCount, getWeeklyTarget] = await Promise.all([
       postDB.countPost({ challenge_id }),
       postDB.countMyPostsInChallenge({ user_id, challenge_id }),
       postDB.countMyPostsThisWeek({ user_id, challenge_id }),
+      postDB.getWeeklyTarget({ challenge_id }),
     ]);
-    return { post, postCount, myPostCount, myWeekPostCount };
+
+    /** 주간 진행도는 분모를 넘지 않아야 한다. */
+    const cappedWeek = Math.min(myWeekPostCount, getWeeklyTarget);
+    return { post, postCount, myPostCount, myWeekPostCount: cappedWeek, getWeeklyTarget };
   } else {
     const error = new Error('해당 챌린지에 이미 인증글을 작성하셨습니다.');
     error.status = 409;
