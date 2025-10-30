@@ -31,14 +31,16 @@
 ```
 
 - response
-  - `post_count`는 해당 챌린지의 총 인증글 수
+  - "post_count" : 해당 챌린지의 총 인증글 수
+  - "myPostCount" : 해당 챌린지에서 사용자가 작성한 인증글 수
+  - "myWeekPostCount": 해당 챌린지에서 일주일동안 사용자가 작성한 인증글 수
 
 ```json
 {
   "ok": true,
   "message": "인증글이 등록되었습니다.",
   "post": {
-    "post_id": "f8063022-4e68-40a8-b3d2-74e452d90099",
+    "post_id": "fb7761a7-6d6b-4ef4-917a-bd755c6d9a9a",
     "content": {
       "tags": ["tag1", "tag2"],
       "goals": ["학습 목표1", "학습 목표2", "..."],
@@ -49,7 +51,7 @@
         "lecture": {
           "series": "강의 이름",
           "teacher": "강사 이름",
-          "lessonEnd": 3, // 강의 종료
+          "lessonEnd": 3,
           "lessonStart": 1
         },
         "textbook": {
@@ -64,10 +66,12 @@
       "studyDurationText": "1시간 40분"
     },
     "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
-    "challenge_id": "433f49ad-e80e-4d60-883c-c747f629f2b7",
-    "created_at": "2025-10-30T00:59:20.007Z"
+    "challenge_id": "106a5e7c-2199-458d-bb19-ae3bd117bbfd",
+    "created_at": "2025-10-30T04:48:03.373Z"
   },
-  "post_count": 3
+  "post_count": 4,
+  "myPostCount": 4,
+  "myWeekPostCount": 2
 }
 ```
 
