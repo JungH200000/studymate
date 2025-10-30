@@ -24,13 +24,19 @@ export const createPost = async (req, res, next) => {
     throw error;
   }
 
-  const { post, postCount } = await postService.createPost({ content, user_id, challenge_id });
+  const { post, postCount, myPostCount, myWeekPostCount } = await postService.createPost({
+    content,
+    user_id,
+    challenge_id,
+  });
 
   return res.status(201).json({
     ok: true,
     message: '인증글이 등록되었습니다.',
     post,
     post_count: postCount,
+    myPostCount,
+    myWeekPostCount,
   });
 };
 
@@ -38,6 +44,14 @@ export const createPost = async (req, res, next) => {
 export const getPosts = async (req, res, next) => {
   const { id: user_id } = req.user;
   const challenge_id = req.params.id;
+  // 제대로된 UUID 형식인지 검증
+  if (!validate(challenge_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
+
   const { page = '1', limit = '20', sort } = req.query;
   const pageNum = Number(page) || 1;
   const limitNum = Number(limit) || 20; // 가져올 개수
@@ -48,7 +62,7 @@ export const getPosts = async (req, res, next) => {
     error.code = 'INVALID_QUERY';
     throw error;
   }
-  if (!Number.isInteger(limitNum) || limit < 1) {
+  if (!Number.isInteger(limitNum) || limitNum < 1) {
     const error = new Error('limit은 1 이상의 정수');
     error.status = 400;
     error.code = 'INVALID_QUERY';
@@ -71,14 +85,21 @@ export const getPosts = async (req, res, next) => {
 /** 인증글 응원 */
 export const postCheer = async (req, res) => {
   const post_id = req.params.id;
-  const { id: user_id } = req.user;
+  // 제대로된 UUID 형식인지 검증
+  if (!validate(post_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
 
+  const { id: user_id } = req.user;
   /** 응원 */
   const cheer = await postService.postCheer({ user_id, post_id });
   const status = cheer.created ? 201 : 200;
 
   return res.status(status).json({
-    ok: false,
+    ok: true,
     user_id,
     post_id,
     ...cheer,
@@ -88,8 +109,15 @@ export const postCheer = async (req, res) => {
 /** 인증글 응원 취소 */
 export const deleteCheer = async (req, res) => {
   const post_id = req.params.id;
-  const { id: user_id } = req.user;
+  // 제대로된 UUID 형식인지 검증
+  if (!validate(post_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
 
+  const { id: user_id } = req.user;
   const cheer = await postService.deleteCheer({ user_id, post_id });
 
   return res.status(200).json({

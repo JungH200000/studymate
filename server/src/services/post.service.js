@@ -26,8 +26,13 @@ export async function createPost({ content, user_id, challenge_id }) {
   if (!isDuplicated) {
     /** 인증글 등록 */
     const post = await postDB.createPost({ content, user_id, challenge_id });
-    const postCount = await postDB.countPost({ challenge_id });
-    return { post, postCount };
+    /** [총 인증글 수/내가 등록한 모든 인증글 수/내가 일주일간 등록한 인증글 수] */
+    const [postCount, myPostCount, myWeekPostCount] = await Promise.all([
+      postDB.countPost({ challenge_id }),
+      postDB.countMyPostsInChallenge({ user_id, challenge_id }),
+      postDB.countMyPostsThisWeek({ user_id, challenge_id }),
+    ]);
+    return { post, postCount, myPostCount, myWeekPostCount };
   } else {
     const error = new Error('해당 챌린지에 이미 인증글을 작성하셨습니다.');
     error.status = 409;
@@ -47,13 +52,19 @@ export async function getPosts({ sort, limit, offset, user_id, challenge_id }) {
   /** 인증글 목록에서 각 인증글의 post_id를 가져와 post_ids 만들기 */
   const post_ids = postsList.map((p) => p.post_id);
 
-  /** 사용자가 응원한 인증글의 post_ids */
-  const cheeredUser_ids = await postDB.getPostCheer({ user_id, post_ids });
+  const [
+    cheeredUser_ids, // 사용자가 응원한 인증글의 post_ids
+    cheerCount, //인증글별 응원 수
+    cheerUserList, // 인증글별 응원 유저 목록
+  ] = await Promise.all([
+    postDB.getPostCheer({ user_id, post_ids }),
+    postDB.getCheerCount({ post_ids }),
+    postDB.getCheerUserList({ post_ids }),
+  ]);
+
   /** Set(n) { post_ids } */
   const cheeredSet = new Set(cheeredUser_ids.map((p) => p.post_id));
 
-  /** 인증글별 응원 수 */
-  const cheerCount = await postDB.getCheerCount({ post_ids });
   /** post_id : cheer_count */
   const cheerCountMap = {};
   cheerCount.forEach((p) => {
@@ -77,8 +88,6 @@ export async function getPosts({ sort, limit, offset, user_id, challenge_id }) {
     return dict; // 예: { A: [{...}, {...}], B: [{...}] }
   }
 
-  /** 인증글별 응원 유저 목록 */
-  const cheerUserList = await postDB.getCheerUserList({ post_ids });
   const cheerListByPost = groupBy(cheerUserList, 'post_id', (r) => ({
     cheer_user_id: r.cheer_user_id,
     cheer_username: r.cheer_username,

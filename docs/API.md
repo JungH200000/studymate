@@ -75,13 +75,13 @@ author_progress: { achieved_this_week, target_per_week }
 
 - 챌린지 참여 : `/api/challenges/:id/participants`
 - 챌린지 좋아요 : `/api/challenges/:id/likes`
-- 인증글 응원 : `/api/posts/:id/cheers`
+- 인증글 응원 : `/api/challenges/posts/:id/cheers`
 
 ### DELETE : 좋아요/응원 취소, 참여 취소
 
 - 챌린지 참여 : `/api/challenges/:id/participants`
 - 챌린지 좋아요 : `/api/challenges/:id/likes`
-- 인증글 응원 : `/api/posts/:id/cheers`
+- 인증글 응원 : `/api/challenges/posts/:id/cheers`
 
 좋아요/응원/참여 POST DELETE 응답에 갱신된 카운트와 상태를 돌려줘야 프론트가 추가 GET 없이 즉시 반영 가능: { like_count, liked_by_me }, { participant_count, joined_by_me}, { cheer_count, cheered_by_me }.
 
