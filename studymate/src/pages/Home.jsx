@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
@@ -10,6 +9,7 @@ import {
     faUserPlus,
     faTrash,
     faRotateRight,
+    faFileAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsUp as regularThumbsUp } from '@fortawesome/free-regular-svg-icons';
 import './Home.css';
@@ -68,20 +68,15 @@ export default function Home() {
 
     const handleRefresh = () => window.location.reload();
 
-    // ✅ 좋아요 처리
     const toggleLike = async (challengeId, e) => {
         e.stopPropagation();
-        console.log('좋아요 클릭됨', challengeId);
         if (!userId) return alert('로그인이 필요합니다.');
-
         const liked = likes[challengeId]?.liked;
 
         try {
             const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
                 method: liked ? 'DELETE' : 'POST',
             });
-
-            console.log('좋아요 응답:', res);
 
             if (res?.ok) {
                 setLikes((prev) => {
@@ -105,20 +100,15 @@ export default function Home() {
         }
     };
 
-    // ✅ 참여 처리
     const toggleParticipation = async (challengeId, e) => {
         e.stopPropagation();
-        console.log('참가 클릭됨', challengeId);
         if (!userId) return alert('로그인이 필요합니다.');
-
         const joined = participants[challengeId]?.joined;
 
         try {
             const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
                 method: joined ? 'DELETE' : 'POST',
             });
-
-            console.log('참가 응답:', res);
 
             if (res?.ok) {
                 setParticipants((prev) => {
@@ -231,7 +221,6 @@ export default function Home() {
                             </div>
 
                             <div className="like-section">
-                                {/* 좋아요 */}
                                 <FontAwesomeIcon
                                     icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
                                     onClick={(e) => toggleLike(challenge.challenge_id, e)}
@@ -239,7 +228,6 @@ export default function Home() {
                                 />
                                 <span className="like-count">{likes[challenge.challenge_id]?.count || 0}</span>
 
-                                {/* 참여 */}
                                 <FontAwesomeIcon
                                     icon={faUserPlus}
                                     onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
@@ -248,12 +236,16 @@ export default function Home() {
                                     }`}
                                 />
                                 <span className="join-count">{participants[challenge.challenge_id]?.count || 0}</span>
+
+                                <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
+                                <span className="stat-count">{challenge.post_count || 0}</span>
                             </div>
                         </div>
                     ))}
                 </div>
             </main>
 
+            <BottomNav setTab={setTab} />
             <BottomNav setTab={setTab} />
         </div>
     );
