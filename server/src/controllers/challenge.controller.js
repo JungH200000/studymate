@@ -4,29 +4,25 @@ import * as challengeService from '../services/challenge.service.js';
 
 /** 챌린지 등록 */
 export const createChallenge = async (req, res, next) => {
-  try {
-    const { title, content, frequency_type, target_per_week, start_date, end_date } = req.body;
-    const { id: user_id } = req.user;
-    const numTpw = frequency_type === 'weekly' ? Number(target_per_week) : null;
+  const { title, content, frequency_type, target_per_week, start_date, end_date } = req.body;
+  const { id: user_id } = req.user;
+  const numTpw = frequency_type === 'weekly' ? Number(target_per_week) : null;
 
-    const createdChallenge = await challengeService.createChallenge({
-      title,
-      content,
-      frequency_type,
-      target_per_week: numTpw,
-      start_date,
-      end_date,
-      creator_id: user_id,
-    });
+  const createdChallenge = await challengeService.createChallenge({
+    title,
+    content,
+    frequency_type,
+    target_per_week: numTpw,
+    start_date,
+    end_date,
+    creator_id: user_id,
+  });
 
-    return res.status(201).json({
-      ok: true,
-      message: 'challenge가 생성되었습니다.',
-      challenge: createdChallenge,
-    });
-  } catch (error) {
-    return next(error);
-  }
+  return res.status(201).json({
+    ok: true,
+    message: 'challenge가 생성되었습니다.',
+    challenge: createdChallenge,
+  });
 };
 
 /** 챌린지 목록 가져오기 */
@@ -83,60 +79,48 @@ export const postParticipation = async (req, res, next) => {
 
 /** 챌린지 참여 취소 */
 export const deleteParticipation = async (req, res, next) => {
-  try {
-    const challenge_id = req.params.id;
-    const { id: user_id } = req.user;
+  const challenge_id = req.params.id;
+  const { id: user_id } = req.user;
 
-    const participation = await challengeService.deleteParticipation({ user_id, challenge_id });
+  const participation = await challengeService.deleteParticipation({ user_id, challenge_id });
 
-    return res.status(200).json({
-      ok: true,
-      user_id,
-      challenge_id,
-      ...participation,
-      message: '챌린지 참여 취소되었습니다.',
-    });
-  } catch (error) {
-    return next(error);
-  }
+  return res.status(200).json({
+    ok: true,
+    user_id,
+    challenge_id,
+    ...participation,
+    message: '챌린지 참여 취소되었습니다.',
+  });
 };
 
 /** 챌린지 좋아요 */
 export const postLike = async (req, res, next) => {
-  try {
-    const challenge_id = req.params.id;
-    const { id: user_id } = req.user;
+  const challenge_id = req.params.id;
+  const { id: user_id } = req.user;
 
-    /** 좋아요한 챌린지와 사용자 ID */
-    const like = await challengeService.postLike({ user_id, challenge_id });
-    const status = like.created ? 201 : 200;
-    return res.status(status).json({
-      ok: true,
-      user_id,
-      challenge_id,
-      ...like,
-    });
-  } catch (error) {
-    return next(error);
-  }
+  /** 좋아요한 챌린지와 사용자 ID */
+  const like = await challengeService.postLike({ user_id, challenge_id });
+  const status = like.created ? 201 : 200;
+  return res.status(status).json({
+    ok: true,
+    user_id,
+    challenge_id,
+    ...like,
+  });
 };
 
 /** 챌린지 좋아요 취소 */
 export const deleteLike = async (req, res, next) => {
-  try {
-    const challenge_id = req.params.id;
-    const { id: user_id } = req.user;
+  const challenge_id = req.params.id;
+  const { id: user_id } = req.user;
 
-    const like = await challengeService.deleteLike({ user_id, challenge_id });
+  const like = await challengeService.deleteLike({ user_id, challenge_id });
 
-    return res.status(200).json({
-      ok: true,
-      user_id,
-      challenge_id,
-      ...like,
-      message: '좋아요가 취소되었습니다.',
-    });
-  } catch (error) {
-    return next(error);
-  }
+  return res.status(200).json({
+    ok: true,
+    user_id,
+    challenge_id,
+    ...like,
+    message: '좋아요가 취소되었습니다.',
+  });
 };
