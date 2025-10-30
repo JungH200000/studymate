@@ -3,7 +3,7 @@
 import * as challengeService from '../services/challenge.service.js';
 
 /** 챌린지 등록 */
-export const createChallenge = async (req, res, next) => {
+export const createChallenge = async (req, res) => {
   const { title, content, frequency_type, target_per_week, start_date, end_date } = req.body;
   const { id: user_id } = req.user;
   const numTpw = frequency_type === 'weekly' ? Number(target_per_week) : null;
@@ -26,7 +26,7 @@ export const createChallenge = async (req, res, next) => {
 };
 
 /** 챌린지 목록 가져오기 */
-export const getChallenges = async (req, res, next) => {
+export const getChallenges = async (req, res) => {
   const { id: user_id } = req.user;
   const { page = '1', limit = '10', sort } = req.query;
   const pageNum = Number(page) || 1;
@@ -59,26 +59,22 @@ export const getChallenges = async (req, res, next) => {
 };
 
 /** 챌린지 참여 신청 */
-export const postParticipation = async (req, res, next) => {
-  try {
-    const challenge_id = req.params.id;
-    const { id: user_id } = req.user;
+export const postParticipation = async (req, res) => {
+  const challenge_id = req.params.id;
+  const { id: user_id } = req.user;
 
-    const participation = await challengeService.postParticipation({ user_id, challenge_id });
-    const status = participation.created ? 201 : 200;
-    return res.status(status).json({
-      ok: true,
-      user_id,
-      challenge_id,
-      ...participation,
-    });
-  } catch (error) {
-    return next(error);
-  }
+  const participation = await challengeService.postParticipation({ user_id, challenge_id });
+  const status = participation.created ? 201 : 200;
+  return res.status(status).json({
+    ok: true,
+    user_id,
+    challenge_id,
+    ...participation,
+  });
 };
 
 /** 챌린지 참여 취소 */
-export const deleteParticipation = async (req, res, next) => {
+export const deleteParticipation = async (req, res) => {
   const challenge_id = req.params.id;
   const { id: user_id } = req.user;
 
@@ -94,7 +90,7 @@ export const deleteParticipation = async (req, res, next) => {
 };
 
 /** 챌린지 좋아요 */
-export const postLike = async (req, res, next) => {
+export const postLike = async (req, res) => {
   const challenge_id = req.params.id;
   const { id: user_id } = req.user;
 
@@ -110,7 +106,7 @@ export const postLike = async (req, res, next) => {
 };
 
 /** 챌린지 좋아요 취소 */
-export const deleteLike = async (req, res, next) => {
+export const deleteLike = async (req, res) => {
   const challenge_id = req.params.id;
   const { id: user_id } = req.user;
 
