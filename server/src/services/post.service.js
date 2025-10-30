@@ -94,3 +94,13 @@ export async function getPosts({ sort, limit, offset, user_id, challenge_id }) {
 
   return totalPostsList;
 }
+
+/** 인증글 응원 */
+export async function postCheer({ user_id, post_id }) {
+  return await postDB.postCheer({ user_id, post_id });
+}
+
+/** 인증글 응원 취소 */
+export async function deleteCheer({ user_id, post_id }) {
+  return await postDB.deleteCheer({ user_id, post_id });
+}

@@ -64,6 +64,39 @@ export const getPosts = async (req, res, next) => {
     pageNum,
     limitNum,
     offset,
-    totalPostsList,
+    postsList: totalPostsList,
+  });
+};
+
+/** 인증글 응원 */
+export const postCheer = async (req, res) => {
+  const post_id = req.params.id;
+  const { id: user_id } = req.user;
+
+  /** 응원 */
+  const cheer = await postService.postCheer({ user_id, post_id });
+  const status = cheer.created ? 201 : 200;
+
+  return res.status(status).json({
+    ok: false,
+    user_id,
+    post_id,
+    ...cheer,
+  });
+};
+
+/** 인증글 응원 취소 */
+export const deleteCheer = async (req, res) => {
+  const post_id = req.params.id;
+  const { id: user_id } = req.user;
+
+  const cheer = await postService.deleteCheer({ user_id, post_id });
+
+  return res.status(200).json({
+    ok: true,
+    user_id,
+    post_id,
+    ...cheer,
+    message: '응원이 취소되었습니다.',
   });
 };

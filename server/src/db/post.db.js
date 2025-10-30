@@ -116,7 +116,7 @@ export async function getPostCheer({ user_id, post_ids }) {
 /** 인증글 응원 수 가져오기 */
 export async function getCheerCount({ post_ids }) {
   const sql = `
-    SELECT post_id, COUNT(*) as cheer_count
+    SELECT post_id, COUNT(*)::int as cheer_count
     FROM post_cheers
     WHERE post_id = ANY($1::uuid[])
     GROUP BY post_id;`;
@@ -140,4 +140,47 @@ export async function getCheerUserList({ post_ids }) {
   const { rows } = await query(sql, params);
 
   return rows;
+}
+
+/** POST 응원 클릭 */
+export async function postCheer({ user_id, post_id }) {
+  const sql = `
+    INSERT INTO post_cheers (user_id, post_id)
+    VALUES ($1, $2)
+    ON CONFLICT (user_id, post_id) DO NOTHING
+    RETURNING 1`;
+  const params = [user_id, post_id];
+
+  const { rowCount } = await query(sql, params);
+  console.log(rowCount);
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS cheer_count
+    FROM post_cheers
+    WHERE post_id = $1`,
+    [post_id]
+  );
+
+  return { cheer_by_me: true, cheer_count: rows[0].cheer_count, created: rowCount > 0 };
+}
+
+/** DELETE 응원 취소 */
+export async function deleteCheer({ user_id, post_id }) {
+  const sql = `
+    DELETE FROM post_cheers
+    WHERE user_id = $1 AND post_id = $2
+    RETURNING 1`;
+  const params = [user_id, post_id];
+
+  const { rowCount } = await query(sql, params);
+
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS cheer_count
+    FROM post_cheers
+    WHERE post_id = $1`,
+    [post_id]
+  );
+
+  return { cheer_by_me: false, cheer_count: rows[0].cheer_count, created: rowCount > 0 };
 }
