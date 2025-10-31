@@ -117,15 +117,15 @@ author_progress: { achieved_this_week, target_per_week }
 
 ### GET : 상대방 프로필, 팔로워, 달성률 재료
 
-- `/api/users/:user_id`
+- `/api/users/:id`
 
 ### GET : 상대방 등록/참여 챌린지 목록
 
-- `/api/users/:user_id/challenges?type=...`
+- `/api/users/:id/challenges?type=...`
 
 `type=created`, `type=joined`
 
-목록은 페이지네이션 `/api/users/:user_id/challenges?type=...&page=1&limit=20&sort=newest`
+목록은 페이지네이션 `/api/users/:id/challenges?type=...&page=1&limit=20&sort=newest`
 
 ### POST : 팔로우
 
