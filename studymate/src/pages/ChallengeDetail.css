@@ -181,6 +181,52 @@
   margin: 10px 0;
 }
 
+.reference-section {
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.horizontal-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.section-divider {
+  margin: 8px 0;
+}
+
+.link-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.add-button {
+  padding: 6px 10px;
+}
+
+.link-list {
+  margin-top: 8px;
+}
+
+.link-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.link-url {
+  color: #0077cc;
+}
+
+.remove-button {
+  padding: 4px 8px;
+}
+
+
 /* 링크 리스트 */
 .link-list {
   margin-top: 8px;

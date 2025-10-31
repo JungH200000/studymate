@@ -390,7 +390,7 @@ export default function ChallengeDetail() {
             `인증글이 등록되었습니다!\n
             내 인증글 수: ${res.myPostCount}\n
             이번 주 인증글 수: ${res.myWeekPostCount}\n
-            주간 목표: ${res.getWeeklyTarget}\n\n
+            주간 목표: ${res.getWeeklyTarget}\n
             이번 주 목표를 모두 달성했어요! 멋져요 👏`
           );
         } else {
@@ -504,7 +504,7 @@ export default function ChallengeDetail() {
               onChange={(e) => setFormData({ ...formData, takeaways: e.target.value })}
             />
 
-            <fieldset style={{ border: "1px solid #eee", padding: 10, borderRadius: 6 }}>
+            <fieldset className="reference-section">
               <legend>참고 자료 (선택)</legend>
               <input
                 type="text"
@@ -512,7 +512,7 @@ export default function ChallengeDetail() {
                 value={formData.textbookName}
                 onChange={(e) => setFormData({ ...formData, textbookName: e.target.value })}
               />
-              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <div className="horizontal-group">
                 <input
                   type="number"
                   placeholder="시작 페이지"
@@ -527,7 +527,7 @@ export default function ChallengeDetail() {
                 />
               </div>
 
-              <hr style={{ margin: "8px 0" }} />
+              <hr className="section-divider" />
 
               <input
                 type="text"
@@ -541,7 +541,7 @@ export default function ChallengeDetail() {
                 value={formData.lectureSeries}
                 onChange={(e) => setFormData({ ...formData, lectureSeries: e.target.value })}
               />
-              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <div className="horizontal-group">
                 <input
                   type="number"
                   placeholder="강의 시작 번호"
@@ -556,27 +556,27 @@ export default function ChallengeDetail() {
                 />
               </div>
 
-              <hr style={{ margin: "8px 0" }} />
+              <hr className="section-divider" />
 
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <div className="link-input-group">
                 <input
                   type="text"
                   placeholder="링크 입력 후 추가"
                   value={formData.linkInput}
                   onChange={(e) => setFormData({ ...formData, linkInput: e.target.value })}
                 />
-                <button type="button" onClick={handleAddLink} style={{ padding: "6px 10px" }}>
+                <button type="button" onClick={handleAddLink} className="add-button">
                   추가
                 </button>
               </div>
 
-              <div style={{ marginTop: 8 }}>
+              <div className="link-list">
                 {formData.links?.map((lnk, i) => (
-                  <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
-                    <a href={lnk} target="_blank" rel="noreferrer" style={{ color: "#0077cc" }}>
+                  <div key={i} className="link-item">
+                    <a href={lnk} target="_blank" rel="noreferrer" className="link-url">
                       {lnk}
                     </a>
-                    <button type="button" onClick={() => handleRemoveLink(i)} style={{ padding: "4px 8px" }}>
+                    <button type="button" onClick={() => handleRemoveLink(i)} className="remove-button">
                       삭제
                     </button>
                   </div>
@@ -584,7 +584,7 @@ export default function ChallengeDetail() {
               </div>
             </fieldset>
 
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="horizontal-group">
               <input
                 type="number"
                 min="0"
