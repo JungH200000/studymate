@@ -9,6 +9,7 @@ import {
     faUserCheck,
     faSpinner,
     faFileAlt,
+    faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsUp as regularThumb } from '@fortawesome/free-regular-svg-icons';
 import './ChallengeDetail.css';
@@ -198,6 +199,99 @@ export default function ChallengeDetail() {
         }
     };
 
+    const handleReportChallenge = async (e) => {
+        e.stopPropagation();
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        const reason = prompt('챌린지 신고 사유를 입력해주세요 (5~500자)');
+        if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
+            return alert('신고 사유는 5~500자여야 합니다.');
+        }
+
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/reports/challenges/${id}`, {
+                method: 'POST',
+                body: JSON.stringify({ content: reason.trim() }),
+            });
+
+            if (res?.ok) {
+                alert('챌린지가 신고되었습니다.');
+            } else {
+                switch (res?.code) {
+                    case 'ERR_ALREADY_REPORTED':
+                        alert('이미 신고한 챌린지입니다.');
+                        break;
+                    case 'INVALID_REPORT_INPUT':
+                        alert('신고 사유는 5~500자여야 합니다.');
+                        break;
+                    default:
+                        alert(res?.message || '신고 처리 중 오류가 발생했습니다.');
+                }
+            }
+        } catch (err) {
+            console.error('챌린지 신고 실패:', err);
+            alert('신고 요청 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleReportPost = async (postId, e) => {
+        e.stopPropagation();
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        const reason = prompt('인증글 신고 사유를 입력해주세요 (5~500자)');
+        if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
+            return alert('신고 사유는 5~500자여야 합니다.');
+        }
+
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/reports/posts/${postId}`, {
+                method: 'POST',
+                body: JSON.stringify({ content: reason.trim() }),
+            });
+
+            if (res?.ok) {
+                alert('인증글이 신고되었습니다.');
+            } else {
+                switch (res?.code) {
+                    case 'ERR_ALREADY_REPORTED':
+                        alert('이미 신고한 인증글입니다.');
+                        break;
+                    case 'INVALID_REPORT_INPUT':
+                        alert('신고 사유는 5~500자여야 합니다.');
+                        break;
+                    default:
+                        alert(res?.message || '신고 처리 중 오류가 발생했습니다.');
+                }
+            }
+        } catch (err) {
+            console.error('인증글 신고 실패:', err);
+            alert('신고 요청 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleDeletePost = async (postId, e) => {
+        e.stopPropagation();
+        if (!window.confirm('정말 이 인증글을 삭제하시겠습니까?')) return;
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        try {
+            const res = await fetchWithAuth(`${API_BASE}/challenges/posts/${postId}`, {
+                method: 'DELETE',
+            });
+
+            if (res?.ok) {
+                setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+                setChallenge((prev) => ({ ...prev, post_count: (prev.post_count || 1) - 1 }));
+                alert('인증글이 삭제되었습니다.');
+            } else {
+                alert('삭제 실패: ' + (res?.message || '알 수 없는 오류'));
+            }
+        } catch (err) {
+            console.error('인증글 삭제 실패:', err);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    };
+
     const handlePostSubmit = async (e) => {
         e.preventDefault();
         if (!userId) return alert('로그인이 필요합니다.');
@@ -212,9 +306,19 @@ export default function ChallengeDetail() {
                 body: JSON.stringify(payload),
             });
 
-            if (res.ok && res.post) {
-                setPosts((prev) => [res.post, ...prev]);
+            if (res?.ok && res.post) {
+                // 새 인증글을 목록에 추가
+                const newPost = {
+                    ...res.post,
+                    cheer_by_me: false,
+                    cheer_count: 0,
+                };
+                setPosts((prev) => [newPost, ...prev]);
+
+                // 챌린지 인증글 수 업데이트
                 setChallenge((prev) => ({ ...prev, post_count: res.post_count }));
+
+                // 폼 초기화
                 setFormData({
                     title: '',
                     goalsText: '',
@@ -227,11 +331,45 @@ export default function ChallengeDetail() {
                     studyMinutesInput: '',
                     nextStepsText: '',
                     tagsText: '',
-                    tagsText: '',
                 });
-                alert('인증글이 등록되었습니다.');
+
+                // 주간 목표 달성 정보 표시
+                const { myPostCount, myWeekPostCount, getWeeklyTarget } = res;
+                const remaining = Math.max(getWeeklyTarget - myWeekPostCount, 0);
+
+                if (remaining === 0) {
+                    alert(
+                        `🎉 인증글이 등록되었습니다!\n\n` +
+                            `📊 내 인증글 수: ${myPostCount}개\n` +
+                            `📅 이번 주 인증글: ${myWeekPostCount}/${getWeeklyTarget}개\n\n` +
+                            `✨ 이번 주 목표를 모두 달성했어요! 멋져요! 👏`
+                    );
+                } else {
+                    alert(
+                        `✅ 인증글이 등록되었습니다!\n\n` +
+                            `📊 내 인증글 수: ${myPostCount}개\n` +
+                            `📅 이번 주 인증글: ${myWeekPostCount}/${getWeeklyTarget}개\n\n` +
+                            `💪 이번 주에 ${remaining}번 더 작성하면 목표 달성!`
+                    );
+                }
             } else {
-                alert(res.message || '작성 실패');
+                // 에러 코드별 메시지 처리
+                switch (res?.code) {
+                    case 'CHALLENGE_NOT_FOUND':
+                        alert('챌린지를 찾을 수 없습니다.');
+                        break;
+                    case 'INVALID_POST_INPUT':
+                        alert('내용을 하나 이상 입력해주세요.');
+                        break;
+                    case 'NOT_PARTICIPATION':
+                        alert('해당 챌린지에 참여하지 않았습니다. 먼저 참가 신청을 해주세요.');
+                        break;
+                    case 'ERR_ALREADY_POSTED_TODAY':
+                        alert('오늘은 이미 인증글을 작성하셨습니다. 내일 다시 작성해주세요!');
+                        break;
+                    default:
+                        alert(res?.message || '인증글 작성에 실패했습니다.');
+                }
             }
         } catch (err) {
             console.error('작성 실패:', err);
@@ -257,7 +395,27 @@ export default function ChallengeDetail() {
             </header>
 
             <div className="detail-content">
-                <h1>{challenge.title}</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1>{challenge.title}</h1>
+                    {userId && challenge.creator_id === userId ? (
+                        <FontAwesomeIcon
+                            icon={faTrash}
+                            className="delete-icon"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (window.confirm('정말 이 챌린지를 삭제하시겠습니까?')) {
+                                    // 삭제 로직 구현 필요
+                                    alert('챌린지 삭제 기능은 구현 필요');
+                                }
+                            }}
+                        />
+                    ) : (
+                        <button className="report-button" onClick={handleReportChallenge}>
+                            🚨
+                        </button>
+                    )}
+                </div>
+
                 <p>{challenge.content}</p>
                 <p>작성자: {challenge.author_username}</p>
                 <p>빈도: {challenge.frequency_type === 'daily' ? '일일' : `주 ${challenge.target_per_week}회`}</p>
@@ -398,13 +556,34 @@ export default function ChallengeDetail() {
                 )}
 
                 <div className="posts-list">
-                    {posts.length === 0 && <p>아직 인증 글이 없습니다.</p>}
+                    {posts.length === 0 && <p className="no-posts-message">아직 인증 글이 없습니다.</p>}
                     {posts.map((post) => (
                         <div key={post.post_id} className="post-card">
-                            {post.content?.title && <h4 className="post-title">{post.content.title}</h4>}
+                            {/* 헤더: 제목 + 삭제/신고 */}
+                            <div className="post-header">
+                                <div className="post-title-section">
+                                    {post.content?.title && <h3 className="post-title">📝 {post.content.title}</h3>}
+                                </div>
+                                {userId && post.user_id === userId ? (
+                                    <FontAwesomeIcon
+                                        icon={faTrash}
+                                        className="delete-icon"
+                                        onClick={(e) => handleDeletePost(post.post_id, e)}
+                                    />
+                                ) : (
+                                    <button
+                                        className="report-button"
+                                        onClick={(e) => handleReportPost(post.post_id, e)}
+                                    >
+                                        🚨
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* 학습 목표 */}
                             {post.content?.goals?.length > 0 && (
-                                <div className="post-section">
-                                    <strong>🎯 학습 목표:</strong>
+                                <div className="post-section goals-section">
+                                    <div className="section-header">🎯 학습 목표</div>
                                     <ul className="post-goals">
                                         {post.content.goals.map((g, i) => (
                                             <li key={i}>{g}</li>
@@ -412,59 +591,99 @@ export default function ChallengeDetail() {
                                     </ul>
                                 </div>
                             )}
+
+                            {/* 학습 요약 */}
                             {post.content?.summary && (
-                                <div className="post-section">
-                                    <strong>📝 학습 요약:</strong>
-                                    <p>{post.content.summary}</p>
+                                <div className="post-section summary-section">
+                                    <div className="section-header">📝 학습 요약</div>
+                                    <p className="section-content">{post.content.summary}</p>
                                 </div>
                             )}
+
+                            {/* 배운 점 */}
                             {post.content?.takeaways && (
-                                <div className="post-section">
-                                    <strong>💡 배운 점:</strong>
-                                    <p>{post.content.takeaways}</p>
+                                <div className="post-section takeaways-section">
+                                    <div className="section-header">💡 배운 점</div>
+                                    <p className="section-content">{post.content.takeaways}</p>
                                 </div>
                             )}
-                            {post.content?.studyDurationText && (
-                                <div className="post-section">
-                                    <strong>⏱️ 학습시간:</strong>
-                                    <span>
-                                        {post.content.studyDurationText} ({post.content.studyMinutes}분)
-                                    </span>
-                                </div>
-                            )}
-                            {post.content?.materials?.textbook && (
-                                <div className="post-section">
-                                    <strong>📚 교재:</strong> {post.content.materials.textbook.name}
-                                    {post.content.materials.textbook.pageStart && (
-                                        <span>
-                                            {' '}
-                                            (p.{post.content.materials.textbook.pageStart}
-                                            {post.content.materials.textbook.pageEnd &&
-                                                ` ~ p.${post.content.materials.textbook.pageEnd}`}
-                                            )
-                                        </span>
-                                    )}
-                                </div>
-                            )}
+
+                            {/* 학습 정보 그리드 */}
+                            <div className="post-info-grid">
+                                {post.content?.studyDurationText && (
+                                    <div className="info-card">
+                                        <div className="info-icon">⏱️</div>
+                                        <div className="info-text">
+                                            <div className="info-label">학습시간</div>
+                                            <div className="info-value">{post.content.studyDurationText}</div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {post.content?.materials?.textbook && (
+                                    <div className="info-card">
+                                        <div className="info-icon">📚</div>
+                                        <div className="info-text">
+                                            <div className="info-label">교재</div>
+                                            <div className="info-value">
+                                                {post.content.materials.textbook.name}
+                                                {post.content.materials.textbook.pageStart && (
+                                                    <span className="page-info">
+                                                        {' '}
+                                                        (p.{post.content.materials.textbook.pageStart}
+                                                        {post.content.materials.textbook.pageEnd &&
+                                                            `-${post.content.materials.textbook.pageEnd}`}
+                                                        )
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 다음 학습 */}
                             {post.content?.nextSteps?.length > 0 && (
-                                <div className="post-section">
-                                    <strong>📌 다음 학습:</strong>
-                                    <ul className="post-next-steps">
+                                <div className="post-section nextsteps-section">
+                                    <div className="section-header">📌 다음 학습 계획</div>
+                                    <ul className="post-nextsteps">
                                         {post.content.nextSteps.map((s, i) => (
                                             <li key={i}>{s}</li>
                                         ))}
                                     </ul>
                                 </div>
                             )}
-                            <span className="post-user">{post.username}</span>
-                            <span className="post-date">{new Date(post.created_at).toLocaleString('ko-KR')}</span>
-                            <div className="icon-wrapper">
-                                <FontAwesomeIcon
-                                    icon={post.cheer_by_me ? solidThumb : regularThumb}
-                                    onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
-                                    className={`cheer-icon ${post.cheer_by_me ? 'cheered' : ''}`}
-                                />
-                                <span className="cheer-count">{post.cheer_count}</span>
+
+                            {/* 태그 */}
+                            {post.content?.tags?.length > 0 && (
+                                <div className="post-tags">
+                                    {post.content.tags.map((tag, i) => (
+                                        <span key={i} className="tag">
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* 푸터: 작성자 + 날짜 + 응원 */}
+                            <div className="post-footer">
+                                <div className="post-meta">
+                                    <span className="post-user">👤 {post.username}</span>
+                                    <span className="post-date">
+                                        {new Date(post.created_at).toLocaleDateString('ko-KR', {
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
+                                    </span>
+                                </div>
+                                <div className="cheer-wrapper">
+                                    <FontAwesomeIcon
+                                        icon={post.cheer_by_me ? solidThumb : regularThumb}
+                                        onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
+                                        className={`cheer-icon ${post.cheer_by_me ? 'cheered' : ''}`}
+                                    />
+                                    <span className="cheer-count">{post.cheer_count}</span>
+                                </div>
                             </div>
                         </div>
                     ))}

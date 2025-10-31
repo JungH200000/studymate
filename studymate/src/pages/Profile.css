@@ -105,6 +105,38 @@ body,
     color: #666;
 }
 
+.challenge-card.joined {
+    background-color: #f0f0f0; /* 참여한 챌린지 배경색 */
+    border: 2px solid #333; /* 검정 테두리 */
+}
+
+.challenge-card.liked {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3); /* 좋아요한 챌린지 강조 */
+}
+
+.like-icon,
+.join-icon {
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* 상태별 색상 */
+.like-icon.liked {
+    color: #ff7b7b;
+}
+.join-icon.joined {
+    color: #71c17d;
+}
+
+/* 카운트 */
+.like-count,
+.join-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
 /* -------------------- 챌린지 탭 -------------------- */
 .challenge-tabs {
     width: 90%;
