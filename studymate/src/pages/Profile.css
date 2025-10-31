@@ -17,7 +17,8 @@ html, body, #root {
   width: 100vw;
   height: 100vh;
   background-color: #f5f6fa;
-  padding-bottom: 60px;
+  padding-bottom: 60px; /* BottomNav 높이만큼 여백 확보 */
+  overflow-y: auto;     /* ✅ 스크롤 가능하게 설정 */
 }
 
 /* 로그아웃 버튼 fixed */
@@ -63,4 +64,52 @@ html, body, #root {
   height: 50px;
   margin-right: 10px;
   display: inline-block;
+}
+
+.challenge-section {
+  margin-top: 20px;
+}
+
+.challenge-card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.challenge-card:hover {
+  background-color: #f0f0f0;
+}
+
+.like-icon,
+.join-icon{
+  transition: transform 0.2s, color 0.2s;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 15px; /* 기본 간격 */
+  
+}
+
+.like-icon:hover,
+.join-icon:hover {
+  transform: scale(1.2);
+}
+
+/* 상태별 색상 */
+.like-icon.liked {
+  color: blue;
+}
+
+.join-icon.joined {
+  color: green;
+}
+
+/* 카운트 */
+.like-count,
+.join-count{
+  margin-left: 4px;
+  font-size: 14px;
+  color: #555;
 }
