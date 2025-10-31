@@ -11,13 +11,15 @@ import "./Profile.css";
 export default function Profile({ setTab }) {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("닉네임");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
-        const data = await fetchWithAuth("http://127.0.0.1:3000/api/user/me");
-        if (data?.username) {
-          setNickname(data.username);
+        const data = await fetchWithAuth("http://127.0.0.1:3000/api/me");
+        if (data?.user?.username) {
+          setNickname(data.user.username);
+          setEmail(data.user.email);
         } else {
           console.warn("사용자 정보를 불러오지 못했습니다.");
         }
@@ -27,7 +29,7 @@ export default function Profile({ setTab }) {
     };
 
     loadUserInfo();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     const confirmLogout = window.confirm("로그아웃하시겠습니까?");
@@ -52,6 +54,7 @@ export default function Profile({ setTab }) {
 
       <div className="profile-content">
         <span className="profile-name">{nickname}</span>
+        <span className="profile-email">{email}</span>
         <FontAwesomeIcon icon={faUser} size="6x" className="profile-icon" />
       </div>
 

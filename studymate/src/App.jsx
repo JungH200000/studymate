@@ -7,6 +7,7 @@ import RequireAuth from "./components/RequireAuth";
 import Home from "./pages/Home";
 import Write from "./pages/Write";
 import Profile from "./pages/Profile";
+import OtherProfile from "./pages/OtherProfile";
 import ChallengeDetail from "./pages/ChallengeDetail";
 
 export default function App() {
@@ -29,6 +30,14 @@ export default function App() {
           element={
             <RequireAuth>
               <Write />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile/:id"
+          element={
+            <RequireAuth>
+              <OtherProfile />
             </RequireAuth>
           }
         />

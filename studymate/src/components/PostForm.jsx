@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ChallengeForm({
+export default function PostForm({
   formData,
   setFormData,
   handleAddLink,

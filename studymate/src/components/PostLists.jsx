@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp as solidThumb, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
 
-export default function ChallengePosts({ posts, userId, handleReportPost, handleDeletePost, toggleCheer }) {
+export default function PostLists({ posts, userId, handleReportPost, handleDeletePost, toggleCheer }) {
   if (posts.length === 0) return <p>아직 인증 글이 없습니다.</p>;
 
   return (

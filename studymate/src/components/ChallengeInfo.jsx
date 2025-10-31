@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
 
-export default function ChallengeHeader({
+export default function ChallengeInfo({
   challenge,
   likes,
   participants,

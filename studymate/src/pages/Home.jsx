@@ -37,7 +37,7 @@ export default function Home() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    if (storedUser?.user_id) setUserId(storedUser.user_id);
+    if (storedUser?.user_id) setUserId(String(storedUser.user_id));
 
     const loadChallenges = async () => {
       setIsLoading(true);
@@ -242,7 +242,16 @@ export default function Home() {
                   onClick={() => navigate(`/challenge/${challenge.challenge_id}`)}
                 >
                   <div className="card-top">
-                    <FontAwesomeIcon icon={faUser} className="profile-icon" />
+                    <FontAwesomeIcon icon={faUser} className="profile-icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (challenge.creator_id === userId) {
+                          navigate("/profile");
+                        } else {
+                          navigate(`/profile/${challenge.creator_id}`);
+                        }
+                      }}
+                    />
                     <div className="user-info">
                       <div className="card-username">
                         {challenge.author_username}
