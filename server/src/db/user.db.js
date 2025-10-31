@@ -60,8 +60,8 @@ export async function getChallenges({ type, limit, offset, sort, user_id }) {
 
 /**
  * 타 사용자 팔로우
- * - follower_id : 타 사용자
- * - followee_id : 본인
+ * - `follower_id` : 팔로우 하는 사람
+ * - `followee_id` : 팔로우 받는 사람
  */
 export async function postFollow({ follower_id, followee_id }) {
   const sql = `

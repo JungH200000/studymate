@@ -167,11 +167,6 @@ export async function getFollowerList({ user_id }) {
   }
 
   const followerList = await userDB.followerList({ user_id });
-  // 빈 목록은 200 + []
-  if (!followerList || followerList.length === 0) {
-    return [];
-  }
-
   const followerCount = await userDB.followerCount({ user_id });
 
   return { followerList, followerCount };
@@ -189,11 +184,6 @@ export async function getFollowingList({ user_id }) {
   }
 
   const followingList = await userDB.followingList({ user_id });
-  // 빈 목록은 200 + []
-  if (!followingList || followingList.length === 0) {
-    return [];
-  }
-
   const followingCount = await userDB.followingCount({ user_id });
 
   return { followingList, followingCount };
