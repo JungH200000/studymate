@@ -103,6 +103,23 @@ export async function countMyPostsThisWeek({ user_id, challenge_id }) {
   return rows[0]?.my_week_post_count ?? 0;
 }
 
+/** 챌린지 target_per_week 가져오기 */
+export async function getWeeklyTarget({ challenge_id }) {
+  const sql = `
+    SELECT
+      CASE
+        WHEN frequency_type = 'daily' THEN 7
+        ELSE COALESCE(target_per_week, 0)
+      END AS weekly_target
+    FROM challenges
+    WHERE challenge_id = $1`;
+  const params = [challenge_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows[0]?.weekly_target ?? 0;
+}
+
 /** 인증글 목록 가져오기 */
 export async function getPosts({ sort, limit, offset, challenge_id }) {
   let sql;
