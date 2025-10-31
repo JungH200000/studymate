@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchWithAuth } from "../api/auth";
-import BottomNav from "../components/BottomNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faThumbsUp as solidThumb,
-  faUserPlus,
-  faUserCheck,
-  faSpinner,
-  faFileAlt,
-  faTrash
-} from "@fortawesome/free-solid-svg-icons";
-import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import BottomNav from "../components/BottomNav";
+import ChallengeInfo from "../components/ChallengeInfo";
+import PostForm from "../components/PostForm";
+import PostLists from "../components/PostLists";
 import "./ChallengeDetail.css";
 
 const API_BASE = "http://127.0.0.1:3000/api";
@@ -422,282 +417,46 @@ export default function ChallengeDetail() {
   if (!challenge) return <div>챌린지를 찾을 수 없습니다.</div>;
 
   return (
-    <div className="challenge-detail-container">
-      <header className="write-header">
-        <span className="cancel-btn" onClick={() => navigate("/home")}>❌</span>
-      </header>
+  <div className="challenge-detail-container">
+    <header className="write-header">
+      <span className="cancel-btn" onClick={() => navigate("/home")}>
+        ❌
+      </span>
+    </header>
 
-      <div className="detail-content">
-        {userId && challenge.creator_id === userId ? (
-          <FontAwesomeIcon
-            icon={faTrash}
-            className="delete-icon"
-            onClick={(e) => handleDelete(challenge.challenge_id, e)}
-          />
-          ) : (
-            <button
-              className="report-button"
-              onClick={(e) => handleReportChallenge(challenge.challenge_id, e)}
-            >🚨</button>
-          )}
-        <h1>{challenge.title}</h1>
-        <p>{challenge.content}</p>
-        <p>작성자: {challenge.author_username}</p>
-        <p>
-          빈도: {challenge.frequency_type === "daily" ? "일일" : `주 ${challenge.target_per_week}회`}
-        </p>
-        <p>
-          기간: {formatDate(challenge.start_date)}
-          {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ""}
-        </p>
+    <div className="detail-content">
+      <ChallengeInfo
+        challenge={challenge}
+        likes={likes}
+        participants={participants}
+        userId={userId}
+        toggleLike={toggleLike}
+        toggleParticipation={toggleParticipation}
+        handleReportChallenge={handleReportChallenge}
+        //handleDelete={handleDelete}
+        formatDate={formatDate}
+      />
 
-        <div className="icon-section">
-          <div className="icon-wrapper">
-            <FontAwesomeIcon
-              icon={likes.liked ? solidThumb : regularThumb}
-              onClick={toggleLike}
-              className={`like-icon ${likes.liked ? "liked" : ""}`}
-            />
-            <span className="like-count">{likes.count}</span>
-          </div>
+      {participants.joined && (
+        <PostForm
+          formData={formData}
+          setFormData={setFormData}
+          handleAddLink={handleAddLink}
+          handleRemoveLink={handleRemoveLink}
+          handlePostSubmit={handlePostSubmit}
+        />
+      )}
 
-          <div className="icon-wrapper">
-            <FontAwesomeIcon
-              icon={participants.joined ? faUserCheck : faUserPlus}
-              onClick={toggleParticipation}
-              className={`join-icon ${participants.joined ? "joined" : ""}`}
-            />
-            <span className="join-count">{participants.count}</span>
-          </div>
-
-          <div className="icon-wrapper">
-            <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
-            <span className="stat-count">{challenge.post_count}</span>
-          </div>
-        </div>
-
-        {participants.joined && (
-          <form className="post-form-card" onSubmit={handlePostSubmit}>
-            <input
-              type="text"
-              placeholder="제목"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            />
-
-            <input
-              type="text"
-              placeholder="학습 목표 (쉼표로 구분)"
-              value={formData.goalsText}
-              onChange={(e) => setFormData({ ...formData, goalsText: e.target.value })}
-            />
-
-            <textarea
-              placeholder="학습 요약"
-              value={formData.summary}
-              onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-            />
-
-            <textarea
-              placeholder="오늘 배운 점 / 느낀 점"
-              value={formData.takeaways}
-              onChange={(e) => setFormData({ ...formData, takeaways: e.target.value })}
-            />
-
-            <fieldset className="reference-section">
-              <legend>참고 자료 (선택)</legend>
-              <input
-                type="text"
-                placeholder="문제집 이름"
-                value={formData.textbookName}
-                onChange={(e) => setFormData({ ...formData, textbookName: e.target.value })}
-              />
-              <div className="horizontal-group">
-                <input
-                  type="number"
-                  placeholder="시작 페이지"
-                  value={formData.textbookPageStart}
-                  onChange={(e) => setFormData({ ...formData, textbookPageStart: e.target.value })}
-                />
-                <input
-                  type="number"
-                  placeholder="종료 페이지"
-                  value={formData.textbookPageEnd}
-                  onChange={(e) => setFormData({ ...formData, textbookPageEnd: e.target.value })}
-                />
-              </div>
-
-              <hr className="section-divider" />
-
-              <input
-                type="text"
-                placeholder="강사 이름"
-                value={formData.lectureTeacher}
-                onChange={(e) => setFormData({ ...formData, lectureTeacher: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="강의 시리즈"
-                value={formData.lectureSeries}
-                onChange={(e) => setFormData({ ...formData, lectureSeries: e.target.value })}
-              />
-              <div className="horizontal-group">
-                <input
-                  type="number"
-                  placeholder="강의 시작 번호"
-                  value={formData.lectureStart}
-                  onChange={(e) => setFormData({ ...formData, lectureStart: e.target.value })}
-                />
-                <input
-                  type="number"
-                  placeholder="강의 종료 번호"
-                  value={formData.lectureEnd}
-                  onChange={(e) => setFormData({ ...formData, lectureEnd: e.target.value })}
-                />
-              </div>
-
-              <hr className="section-divider" />
-
-              <div className="link-input-group">
-                <input
-                  type="text"
-                  placeholder="링크 입력 후 추가"
-                  value={formData.linkInput}
-                  onChange={(e) => setFormData({ ...formData, linkInput: e.target.value })}
-                />
-                <button type="button" onClick={handleAddLink} className="add-button">
-                  추가
-                </button>
-              </div>
-
-              <div className="link-list">
-                {formData.links?.map((lnk, i) => (
-                  <div key={i} className="link-item">
-                    <a href={lnk} target="_blank" rel="noreferrer" className="link-url">
-                      {lnk}
-                    </a>
-                    <button type="button" onClick={() => handleRemoveLink(i)} className="remove-button">
-                      삭제
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </fieldset>
-
-            <div className="horizontal-group">
-              <input
-                type="number"
-                min="0"
-                placeholder="시간(정수)"
-                value={formData.studyHours}
-                onChange={(e) => setFormData({ ...formData, studyHours: e.target.value })}
-              />
-              <input
-                type="number"
-                min="0"
-                placeholder="분(정수)"
-                value={formData.studyMinutesInput}
-                onChange={(e) => setFormData({ ...formData, studyMinutesInput: e.target.value })}
-              />
-            </div>
-
-            <input
-              type="text"
-              placeholder="다음 학습(쉼표로 구분)"
-              value={formData.nextStepsText}
-              onChange={(e) => setFormData({ ...formData, nextStepsText: e.target.value })}
-            />
-
-            <input
-              type="text"
-              placeholder="태그 (쉼표로 구분)"
-              value={formData.tagsText}
-              onChange={(e) => setFormData({ ...formData, tagsText: e.target.value })}
-            />
-
-            <button type="submit">작성</button>
-          </form>
-        )}
-
-        <div className="posts-list">
-          {posts.length === 0 && <p>아직 인증 글이 없습니다.</p>}
-          {posts.map((post) => (
-            <div key={post.post_id} className="post-card">
-              {userId && post.user_id === userId ? (
-                <FontAwesomeIcon
-                  icon={faTrash}
-                  className="delete-icon"
-                  onClick={() => handleDeletePost(post.post_id)}
-                />
-              ) : (
-                <button
-                  className="report-button"
-                  onClick={() => handleReportPost(post.post_id)}
-                >
-                  🚨
-                </button>
-              )}
-              <h4>{post.content?.title || ""}</h4>
-              {post.content?.goals && (
-                <ul>
-                  {post.content.goals.map((g, i) => (
-                    <li key={i}>{g}</li>
-                  ))}
-                </ul>
-              )}
-              <p>{post.content?.summary}</p>
-              <p>{post.content?.takeaways}</p>
-              {post.content?.studyDurationText && (
-                <p>학습시간: {post.content.studyDurationText} ({post.content.studyMinutes}분)</p>
-              )}
-              {post.content?.materials?.textbook && (
-                <p>
-                  교재: {post.content.materials.textbook.name}{" "}
-                  {post.content.materials.textbook.pageStart
-                    ? `p${post.content.materials.textbook.pageStart}`
-                    : ""}{" "}
-                  {post.content.materials.textbook.pageEnd ? `~ p${post.content.materials.textbook.pageEnd}` : ""}
-                </p>
-              )}
-              {post.content?.materials?.lecture && (
-                <p>
-                  강의: {post.content.materials.lecture.teacher} - {post.content.materials.lecture.series} (
-                  {post.content.materials.lecture.lessonStart
-                    ? post.content.materials.lecture.lessonStart
-                    : ""}{" "}
-                  {post.content.materials.lecture.lessonEnd ? `~ ${post.content.materials.lecture.lessonEnd}` : ""})
-                </p>
-              )}
-              {post.content?.materials?.links?.length > 0 && (
-                <div>
-                  링크:
-                  <ul>
-                    {post.content.materials.links.map((l, idx) => (
-                      <li key={idx}>
-                        <a href={l} target="_blank" rel="noreferrer">
-                          {l}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <span className="post-user">{post.username}</span>
-              <span className="post-date">{new Date(post.created_at).toLocaleString()}</span>
-              <div className="icon-wrapper">
-                <FontAwesomeIcon
-                  icon={post.cheer_by_me ? solidThumb : regularThumb}
-                  onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
-                  className={`cheer-icon ${post.cheer_by_me ? "cheered" : ""}`}
-                />
-                <span className="cheer-count">{post.cheer_count}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <BottomNav setTab={setTab} />
+      <PostLists
+        posts={posts}
+        userId={userId}
+        handleReportPost={handleReportPost}
+        //handleDeletePost={handleDeletePost}
+        toggleCheer={toggleCheer}
+      />
     </div>
-  );
+
+    <BottomNav setTab={setTab} />
+  </div>
+);
 }
