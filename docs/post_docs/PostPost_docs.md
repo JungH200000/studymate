@@ -8,7 +8,7 @@
 
 ## 성공
 
-- request1
+### request1
 
 ```http
 {
@@ -30,17 +30,21 @@
 }
 ```
 
-- response
-  - "post_count" : 해당 챌린지의 총 인증글 수
-  - "myPostCount" : 해당 챌린지에서 사용자가 작성한 인증글 수
-  - "myWeekPostCount": 해당 챌린지에서 일주일동안 사용자가 작성한 인증글 수
+### response
+
+- "post_count" : 해당 챌린지의 총 인증글 수
+- "myPostCount" : 해당 챌린지에서 사용자가 작성한 인증글 수
+- "myWeekPostCount": 해당 챌린지에서 일주일동안 사용자가 작성한 인증글 수
+- "getWeeklyTarget": 해당 챌린지의 target_per_week(daily일 경우 7)
+
+#### 챌린지의 frequency_type이 daily일 경우
 
 ```json
 {
   "ok": true,
   "message": "인증글이 등록되었습니다.",
   "post": {
-    "post_id": "fb7761a7-6d6b-4ef4-917a-bd755c6d9a9a",
+    "post_id": "0b1812dc-be7d-4219-aadf-a64d448b7417",
     "content": {
       "tags": ["tag1", "tag2"],
       "goals": ["학습 목표1", "학습 목표2", "..."],
@@ -67,17 +71,61 @@
     },
     "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
     "challenge_id": "106a5e7c-2199-458d-bb19-ae3bd117bbfd",
-    "created_at": "2025-10-30T04:48:03.373Z"
+    "created_at": "2025-10-30T12:07:55.466Z"
   },
   "post_count": 4,
   "myPostCount": 4,
-  "myWeekPostCount": 2
+  "myWeekPostCount": 2,
+  "getWeeklyTarget": 7
 }
 ```
 
-- request2
+#### 챌린지의 frequency_type이 weekly일 경우
 
-  - request를 보낼 때 아래 property가 없는 경우가 있다면 생략해서 보내기
+```json
+{
+  "ok": true,
+  "message": "인증글이 등록되었습니다.",
+  "post": {
+    "post_id": "8d7d0d96-bdcc-4341-994b-00e1f162f876",
+    "content": {
+      "tags": ["tag1", "tag2"],
+      "goals": ["학습 목표1", "학습 목표2", "..."],
+      "title": "제목",
+      "summary": "학습 요약",
+      "materials": {
+        "links": [],
+        "lecture": {
+          "series": "강의 이름",
+          "teacher": "강사 이름",
+          "lessonEnd": 3,
+          "lessonStart": 1
+        },
+        "textbook": {
+          "name": "문제집 이름",
+          "pageEnd": 45,
+          "pageStart": 25
+        }
+      },
+      "nextSteps": ["다음 학습 목표"],
+      "takeaways": "오늘 배운 점/느낀 점",
+      "studyMinutes": 100,
+      "studyDurationText": "1시간 40분"
+    },
+    "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
+    "challenge_id": "433f49ad-e80e-4d60-883c-c747f629f2b7",
+    "created_at": "2025-10-30T12:11:35.104Z"
+  },
+  "post_count": 7,
+  "myPostCount": 4,
+  "myWeekPostCount": 3,
+  "getWeeklyTarget": 3
+}
+```
+
+### request2
+
+- request를 보낼 때 아래 property가 없는 경우가 있다면 생략해서 보내기
 
 ```http
  {
