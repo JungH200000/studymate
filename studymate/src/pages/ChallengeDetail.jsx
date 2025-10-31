@@ -11,7 +11,6 @@ import {
   faFileAlt,
   faTrash
 } from "@fortawesome/free-solid-svg-icons";
-
 import { faThumbsUp as regularThumb } from "@fortawesome/free-regular-svg-icons";
 import "./ChallengeDetail.css";
 
@@ -30,10 +29,9 @@ export default function ChallengeDetail() {
 
   const [formData, setFormData] = useState({
     title: "",
-    goalsText: "", // comma separated
+    goalsText: "",
     summary: "",
     takeaways: "",
-    // materials
     textbookName: "",
     textbookPageStart: "",
     textbookPageEnd: "",
@@ -43,10 +41,8 @@ export default function ChallengeDetail() {
     lectureEnd: "",
     linkInput: "",
     links: [],
-    // duration
     studyHours: "",
     studyMinutesInput: "",
-    // other
     nextStepsText: "",
     tagsText: "",
   });
@@ -240,13 +236,11 @@ export default function ChallengeDetail() {
     try {
       const data = await fetchWithAuth(`${API_BASE}/challenges/posts/${postId}/cheers`, { method });
 
-      // 응답이 없거나 cheer_by_me가 boolean이 아니면 실패 처리
       if (!data || typeof data.cheer_by_me !== "boolean") {
         alert(data?.message || "응원 요청에 실패했습니다.");
         return;
       }
 
-      // 응원 상태 업데이트
       setPosts((prev) =>
         prev.map((p) =>
           p.post_id === postId
@@ -258,8 +252,6 @@ export default function ChallengeDetail() {
             : p
         )
       );
-
-      // 중복 응원/취소 안내 메시지 (선택)
       if (data.created === false) {
         alert("이미 처리된 요청입니다.");
       }
@@ -344,65 +336,80 @@ export default function ChallengeDetail() {
   };
 
   const handlePostSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const content = buildContentPayload();
-  if (!Object.keys(content).length) {
-    return alert("content를 하나 이상 입력해주세요.");
-  }
+    const content = buildContentPayload();
+    if (!Object.keys(content).length) {
+      return alert("content를 하나 이상 입력해주세요.");
+    }
 
-  try {
-    const payload = {
-      content,
-      user_id: userId,
-      challenge_id: id,
-    };
+    try {
+      const payload = {
+        content,
+        user_id: userId,
+        challenge_id: id,
+      };
 
-    const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-
-    if (res.ok && res.post) {
-      // 인증글 목록에 추가
-      setPosts((prev) => [res.post, ...prev]);
-
-      // ✅ 전체 인증글 수만 업데이트
-      setChallenge((prev) => ({
-        ...prev,
-        post_count: res.post_count,
-      }));
-
-      // 폼 초기화
-      setFormData({
-        title: "",
-        goalsText: "",
-        summary: "",
-        takeaways: "",
-        textbookName: "",
-        textbookPageStart: "",
-        textbookPageEnd: "",
-        lectureTeacher: "",
-        lectureSeries: "",
-        lectureStart: "",
-        lectureEnd: "",
-        linkInput: "",
-        links: [],
-        studyHours: "",
-        studyMinutesInput: "",
-        nextStepsText: "",
-        tagsText: "",
+      const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
+        method: "POST",
+        body: JSON.stringify(payload),
       });
 
-      alert("인증글이 등록되었습니다.");
-    } else {
-      alert(res.message || "작성 실패");
+      if (res.ok && res.post) {
+        setPosts((prev) => [res.post, ...prev]);
+
+        setChallenge((prev) => ({
+          ...prev,
+          post_count: res.post_count,
+        }));
+
+        setFormData({
+          title: "",
+          goalsText: "",
+          summary: "",
+          takeaways: "",
+          textbookName: "",
+          textbookPageStart: "",
+          textbookPageEnd: "",
+          lectureTeacher: "",
+          lectureSeries: "",
+          lectureStart: "",
+          lectureEnd: "",
+          linkInput: "",
+          links: [],
+          studyHours: "",
+          studyMinutesInput: "",
+          nextStepsText: "",
+          tagsText: "",
+        });
+
+        const remaining = Math.max(res.getWeeklyTarget - res.myWeekPostCount, 0);
+
+        if (remaining === 0) {
+          alert(
+            `인증글이 등록되었습니다!\n
+            내 인증글 수: ${res.myPostCount}\n
+            이번 주 인증글 수: ${res.myWeekPostCount}\n
+            주간 목표: ${res.getWeeklyTarget}\n\n
+            이번 주 목표를 모두 달성했어요! 멋져요 👏`
+          );
+        } else {
+          alert(
+            `인증글이 등록되었습니다.\n
+            내 인증글 수: ${res.myPostCount}\n
+            이번 주 인증글 수: ${res.myWeekPostCount}\n
+            주간 목표: ${res.getWeeklyTarget}\n
+            이번 주에 ${remaining}번 더 인증글을 작성하면 목표를 달성할 수 있어요!`
+          );
+        }
+      } else {
+        alert(res.message || "작성 실패");
+      }
+    } catch (err) {
+      console.error("작성 실패:", err);
+      alert("인증글 작성 중 오류가 발생했습니다.");
     }
-  } catch (err) {
-    console.error("작성 실패:", err);
-    alert("인증글 작성 중 오류가 발생했습니다.");
-  }
-};
+  };
 
 
   if (isLoading)
@@ -463,7 +470,6 @@ export default function ChallengeDetail() {
             <span className="join-count">{participants.count}</span>
           </div>
 
-            {/* 전체 인증글 수 */}
           <div className="icon-wrapper">
             <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
             <span className="stat-count">{challenge.post_count}</span>
