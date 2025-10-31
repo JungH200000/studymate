@@ -10,6 +10,8 @@ import testRoutes from './routes/test.routes.js';
 import challengeRoutes from './routes/challenge.routes.js';
 import postRoutes from './routes/post.routes.js';
 import reportRoutes from './routes/report.routes.js';
+import meRoutes from './routes/me.routes.js';
+import usersRoutes from './routes/users.routes.js';
 
 const app = express();
 
@@ -49,6 +51,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/challenges', postRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/me', meRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/test', testRoutes);
 
 /* ===== 전역 Error ===== */
