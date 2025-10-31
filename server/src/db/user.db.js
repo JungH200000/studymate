@@ -57,3 +57,105 @@ export async function getChallenges({ type, limit, offset, sort, user_id }) {
     return rows;
   }
 }
+
+/**
+ * 타 사용자 팔로우
+ * - follower_id : 타 사용자
+ * - followee_id : 본인
+ */
+export async function postFollow({ follower_id, followee_id }) {
+  const sql = `
+    INSERT INTO follows (follower_id, followee_id)
+    VALUES ($1, $2)
+    ON CONFLICT (follower_id, followee_id) DO NOTHING
+    RETURNING 1`;
+  const params = [follower_id, followee_id];
+
+  const { rowCount } = await query(sql, params);
+
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS follower_count
+    FROM follows
+    WHERE followee_id = $1`,
+    [followee_id]
+  );
+
+  return { follow_by_me: true, follower_count: rows[0].follower_count, created: rowCount > 0 };
+}
+/** 사용자 팔로우 취소 */
+export async function deleteFollow({ follower_id, followee_id }) {
+  const sql = `
+    DELETE FROM follows
+    WHERE follower_id = $1 AND followee_id = $2
+    RETURNING 1`;
+  const params = [follower_id, followee_id];
+
+  const { rowCount } = await query(sql, params);
+
+  const { rows } = await query(
+    `
+    SELECT COUNT(*)::int AS follower_count
+    FROM follows
+    WHERE followee_id = $1`,
+    [followee_id]
+  );
+
+  return { follow_by_me: false, follower_count: rows[0].follower_count, deleted: rowCount > 0 };
+}
+
+/** 사용자 팔로워 수 : 나를 팔로우한 사용자 수 */
+export async function followerCount({ user_id }) {
+  const sql = `
+    SELECT COUNT(*)::int AS follower_count
+    FROM follows
+    WHERE followee_id = $1`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows[0].follower_count;
+}
+
+/** 사용자 팔로워 목록 */
+export async function followerList({ user_id }) {
+  const sql = `
+    SELECT u.user_id, u.username, f.created_at AS followed_at
+    FROM follows f
+    LEFT JOIN users u ON f.follower_id = u.user_id
+    WHERE followee_id = $1
+    ORDER BY u.username`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
+/** 사용자 팔로잉 수 : 내가 팔로우한 사용자 수 */
+export async function followingCount({ user_id }) {
+  const sql = `
+    SELECT COUNT(*)::int AS following_count
+    FROM follows
+    WHERE follower_id = $1`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows[0].following_count;
+}
+
+/** 사용자 팔로잉 목록 */
+export async function followingList({ user_id }) {
+  const sql = `
+    SELECT u.username AS followerName, f.*
+    FROM follows f
+    LEFT JOIN users u ON f.followee_id = u.user_id
+    WHERE follower_id = $1
+    ORDER BY u.username`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}

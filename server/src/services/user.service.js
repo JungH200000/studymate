@@ -126,3 +126,75 @@ export async function getChallenges({ type, limit, offset, sort, user_id, viewer
 
   return totalChallengesList;
 }
+
+/** 타 사용자 팔로우 */
+export async function postFollow({ user_id, viewer_id }) {
+  const isUser = await userDB.verifyUser({ user_id });
+  /** 존재하는 사용자인지 확인 */
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  return await userDB.postFollow({ follower_id: viewer_id, followee_id: user_id });
+}
+
+/** 타 사용자 언팔로우 */
+export async function deleteFollow({ user_id, viewer_id }) {
+  const isUser = await userDB.verifyUser({ user_id });
+  /** 존재하는 사용자인지 확인 */
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  return await userDB.deleteFollow({ follower_id: viewer_id, followee_id: user_id });
+}
+
+/** 사용자 팔로워 목록 */
+export async function getFollowerList({ user_id }) {
+  const isUser = await userDB.verifyUser({ user_id });
+  /** 존재하는 사용자인지 확인 */
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  const followerList = await userDB.followerList({ user_id });
+  // 빈 목록은 200 + []
+  if (!followerList || followerList.length === 0) {
+    return [];
+  }
+
+  const followerCount = await userDB.followerCount({ user_id });
+
+  return { followerList, followerCount };
+}
+
+/** 사용자 팔로잉 목록 */
+export async function getFollowingList({ user_id }) {
+  const isUser = await userDB.verifyUser({ user_id });
+  /** 존재하는 사용자인지 확인 */
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  const followingList = await userDB.followingList({ user_id });
+  // 빈 목록은 200 + []
+  if (!followingList || followingList.length === 0) {
+    return [];
+  }
+
+  const followingCount = await userDB.followingCount({ user_id });
+
+  return { followingList, followingCount };
+}
