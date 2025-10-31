@@ -129,13 +129,19 @@ author_progress: { achieved_this_week, target_per_week }
 
 ### POST : 팔로우
 
-- `/api/users/:id/follow`
+- `/api/users/:id/follows`
 
 ### DELETE : 언팔로우
 
-- `/api/users/:id/follow`
+- `/api/users/:id/follows`
 
-응답: { follower_count, is_following }
+### GET : 팔로워 목록
+
+- `/api/users/:id/followers`
+
+### GET : 팔로잉 목록
+
+- `/api/users/:id/followings`
 
 ## 검색
 
