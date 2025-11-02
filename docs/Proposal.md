@@ -18,21 +18,18 @@
 많은 학생이 목표는 알차게 세우지만 혼자 꾸준히 실천하는 데 어려움을 겪습니다.
 [자료1]신종호 서울대 교육학과 교수는 자기주도 학습이 흔히 실패하는 이유로 "공부 목적의식의 부재, 흥미 결여, 혼자 공부하기의 난이도"를 지적합니다.
 
-한편, 최근 5년 사이 학생의 주의/집중 관련 지원 필요도는 높아졌습니다. [자료2]국민건강보험공단 자료를 인용한 보도에 따르면 ADHD 진단 학생 수가 2019년 54,347명에서 2023년 111,587명으로 두 배 이상 증가했습니다.
+최근 5년 사이 학생의 주의/집중 관련 지원 필요도도 높아졌습니다. [자료2]국민건강보험공단 자료를 인용한 보도에 따르면 ADHD 진단 학생 수가 2019년 54,347명에서 2023년 111,587명으로 두 배 이상 증가했습니다.
 
-사교육 의존도도 높습니다. [자료3]통계청 '2024 초중고 사교육비 조사'에 따르면 사교육 참여율은 80%, 주당 참여시간은 7.6 시간으로 집계되었습니다. 이는 '투자'가 '매일의 자기 실행'으로 연결되지 않음을 보여줍니다.
-
-또한 디지털 환경은 주의 분산을 키우기도 합니다. [자료4]과학기술정보통신부 IITP 통계에 따르면 2024년 청소년 스마트폰 과의존 '위험군' 비율은 42.6%였습니다.
+또한 디지털 환경은 주의 분산을 키우기도 합니다. [자료3]과학기술정보통신부 IITP 통계에 따르면 2024년 청소년 스마트폰 과의존 '위험군' 비율은 42.6%였습니다.
 
 그래서 저희는 하루 학습 인증과 친구 간 경쟁/응원 그리고 달성률 시각화를 결합한 학습 습관 챌린지형 플랫폼을 기획했습니다. 학생은 목표를 챌린지로 설정하고 매일 인증하며, 시각화(달성률)로 꾸준함을 강화합니다.
 
-시장성도 있습니다. [자료5]글로벌 '습관 추적 앱' 시장은 2024년 17억 달러에서 2033년 55억 달러로 성장 전망이 제시됩니다.
+시장성도 있습니다. [자료4]글로벌 '습관 추적 앱' 시장은 2024년 17억 달러에서 2033년 55억 달러로 성장 전망이 제시됩니다.
 
 [자료1]: https://www.donga.com/news/article/all/20220811/114924611/1
 [자료2]: https://www.hangyo.com/news/article.html?no=105085
-[자료3]: https://kostat.go.kr/board.es?act=view&bid=245&list_no=435485&mainXml=Y&mid=a10301010000
-[자료4]: https://iitp.kr/kr/1/knowledge/statisticsView.it?identifier=02-008-250328-000001&masterCode=publication&searClassCode=K_STAT_01&utm_source=chatgpt.com
-[자료5]: https://straitsresearch.com/report/habit-tracking-apps-market?utm_source=chatgpt.com
+[자료3]: https://iitp.kr/kr/1/knowledge/statisticsView.it?identifier=02-008-250328-000001&masterCode=publication&searClassCode=K_STAT_01
+[자료4]: https://straitsresearch.com/report/habit-tracking-apps-market?utm_source=chatgpt.com
 
 ### 4. 주요 기능
 
