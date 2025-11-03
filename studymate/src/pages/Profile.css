@@ -94,15 +94,42 @@ body,
     margin-bottom: 6px;
 }
 
+.profile-id {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+/* 팔로우 통계 (가로 배치) */
 .profile-stats {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .stat-item {
     font-size: 14px;
     color: #666;
+    transition: color 0.2s;
+}
+
+.stat-item.clickable {
+    cursor: pointer;
+}
+
+.stat-item.clickable:hover {
+    color: #ff6b6b;
+}
+
+.stat-item strong {
+    color: #333;
+    font-weight: 700;
+}
+
+.stat-divider {
+    color: #ddd;
+    font-size: 14px;
 }
 
 .challenge-card.joined {

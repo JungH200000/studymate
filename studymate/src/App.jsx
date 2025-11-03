@@ -9,6 +9,8 @@ import Write from './pages/Write';
 import Profile from './pages/Profile';
 import OtherProfile from './pages/OtherProfile';
 import ChallengeDetail from './pages/ChallengeDetail';
+import FollowerList from './pages/FollowerList';
+import FollowingList from './pages/FollowingList';
 
 export default function App() {
     return (
@@ -17,6 +19,8 @@ export default function App() {
                 <Route path="/" element={<Intro />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Signup />} />
+                <Route path="/users/:id/followers" element={<FollowerList />} />
+                <Route path="/users/:id/followings" element={<FollowingList />} />
                 <Route
                     path="/home"
                     element={

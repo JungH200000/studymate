@@ -13,19 +13,48 @@ export default function Profile({ setTab }) {
 
     const [nickname, setNickname] = useState('닉네임');
     const [email, setEmail] = useState('');
+    const [userId, setUserId] = useState('');
     const [createdChallenges, setCreatedChallenges] = useState([]);
     const [joinedChallenges, setJoinedChallenges] = useState([]);
+
+    // 팔로우 통계
+    const [followerCount, setFollowerCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
 
     useEffect(() => {
         const loadUserInfo = async () => {
             try {
                 const data = await fetchWithAuth('http://127.0.0.1:3000/api/me');
-                if (data?.user?.username) {
-                    setNickname(data.user.username);
-                    setEmail(data.user.email);
+                if (data?.user) {
+                    setNickname(data.user.username || '닉네임');
+                    setEmail(data.user.email || '');
+                    setUserId(data.user.user_id || '');
+
+                    // user_id를 받은 후 팔로우 통계 로드
+                    if (data.user.user_id) {
+                        loadFollowStats(data.user.user_id);
+                    }
                 }
             } catch (err) {
                 console.error('❌ 사용자 정보 요청 실패:', err);
+            }
+        };
+
+        const loadFollowStats = async (user_id) => {
+            try {
+                const [followers, followings] = await Promise.all([
+                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${user_id}/followers`),
+                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${user_id}/followings`),
+                ]);
+
+                if (followers?.followerCount !== undefined) {
+                    setFollowerCount(followers.followerCount);
+                }
+                if (followings?.followingCount !== undefined) {
+                    setFollowingCount(followings.followingCount);
+                }
+            } catch (err) {
+                console.error('❌ 팔로우 통계 요청 실패:', err);
             }
         };
 
@@ -64,6 +93,16 @@ export default function Profile({ setTab }) {
         navigate('/login');
     };
 
+    const handleFollowerClick = () => {
+        if (!userId) return;
+        navigate(`/users/${userId}/followers`);
+    };
+
+    const handleFollowingClick = () => {
+        if (!userId) return;
+        navigate(`/users/${userId}/followings`);
+    };
+
     const currentList = activeTab === 'created' ? createdChallenges : joinedChallenges;
 
     return (
@@ -78,6 +117,17 @@ export default function Profile({ setTab }) {
                 <div className="profile-info">
                     <span className="profile-name">{nickname}</span>
                     <span className="profile-id">이메일: {email}</span>
+
+                    {/* 팔로우 통계 */}
+                    <div className="profile-stats">
+                        <span className="stat-item clickable" onClick={handleFollowerClick}>
+                            팔로워 <strong>{followerCount}</strong>
+                        </span>
+                        <span className="stat-divider">·</span>
+                        <span className="stat-item clickable" onClick={handleFollowingClick}>
+                            팔로잉 <strong>{followingCount}</strong>
+                        </span>
+                    </div>
                 </div>
 
                 <div className="profile-icon">
