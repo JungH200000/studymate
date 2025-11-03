@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import './Auth.css';
 
 const emojis = ['✏️', '📚', '📝', '📖', '🖍️'];
 const NUM_EMOJIS = 10;
 
-export default function Login() {
+export default function Signup() {
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fallingEmojis, setFallingEmojis] = useState([]);
     const navigate = useNavigate();
 
-    // 이모지 떨어지는 애니메이션
     useEffect(() => {
         const ems = [];
         for (let i = 0; i < NUM_EMOJIS; i++) {
@@ -27,47 +26,36 @@ export default function Login() {
         setFallingEmojis(ems);
     }, []);
 
-    const handleLogin = async (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-
-        if (!email || !password) {
-            alert('이메일과 비밀번호를 입력하세요');
-            return;
+        if (!username || !email || !password) {
+            return alert('모든 항목을 입력하세요.');
         }
 
         try {
-            const res = await axios.post(
-                'http://127.0.0.1:3000/api/auth/login',
-                { email, password },
-                { withCredentials: true }
-            );
+            const res = await fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password }),
+            });
 
-            const data = res.data;
+            const data = await res.json();
 
             if (data.ok) {
-                localStorage.setItem(
-                    'user',
-                    JSON.stringify({
-                        user_id: data.user.id,
-                        email: data.user.email,
-                        username: data.user.username,
-                    })
-                );
-                localStorage.setItem('accessToken', data.accessToken); // 선택
-
+                localStorage.setItem('user', JSON.stringify(data.user));
+                alert('회원가입 완료!');
                 navigate('/home');
             } else {
-                alert(data.message || '이메일 또는 비밀번호를 확인하세요');
+                alert(data.error);
             }
         } catch (err) {
-            console.error('❌ 로그인 요청 실패:', err);
-            alert('로그인 중 오류가 발생했습니다. ' + err.message);
+            console.error(err);
+            alert('회원가입 중 오류가 발생했습니다.');
         }
     };
 
     return (
         <div className="auth-container">
-            {/* 이모지 애니메이션 */}
             {fallingEmojis.map((em) => (
                 <span
                     key={em.id}
@@ -82,9 +70,9 @@ export default function Login() {
                 </span>
             ))}
 
-            <h2>로그인</h2>
+            <h2>회원가입</h2>
             <form
-                onSubmit={handleLogin}
+                onSubmit={handleSignup}
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -93,6 +81,12 @@ export default function Login() {
                     position: 'relative',
                 }}
             >
+                <input
+                    type="text"
+                    placeholder="닉네임"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
                 <input type="email" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <input
                     type="password"
@@ -100,10 +94,10 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <button type="submit">로그인</button>
+                <button type="submit">가입하기</button>
             </form>
-            <p onClick={() => navigate('/register')} className="link">
-                회원가입하기
+            <p onClick={() => navigate('/login')} className="link">
+                로그인으로 돌아가기
             </p>
         </div>
     );

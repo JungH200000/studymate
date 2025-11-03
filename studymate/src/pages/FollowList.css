@@ -1,0 +1,92 @@
+/* src/pages/FollowList.css */
+
+/* -------------------- 페이지 컨테이너 -------------------- */
+.follow-list-container {
+    padding-top: 50px; /* 헤더 공간 */
+    padding-bottom: 70px; /* 하단 네비게이션 공간 */
+    min-height: 100vh;
+    width: 100%;
+    background-color: #f7f7f7;
+}
+
+/* -------------------- 헤더 (뒤로가기 + 제목) -------------------- */
+.follow-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    padding: 15px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+.back-icon {
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+/* -------------------- 목록 아이템 -------------------- */
+.follow-item-list {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.follow-item {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.follow-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 123, 123, 0.1);
+}
+
+.follow-avatar {
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+    color: white;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.follow-info {
+    flex-grow: 1;
+}
+
+.follow-nickname {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.follow-date {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+}
