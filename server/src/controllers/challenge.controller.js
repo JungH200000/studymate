@@ -28,7 +28,7 @@ export const createChallenge = async (req, res) => {
 /** 챌린지 목록 가져오기 */
 export const getChallenges = async (req, res) => {
   const { id: user_id } = req.user;
-  const { page = '1', limit = '10', sort } = req.query;
+  const { q, page = '1', limit = '10', sort } = req.query;
   const pageNum = Number(page) || 1;
   const limitNum = Number(limit) || 10; // 가져올 개수
   const offset = (pageNum - 1) * limitNum; // 건너뛸 개수
@@ -45,12 +45,23 @@ export const getChallenges = async (req, res) => {
     throw error;
   }
 
+  const qSafe = typeof q === 'string' ? q.trim() : '';
+  const allowedSort = new Set(['newest']);
+  const sortSafe = allowedSort.has(sort) ? sort : 'newest';
+
   /** 챌린지 목록 가져오기 */
-  const challengesList = await challengeService.getChallenges({ user_id, sort, limit: limitNum, offset });
+  const challengesList = await challengeService.getChallenges({
+    user_id,
+    q: qSafe,
+    sort: sortSafe,
+    limit: limitNum,
+    offset,
+  });
 
   res.status(200).json({
     ok: true,
     user_id,
+    q,
     pageNum,
     limitNum,
     offset,

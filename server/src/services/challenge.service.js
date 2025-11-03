@@ -25,9 +25,9 @@ export async function createChallenge({
 }
 
 /** 챌린지 목록 가져오기 */
-export async function getChallenges({ user_id, sort, limit, offset }) {
+export async function getChallenges({ user_id, q, sort, limit, offset }) {
   /** 챌린지 목록 */
-  const challengesList = await challengeDB.getChallenges({ sort, limit, offset });
+  const challengesList = await challengeDB.getChallenges({ q, sort, limit, offset });
   // 빈 목록은 200 + []
   if (!challengesList || challengesList.length === 0) {
     return [];
