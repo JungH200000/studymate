@@ -101,7 +101,13 @@ author_progress: { achieved_this_week, target_per_week }
 
 `{ target_type`: "post", `target_id: <post_id>, content: string }`
 
-## 사용자 페이지
+## 5. 검색
+
+### GET : 챌린지 title 기준으로 검색
+
+- `/api/challenges?q=검색어&page=1&limit=20&sort=newest`
+
+## 6. 사용자 페이지
 
 ### GET : 본인 프로필, 팔로워, 달성률 재료
 
@@ -142,9 +148,3 @@ author_progress: { achieved_this_week, target_per_week }
 ### GET : 팔로잉 목록
 
 - `/api/users/:id/followings`
-
-## 검색
-
-### GET : 챌린지 title 기준으로 검색
-
-- `/api/challenges?q=검색어&page=1&limit=20&sort=newest`
