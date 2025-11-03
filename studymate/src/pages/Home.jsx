@@ -10,6 +10,8 @@ import {
     faTrash,
     faRotateRight,
     faFileAlt,
+    faSpinner,
+    faSearch, // 🔍 검색 아이콘 추가
 } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsUp as regularThumbsUp } from '@fortawesome/free-regular-svg-icons';
 import './Home.css';
@@ -19,9 +21,14 @@ const API_BASE = 'http://127.0.0.1:3000/api';
 export default function Home() {
     const [tab, setTab] = useState('home');
     const [challenges, setChallenges] = useState([]);
+    // 🌟 useState 초기값 수정된 상태 유지
     const [likes, setLikes] = useState({});
     const [participants, setParticipants] = useState({});
+
     const [userId, setUserId] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    // 🌟 검색 상태 추가
+    const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
     const formatDate = (isoString) => {
@@ -39,7 +46,9 @@ export default function Home() {
         if (storedUser.user_id) setUserId(storedUser.user_id);
 
         const loadChallenges = async () => {
+            setIsLoading(true);
             try {
+                // API에서 전체 챌린지 목록을 불러옵니다.
                 const res = await fetchWithAuth(`${API_BASE}/challenges`);
                 const list = Array.isArray(res?.challengesList) ? res.challengesList : [];
                 setChallenges(list);
@@ -60,6 +69,8 @@ export default function Home() {
                 setParticipants(initialParticipants);
             } catch (err) {
                 console.error('챌린지 가져오기 실패:', err);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -198,104 +209,153 @@ export default function Home() {
         }
     };
 
+    // 🌟 클라이언트 측 챌린지 필터링 로직 수정 (제목 또는 사용자 이름 검색)
+    const filteredChallenges = challenges.filter((challenge) => {
+        const query = searchQuery.trim().toLowerCase();
+        if (query === '') {
+            return true; // 검색어가 없으면 모두 표시
+        }
+
+        // 제목(title) 또는 사용자 이름(author_username)에 검색어가 포함되어 있는지 확인
+        const titleMatch = challenge.title?.toLowerCase().includes(query);
+        const usernameMatch = challenge.author_username?.toLowerCase().includes(query); // 🌟 사용자 이름 검색 추가
+
+        return titleMatch || usernameMatch; // 🌟 조건 변경
+    });
+
     return (
         <div className="home-container">
             <header className="home-header">
-                <span className="refresh-emoji" onClick={handleRefresh}>
-                    <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
-                </span>
-                <div className="write-button">
-                    <p className="challenge-question" onClick={() => navigate('/write')}>
-                        누르면 작성탭으로 이동
-                    </p>
+                <div className="header-content-wrapper">
+                    <span className="refresh-emoji" onClick={handleRefresh}>
+                        <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
+                    </span>
+
+                    {/* 🌟 검색 입력 필드 */}
+                    <div className="search-box">
+                        <FontAwesomeIcon icon={faSearch} className="search-icon-inside" />
+                        <input
+                            type="text"
+                            // 🌟 플레이스홀더 텍스트 수정
+                            placeholder="제목 또는 사용자 검색"
+                            className="search-input"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    {/* --------------------------- */}
+
+                    <div className="write-button">
+                        <p className="challenge-question" onClick={() => navigate('/write')}>
+                            누르면 게시판
+                        </p>
+                    </div>
                 </div>
             </header>
 
             <main className="home-content">
-                <div className="post-list">
-                    {challenges.length === 0 && <p className="tab-message">등록된 챌린지가 없습니다.</p>}
+                {isLoading ? (
+                    <div className="loading-spinner">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                    </div>
+                ) : (
+                    <div className="post-list">
+                        {/* 🌟 필터링된 목록이 없을 때 메시지 */}
+                        {filteredChallenges.length === 0 && (
+                            <p className="tab-message">
+                                {searchQuery
+                                    ? `'${searchQuery}'에 해당하는 챌린지가 없습니다.`
+                                    : '등록된 챌린지가 없습니다.'}
+                            </p>
+                        )}
 
-                    {challenges.map((challenge) => (
-                        <div
-                            className="challenge-card"
-                            key={challenge.challenge_id}
-                            onClick={() => navigate(`/challenge/${challenge.challenge_id}`)}
-                        >
-                            <div className="card-top">
-                                <FontAwesomeIcon
-                                    icon={faUser}
-                                    className="profile-icon"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (challenge.creator_id === userId) {
-                                            navigate('/profile');
-                                        } else {
-                                            navigate(`/profile/${challenge.creator_id}`);
-                                        }
-                                    }}
-                                />
-                                <div className="user-info">
-                                    <div className="card-username">{challenge.author_username || '익명'}</div>
-                                    <div className="card-title">{challenge.title}</div>
+                        {/* 🌟 filteredChallenges를 map하여 렌더링 */}
+                        {filteredChallenges.map((challenge) => (
+                            <div
+                                className="challenge-card"
+                                key={challenge.challenge_id}
+                                onClick={() => navigate(`/challenge/${challenge.challenge_id}`)}
+                            >
+                                <div className="card-top">
+                                    <FontAwesomeIcon
+                                        icon={faUser}
+                                        className="profile-icon"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (challenge.creator_id === userId) {
+                                                navigate('/profile');
+                                            } else {
+                                                navigate(`/profile/${challenge.creator_id}`);
+                                            }
+                                        }}
+                                    />
+                                    <div className="user-info">
+                                        <div className="card-username">{challenge.author_username || '익명'}</div>
+                                        <div className="card-title">{challenge.title}</div>
+                                    </div>
+
+                                    {challenge.creator_id === userId ? (
+                                        <FontAwesomeIcon
+                                            icon={faTrash}
+                                            className="delete-icon"
+                                            onClick={(e) => handleDelete(challenge.challenge_id, e)}
+                                        />
+                                    ) : (
+                                        <button
+                                            className="report-button"
+                                            onClick={(e) => handleReportChallenge(challenge.challenge_id, e)}
+                                        >
+                                            🚨
+                                        </button>
+                                    )}
                                 </div>
 
-                                {challenge.creator_id === userId ? (
-                                    <FontAwesomeIcon
-                                        icon={faTrash}
-                                        className="delete-icon"
-                                        onClick={(e) => handleDelete(challenge.challenge_id, e)}
-                                    />
-                                ) : (
-                                    <button
-                                        className="report-button"
-                                        onClick={(e) => handleReportChallenge(challenge.challenge_id, e)}
+                                {challenge.content && <div className="card-content">{challenge.content}</div>}
+
+                                <div className="card-info">
+                                    <span
+                                        className={
+                                            challenge.frequency_type === 'daily'
+                                                ? 'frequency-daily'
+                                                : 'frequency-weekly'
+                                        }
                                     >
-                                        🚨
-                                    </button>
-                                )}
+                                        {challenge.frequency_type === 'daily'
+                                            ? '일일'
+                                            : `주 ${challenge.target_per_week}회`}
+                                    </span>
+                                    <span>
+                                        {formatDate(challenge.start_date)}
+                                        {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ''}
+                                    </span>
+                                </div>
+
+                                <div className="like-section">
+                                    <FontAwesomeIcon
+                                        icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
+                                        onClick={(e) => toggleLike(challenge.challenge_id, e)}
+                                        className={`like-icon ${likes[challenge.challenge_id]?.liked ? 'liked' : ''}`}
+                                    />
+                                    <span className="like-count">{likes[challenge.challenge_id]?.count || 0}</span>
+
+                                    <FontAwesomeIcon
+                                        icon={faUserPlus}
+                                        onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
+                                        className={`join-icon ${
+                                            participants[challenge.challenge_id]?.joined ? 'joined' : ''
+                                        }`}
+                                    />
+                                    <span className="join-count">
+                                        {participants[challenge.challenge_id]?.count || 0}
+                                    </span>
+
+                                    <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
+                                    <span className="stat-count">{challenge.post_count || 0}</span>
+                                </div>
                             </div>
-
-                            {challenge.content && <div className="card-content">{challenge.content}</div>}
-
-                            <div className="card-info">
-                                <span
-                                    className={
-                                        challenge.frequency_type === 'daily' ? 'frequency-daily' : 'frequency-weekly'
-                                    }
-                                >
-                                    {challenge.frequency_type === 'daily'
-                                        ? '일일'
-                                        : `주 ${challenge.target_per_week}회`}
-                                </span>
-                                <span>
-                                    {formatDate(challenge.start_date)}
-                                    {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ''}
-                                </span>
-                            </div>
-
-                            <div className="like-section">
-                                <FontAwesomeIcon
-                                    icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
-                                    onClick={(e) => toggleLike(challenge.challenge_id, e)}
-                                    className={`like-icon ${likes[challenge.challenge_id]?.liked ? 'liked' : ''}`}
-                                />
-                                <span className="like-count">{likes[challenge.challenge_id]?.count || 0}</span>
-
-                                <FontAwesomeIcon
-                                    icon={faUserPlus}
-                                    onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
-                                    className={`join-icon ${
-                                        participants[challenge.challenge_id]?.joined ? 'joined' : ''
-                                    }`}
-                                />
-                                <span className="join-count">{participants[challenge.challenge_id]?.count || 0}</span>
-
-                                <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
-                                <span className="stat-count">{challenge.post_count || 0}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </main>
 
             <BottomNav setTab={setTab} />

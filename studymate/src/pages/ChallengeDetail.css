@@ -574,6 +574,15 @@
     color: #555;
 }
 
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-size: 2rem;
+    color: #666;
+}
+
 /* 모바일 최적화 */
 @media (max-width: 480px) {
     .detail-content,
