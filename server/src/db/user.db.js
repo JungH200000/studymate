@@ -159,3 +159,22 @@ export async function followingList({ user_id }) {
 
   return rows;
 }
+
+/** 사용자 검색 */
+export async function searchUsers({ q, limit, offset }) {
+  const raw = (q ?? '').trim();
+  const esc = raw.replace(/[%_]/g, (m) => '\\' + m);
+  const searchWord = `%${esc}%`;
+
+  const sql = `
+    SELECT user_id, username, created_at
+    FROM users
+    WHERE username ILIKE $1 ESCAPE '\\'
+    ORDER BY username ASC
+    LIMIT $2 OFFSET $3`;
+  const params = [searchWord, limit, offset];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}

@@ -188,3 +188,8 @@ export async function getFollowingList({ user_id }) {
 
   return { followingList, followingCount };
 }
+
+/** 사용자 검색 */
+export function searchUsers({ q, limit, offset }) {
+  return userDB.searchUsers({ q, limit, offset });
+}

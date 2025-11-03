@@ -6,6 +6,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = express.Router();
 
+router.get('/', requireAuth, asyncHandler(userController.searchUsers));
 router.get('/:id', requireAuth, asyncHandler(userController.getUserInfo));
 router.get('/:id/challenges', requireAuth, asyncHandler(userController.getChallengesByUser));
 router
