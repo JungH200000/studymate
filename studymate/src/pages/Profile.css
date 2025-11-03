@@ -132,15 +132,6 @@ body,
     font-size: 14px;
 }
 
-.challenge-card.joined {
-    background-color: #f0f0f0; /* 참여한 챌린지 배경색 */
-    border: 2px solid #333; /* 검정 테두리 */
-}
-
-.challenge-card.liked {
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3); /* 좋아요한 챌린지 강조 */
-}
-
 .like-icon,
 .join-icon {
     font-size: 20px;
@@ -193,6 +184,58 @@ body,
     font-weight: 700;
     border-bottom: 3px solid #ff7b7b;
     background: linear-gradient(to bottom, #fff7f7, #fff);
+}
+
+/* -------------------- 팔로우/언팔로우 버튼 (OtherProfile 전용) -------------------- */
+.follow-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+}
+
+.follow-button,
+.unfollow-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 아이콘과 텍스트 사이 간격 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.follow-button {
+    background-color: #ff6b6b; /* 주색 (팔로우) */
+    color: white;
+}
+
+.follow-button:hover:not(:disabled) {
+    background-color: #ff4d4d;
+    transform: translateY(-1px);
+}
+
+.unfollow-button {
+    background-color: #f0f0f0; /* 보조색 (언팔로우) */
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.unfollow-button:hover:not(:disabled) {
+    background-color: #e0e0e0;
+    color: #333;
+    transform: translateY(-1px);
+}
+
+.follow-button:disabled,
+.unfollow-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* -------------------- 챌린지 목록 컨테이너 -------------------- */
