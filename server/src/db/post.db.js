@@ -199,7 +199,7 @@ export async function postCheer({ user_id, post_id }) {
   const params = [user_id, post_id];
 
   const { rowCount } = await query(sql, params);
-  console.log(rowCount);
+
   const { rows } = await query(
     `
     SELECT COUNT(*)::int AS cheer_count
