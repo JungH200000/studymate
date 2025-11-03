@@ -243,3 +243,36 @@ export const getFollowingList = async (req, res) => {
     followingCount,
   });
 };
+
+/** 사용자 검색 */
+export const searchUsers = async (req, res) => {
+  const { q, page = '1', limit = '20' } = req.query;
+  const pageNum = Number(page) || 1;
+  const limitNum = Number(limit) || 10; // 가져올 개수
+  const offset = (pageNum - 1) * limitNum; // 건너뛸 개수
+  if (!Number.isInteger(pageNum) || pageNum < 1) {
+    const error = new Error('page는 1 이상의 정수');
+    error.status = 400;
+    error.code = 'INVALID_QUERY';
+    throw error;
+  }
+  if (!Number.isInteger(limitNum) || limitNum < 1) {
+    const error = new Error('limit은 1 이상의 정수');
+    error.status = 400;
+    error.code = 'INVALID_QUERY';
+    throw error;
+  }
+
+  const qSafe = typeof q === 'string' ? q.trim() : '';
+
+  const searchUsers = await userService.searchUsers({ q: qSafe, limit: limitNum, offset });
+
+  return res.status(200).json({
+    ok: true,
+    q: qSafe,
+    pageNum,
+    limitNum,
+    offset,
+    searchUsers,
+  });
+};

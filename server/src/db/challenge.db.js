@@ -24,28 +24,48 @@ export async function createChallenge({
 }
 
 /** Challenge 목록 가져오기 */
-export async function getChallenges({ sort, limit, offset }) {
+export async function getChallenges({ q, sort, limit, offset }) {
   let sql;
-  if (sort === 'newest') {
-    sql = `
-      SELECT c.*, u.user_id as author_id, u.username as author_username
+  if (!q) {
+    if (sort === 'newest') {
+      sql = `
+      SELECT c.*, u.user_id AS author_id, u.username AS author_username
       FROM challenges c
       LEFT JOIN users u ON c.creator_id = u.user_id
       ORDER BY c.created_at DESC
       LIMIT $1 OFFSET $2`;
+    } else {
+      sql = `
+      SELECT c.*, u.user_id AS author_id, u.username AS author_username
+      FROM challenges c
+      LEFT JOIN users u ON c.creator_id = u.user_id
+      ORDER BY c.created_at DESC
+      LIMIT $1 OFFSET $2`;
+    }
+    const params = [limit, offset];
+
+    const { rows } = await query(sql, params);
+
+    return rows;
   } else {
+    // q(검색어)가 존재할 때
+    const raw = (q ?? '').trim();
+    const esc = raw.replace(/[%_]/g, (m) => '\\' + m);
+    const searchWord = `%${esc}%`;
+
     sql = `
-      SELECT c.*, u.user_id as author_id, u.username as author_username
+      SELECT c.*, u.user_id AS author_id, u.username AS author_username
       FROM challenges c
       LEFT JOIN users u ON c.creator_id = u.user_id
+      WHERE c.title ILIKE $1 ESCAPE '\\'
       ORDER BY c.created_at DESC
-      LIMIT $1 OFFSET $2`;
+      LIMIT $2 OFFSET $3;`;
+    const params = [searchWord, limit, offset];
+
+    const { rows } = await query(sql, params);
+
+    return rows;
   }
-  const params = [limit, offset];
-
-  const { rows } = await query(sql, params);
-
-  return rows;
 }
 
 /** 사용자가 참여한 challenge의 challenge_id 가져오기 */
