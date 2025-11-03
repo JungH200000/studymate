@@ -18,6 +18,9 @@ export default function Profile({ setTab }) {
   const [email, setEmail] = useState("");
   const [createdChallenges, setCreatedChallenges] = useState([]);
   const [joinedChallenges, setJoinedChallenges] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
+  const [followingCount, setFollowingCount] = useState(0);
+
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -26,6 +29,7 @@ export default function Profile({ setTab }) {
         if (data?.user?.username) {
           setNickname(data.user.username);
           setEmail(data.user.email);
+          
         } else {
           console.warn("사용자 정보를 불러오지 못했습니다.");
         }
@@ -46,8 +50,27 @@ export default function Profile({ setTab }) {
       }
     };
 
+    const loadFollowings = async () => {
+      try {
+        const data = await fetchWithAuth("http://127.0.0.1:3000/api/me");
+        const userId = data?.user?.id;
+
+        if (!userId) return;
+
+        const followData = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${userId}/followings`);
+        if (followData?.ok) {
+          setFollowingList(followData.followingList || []);
+          setFollowingCount(followData.followingCount || 0);
+        }
+      } catch (err) {
+        console.error("❌ 팔로우 목록 요청 실패:", err);
+      }
+    };
+
+
     loadUserInfo();
     loadChallenges();
+    loadFollowings();
   }, [navigate]);
 
   const handleChallengeClick = (id) => {
@@ -79,6 +102,22 @@ export default function Profile({ setTab }) {
         <span className="profile-name">{nickname}</span>
         <span className="profile-email">{email}</span>
         <FontAwesomeIcon icon={faUser} size="6x" className="profile-icon" />
+      </div>
+
+      <div className="follow-section">
+        <h3>내가 팔로우한 사용자 ({followingCount}명)</h3>
+        {followingList.length === 0 ? (
+          <p>팔로우한 사용자가 없습니다.</p>
+        ) : (
+          <ul className="follow-list">
+            {followingList.map((user) => (
+              <li key={user.followee_id} className="follow-item">
+                <FontAwesomeIcon icon={faUser} className="follow-icon" />
+                <span className="follow-name">{user.followername}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="challenge-section">
