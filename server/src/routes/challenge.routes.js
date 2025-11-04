@@ -22,6 +22,8 @@ router
   .post(requireAuth, asyncHandler(challengeController.postLike))
   .delete(requireAuth, asyncHandler(challengeController.deleteLike));
 
-router.route('/:id/progress/week').get(requireAuth, asyncHandler(challengeController.weeklyAchieved));
+router.get('/:id/progress/week', requireAuth, asyncHandler(challengeController.weeklyAchieved));
+router.get('/:id/progress/total', requireAuth, asyncHandler(challengeController.totalAchieved));
+router.get('/:id/progress/30days', requireAuth, asyncHandler(challengeController.day30Achieved));
 
 export default router;
