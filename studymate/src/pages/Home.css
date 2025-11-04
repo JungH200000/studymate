@@ -28,9 +28,6 @@
     box-shadow: 0 2px 8px rgba(255, 123, 123, 0.1);
 }
 
-.search-bar{
-    margin-top: 80px;;
-}
 
 /* 새로고침 아이콘 스타일 */
 .refresh-icon {
@@ -44,18 +41,34 @@
     transform: rotate(90deg);
 }
 
-/* 작성탭 이동 텍스트 */
-.challenge-question {
-    margin-top: 6px;
-    font-size: 15px;
-    color: #ff7b7b;
-    font-weight: 600;
+.search-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* select와 input을 동일한 높이와 너비 비율로 */
+.search-bar select,
+.search-bar input {
+    flex: 1; /* 같은 비율로 늘어나도록 */
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    height: 30px; /* 원하는 높이 고정 */
+    box-sizing: border-box;
+}
+
+/* 버튼은 고정 크기 */
+.search-bar button {
+    padding: 6px 12px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
     cursor: pointer;
-    transition: color 0.3s ease;
+    height: 30px; /* select/input과 높이 맞춤 */
 }
-.challenge-question:hover {
-    color: #ff4d4d;
-}
+
 
 /* 메인 콘텐츠 */
 .home-content {

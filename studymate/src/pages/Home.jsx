@@ -82,15 +82,9 @@ export default function Home() {
         try {
             if (searchType === 'challenges') {
                 const res = await fetchWithAuth(`${API_BASE}/challenges?q=${encodeURIComponent(query)}`);
-                console.log(`${API_BASE}/challenges?q=${encodeURIComponent(query)}`)
-                console.log(res)
-                console.log(query)
                 setChallenges(res?.challengesList || []);
             } else {
                 const res = await fetchWithAuth(`${API_BASE}/users?q=${encodeURIComponent(query)}`);
-                console.log(`${API_BASE}/users?q=${encodeURIComponent(query)}`)
-                console.log(res)
-                console.log(query)
                 setUsers(res?.searchUsers || []);
             }
         } catch (err) {
@@ -162,37 +156,36 @@ export default function Home() {
     return (
         <div className="home-container">
             <header className="home-header">
-                <span className="refresh-emoji" onClick={handleRefresh}>
-                    <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
-                </span>
-                <div className="write-button">
-                    <p className="challenge-question" onClick={() => navigate('/write')}>
-                        누르면 작성탭으로 이동
-                    </p>
-                </div>
-            </header>
+    <div className="header-top">
+        {/* 새로고침 버튼 */}
+        <span className="refresh-emoji" onClick={handleRefresh}>
+            <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
+        </span>
+    </div>
 
-            {/* 검색 영역 */}
-            <div className="search-bar">
-                <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-                    <option value="challenges">챌린지</option>
-                    <option value="users">사용자</option>
-                </select>
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    placeholder={
-                        searchType === 'challenges'
-                            ? '챌린지 제목이나 내용을 검색하세요'
-                            : '사용자 이름을 검색하세요'
-                    }
-                />
-                <button onClick={handleSearch}>
-                    <FontAwesomeIcon icon={faSearch} />
-                </button>
-            </div>
+    {/* 검색 영역 */}
+    <div className="search-bar">
+        <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+            <option value="challenges">챌린지</option>
+            <option value="users">사용자</option>
+        </select>
+        <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder={
+                searchType === 'challenges'
+                    ? '챌린지 제목이나 내용을 검색하세요'
+                    : '사용자 이름을 검색하세요'
+            }
+        />
+        <button onClick={handleSearch}>
+            <FontAwesomeIcon icon={faSearch} />
+        </button>
+    </div>
+</header>
+
 
             <main className="home-content">
                 {searchType === 'challenges' ? (
