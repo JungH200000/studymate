@@ -50,9 +50,13 @@
 
 ## 4. 검색
 
-### GET : 챌린지 title 기준으로 검색
+- 옵션: 페이지네이션 `page=1&limit=20&sort=newest`
 
-- `/api/challenges?q=검색어&page=1&limit=20&sort=newest`
+### 챌린지 검색 : `GET /api/challenges?q=검색어
+
+- `/api/challenges?q=검색어`
+
+### 사용자 검색 : `GET /api/users?q=검색어
 
 ## 5. 인증글 피드
 
@@ -109,42 +113,47 @@ author_progress: { achieved_this_week, target_per_week }
 
 ## 6. 사용자 페이지
 
-### GET : 본인 프로필, 팔로워, 달성률 재료
+### 유저 정보
 
-- `/api/me`
+- 챌린지와 인증글 목록을 불러올 때 해당 글의 작성자의 user_id와 username을 함께 가져왔었음
+- 상대방 페이지에서는 상대방 이메일이 출력되지 않도록 설정
 
-### GET : 본인 등록/참여 챌린지 목록
+#### 본인 정보 : `GET /api/me`
 
-- `/api/me/challenges?type=...`
+#### 상대방 정보 : `GET /api/users/:id`
 
-`type=created`, `type=joined`
+### 사용자가 생성/참여한 챌린지 목록
 
-목록은 페이지네이션 `/api/me/challenges?type=...&page=1&limit=20&sort=newest`
+- 챌린지와 인증글 목록을 불러올 때 해당 글의 작성자의 user_id와 username을 함께 가져왔었음
+- `joined_by_me`와 `liked_by_me`는 로그인 중인 본인이 챌린지에 참여 유무와 좋아요 유무를 나타냄(타 사용자 페이지에서도 마찬가지)
+- 옵션: 목록은 페이지네이션 `...&page=1&limit=20&sort=newest`
 
-### GET : 상대방 프로필, 팔로워, 달성률 재료
+#### 본인 : `GET /api/me/challenges?type=??`
 
-- `/api/users/:id`
+- type은 joined(참여)와 created(생성) 둘 중 하나
 
-### GET : 상대방 등록/참여 챌린지 목록
+#### 상대방 : `GET /api/users/:id/challenges?type=??`
 
-- `/api/users/:id/challenges?type=...`
+- type은 joined(참여)와 created(생성) 둘 중 하나
 
-`type=created`, `type=joined`
+### 팔로우
 
-목록은 페이지네이션 `/api/users/:id/challenges?type=...&page=1&limit=20&sort=newest`
+#### 팔로우 : `POST /api/users/:id/follow`
 
-### POST : 팔로우
+#### 언팔로우 : `DELETE /api/users/:id/follow`
 
-- `/api/users/:id/follows`
+#### 팔로워 목록 : `GET /api/users/:id/followers`
 
-### DELETE : 언팔로우
+- 나를 팔로우한 사용자들
 
-- `/api/users/:id/follows`
+#### 팔로잉 목록 : `GET /api/users/:id/followings`
 
-### GET : 팔로워 목록
+- 내가 팔로우한 사용자들
 
-- `/api/users/:id/followers`
+### 달성률
 
-### GET : 팔로잉 목록
+#### 이번 주 : `GET /api/challenges/:id/progress/week`
 
-- `/api/users/:id/followings`
+#### 전체 : `GET /api/challenges/:id/progress/total`
+
+#### 이번 달 : `GET /api/challenges/:id/progress/months`
