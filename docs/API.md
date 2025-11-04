@@ -156,4 +156,4 @@ author_progress: { achieved_this_week, target_per_week }
 
 #### 전체 : `GET /api/challenges/:id/progress/total`
 
-#### 이번 달 : `GET /api/challenges/:id/progress/months`
+#### 이번 달 : `GET /api/challenges/:id/progress/30days`
