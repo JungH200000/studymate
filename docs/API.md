@@ -60,13 +60,13 @@
 
 ## 5. 인증글 피드
 
-### GET : 챌린지 기본 정보, 챌린지 좋아요/인증글 수/참여자 수, 챌린지 올린 사용자
+### 5.1 GET : 챌린지 기본 정보, 챌린지 좋아요/인증글 수/참여자 수, 챌린지 올린 사용자
 
 - `/api/challenges/:id`
 
 응답에 `author`, `like_count`, `post_count`, `participant_count` `liked_by_me`, `joined_by_me` 를 같이 포함
 
-### GET : 해당 챌린지의 인증글 목록(작성자, 응원 포함)
+### 5.2 GET : 해당 챌린지의 인증글 목록(작성자, 응원 포함)
 
 - `/api/challenges/:id/posts?page=1&limit=20&sort=newest`
 
@@ -81,13 +81,13 @@ author_progress: { achieved_this_week, target_per_week }
 { "title": "...", "goals": ["..."], "summary": "...", "references": "...", "insights": "...", "comment": "..." }
 ```
 
-### POST : 좋아요/응원 버튼 클릭, 참여 버튼 클릭
+### 5.3 POST : 좋아요/응원 버튼 클릭, 참여 버튼 클릭
 
 - 챌린지 참여 : `/api/challenges/:id/participants`
 - 챌린지 좋아요 : `/api/challenges/:id/likes`
 - 인증글 응원 : `/api/challenges/posts/:id/cheers`
 
-### DELETE : 좋아요/응원 취소, 참여 취소
+### 5.4 DELETE : 좋아요/응원 취소, 참여 취소
 
 - 챌린지 참여 : `/api/challenges/:id/participants`
 - 챌린지 좋아요 : `/api/challenges/:id/likes`
@@ -95,7 +95,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 좋아요/응원/참여 POST DELETE 응답에 갱신된 카운트와 상태를 돌려줘야 프론트가 추가 GET 없이 즉시 반영 가능: { like_count, liked_by_me }, { participant_count, joined_by_me}, { cheer_count, cheered_by_me }.
 
-### POST : 인증 글 게시
+### 5.5 POST : 인증 글 게시
 
 - `/api/challenges/:id/posts`
 
@@ -105,7 +105,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 참여자만 게시 가능하도록 `joined_by_me` 체크
 
-### POST: 부적절한 인증글 신고
+### 5.6 POST: 부적절한 인증글 신고
 
 - `/api/reports/posts/:id`
 
@@ -113,7 +113,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 ## 6. 사용자 페이지
 
-### 유저 정보
+### 6.1 유저 정보
 
 - 챌린지와 인증글 목록을 불러올 때 해당 글의 작성자의 user_id와 username을 함께 가져왔었음
 - 상대방 페이지에서는 상대방 이메일이 출력되지 않도록 설정
@@ -122,7 +122,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 #### 상대방 정보 : `GET /api/users/:id`
 
-### 사용자가 생성/참여한 챌린지 목록
+### 6.2 사용자가 생성/참여한 챌린지 목록
 
 - 챌린지와 인증글 목록을 불러올 때 해당 글의 작성자의 user_id와 username을 함께 가져왔었음
 - `joined_by_me`와 `liked_by_me`는 로그인 중인 본인이 챌린지에 참여 유무와 좋아요 유무를 나타냄(타 사용자 페이지에서도 마찬가지)
@@ -136,7 +136,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 - type은 joined(참여)와 created(생성) 둘 중 하나
 
-### 팔로우
+### 6.3 팔로우
 
 #### 팔로우 : `POST /api/users/:id/follow`
 
@@ -150,7 +150,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 - 내가 팔로우한 사용자들
 
-### 달성률
+### 6.4 달성률
 
 #### 이번 주 : `GET /api/challenges/:id/progress/week`
 
