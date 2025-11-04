@@ -257,15 +257,17 @@ export async function weeklyAchieved({ user_id }) {
       SELECT (now() AT TIME ZONE 'Asia/Seoul')::date AS d
     ),
     wk AS (
-      SELECT date_trunc('week', d)::date AS start_d,
-            (date_trunc('week', d) + interval '6 day')::date AS end_d
+      SELECT 
+        date_trunc('week', d)::date AS start_d,
+        (date_trunc('week', d) + interval '6 day')::date AS end_d
       FROM kst_today
     ),
     -- 이번 주에 사용자가 인증해야 하는 챌린지
     cfg AS(
-      SELECT c.challenge_id, c.frequency_type, COALESCE(c.target_per_week, 7) AS tpw,
-            GREATEST(wk.start_d, c.start_date, pc.join_at::date) AS act_start,
-            LEAST(wk.end_d, COALESCE(c.end_date, wk.end_d)) AS act_end_week
+      SELECT 
+        c.challenge_id, c.frequency_type, COALESCE(c.target_per_week, 7) AS tpw,
+        GREATEST(wk.start_d, c.start_date, pc.join_at::date) AS act_start,
+        LEAST(wk.end_d, COALESCE(c.end_date, wk.end_d)) AS act_end_week
       FROM challenges c
       JOIN participation pc on pc.challenge_id = c.challenge_id AND pc.user_id = $1
       CROSS JOIN wk
@@ -275,27 +277,30 @@ export async function weeklyAchieved({ user_id }) {
     ),
     -- 오늘 날짜 추가
     cut AS (
-      SELECT challenge_id, frequency_type, tpw, act_start, act_end_week,
-            LEAST(act_end_week, (now() AT TIME ZONE 'Asia/Seoul')::date) AS act_end_today
+      SELECT 
+        challenge_id, frequency_type, tpw, act_start, act_end_week,
+        LEAST(act_end_week, (now() AT TIME ZONE 'Asia/Seoul')::date) AS act_end_today
     FROM cfg
     ),
     days AS (
-      SELECT challenge_id, frequency_type, tpw, act_start, act_end_week, act_end_today,
-            GREATEST(0, (act_end_week - act_start + 1))::int AS days_week,
-            GREATEST(0, (act_end_today - act_start + 1))::int AS days_sofar
+      SELECT 
+        challenge_id, frequency_type, tpw, act_start, act_end_week, act_end_today,
+        GREATEST(0, (act_end_week - act_start + 1))::int AS days_week,
+        GREATEST(0, (act_end_today - act_start + 1))::int AS days_sofar
     FROM cut
     ),
     -- 주간 참여해야 하는 일 수 / 오늘까지 참여해야 하는 일 수
     targets AS (
-      SELECT challenge_id, frequency_type, tpw, act_start, act_end_week, act_end_today, days_week, days_sofar,
-            CASE WHEN days_week <= 0 THEN 0
-                  WHEN frequency_type = 'daily' THEN days_week
-                  ELSE CEIL(tpw * days_week / 7.0)::int
-            END AS target_week,
-            CASE WHEN days_sofar <= 0 THEN 0
-                  WHEN frequency_type = 'daily' THEN days_sofar
-                  ELSE CEIL(tpw * days_sofar / 7.0)::int
-            END AS target_sofar
+      SELECT 
+        challenge_id, frequency_type, tpw, act_start, act_end_week, act_end_today, days_week, days_sofar,
+        CASE WHEN days_week <= 0 THEN 0
+             WHEN frequency_type = 'daily' THEN days_week
+             ELSE CEIL(tpw * days_week / 7.0)::int
+        END AS target_week,
+        CASE WHEN days_sofar <= 0 THEN 0
+             WHEN frequency_type = 'daily' THEN days_sofar
+             ELSE CEIL(tpw * days_sofar / 7.0)::int
+        END AS target_sofar
       FROM days      
     ),
     -- 이번주 챌린지별 인증 횟수
@@ -307,22 +312,23 @@ export async function weeklyAchieved({ user_id }) {
         AND p.posted_date_kst BETWEEN t.act_start AND t.act_end_today
       GROUP BY p.challenge_id
     )
-    SELECT t.challenge_id, c.title, 
-           COALESCE(a.cnt) AS achieved_sofar,
-           LEAST(COALESCE(a.cnt, 0), t.target_sofar) AS achieved_sofar_capped,
-           t.target_sofar AS weekly_target_sofar,
-           CASE WHEN t.target_sofar > 0
-                 THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_sofar)::numeric / t.target_sofar, 3)
-                 ELSE 0
-           END AS rate_sofar,
-           LEAST(COALESCE(a.cnt, 0), t.target_week) AS achieved_full_capped,
-           t.target_week AS weekly_target_full,
-           CASE WHEN t.target_week > 0
-                 THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_week)::numeric / t.target_week, 3)
-                 ELSE 0
-           END AS rate_fullweek,
-           GREATEST(t.target_week - LEAST(COALESCE(a.cnt, 0), t.target_week), 0) AS remaining_to_100,
-           GREATEST(t.days_week - t.days_sofar, 0) AS remaining_days
+    SELECT 
+      t.challenge_id, c.title, 
+      COALESCE(a.cnt) AS achieved_sofar,
+      LEAST(COALESCE(a.cnt, 0), t.target_sofar) AS achieved_sofar_capped,
+      t.target_sofar AS weekly_target_sofar,
+      CASE WHEN t.target_sofar > 0
+           THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_sofar)::numeric / t.target_sofar, 3)
+           ELSE 0
+      END AS rate_sofar,
+      LEAST(COALESCE(a.cnt, 0), t.target_week) AS achieved_full_capped,
+      t.target_week AS weekly_target_full,
+      CASE WHEN t.target_week > 0
+           THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_week)::numeric / t.target_week, 3)
+           ELSE 0
+      END AS rate_fullweek,
+      GREATEST(t.target_week - LEAST(COALESCE(a.cnt, 0), t.target_week), 0) AS remaining_to_100,
+      GREATEST(t.days_week - t.days_sofar, 0) AS remaining_days
     FROM targets t
     LEFT JOIN achieved a USING (challenge_id)
     LEFT JOIN challenges c ON t.challenge_id = c.challenge_id
