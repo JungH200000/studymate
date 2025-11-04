@@ -22,4 +22,6 @@ router
   .post(requireAuth, asyncHandler(challengeController.postLike))
   .delete(requireAuth, asyncHandler(challengeController.deleteLike));
 
+router.route('/:id/progress/week').get(requireAuth, asyncHandler(challengeController.weeklyAchieved));
+
 export default router;

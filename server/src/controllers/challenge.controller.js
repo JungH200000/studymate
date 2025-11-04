@@ -131,3 +131,17 @@ export const deleteLike = async (req, res) => {
     message: '좋아요가 취소되었습니다.',
   });
 };
+
+/** 주간 달성률 */
+export const weeklyAchieved = async (req, res) => {
+  const user_id = req.params.id;
+
+  const { achievedChallengesList, today, weekly } = await challengeService.weeklyAchieved({ user_id });
+
+  return res.status(200).json({
+    ok: true,
+    today,
+    weekly,
+    achievedChallengesList,
+  });
+};

@@ -140,3 +140,24 @@ export async function postLike({ user_id, challenge_id }) {
 export async function deleteLike({ user_id, challenge_id }) {
   return await challengeDB.deleteLike({ user_id, challenge_id });
 }
+
+/** 주간 달성률 */
+export async function weeklyAchieved({ user_id }) {
+  const achievedChallengesList = await challengeDB.weeklyAchieved({ user_id });
+
+  // 오늘까지 달성률
+  const weeklySoFarAchieved = achievedChallengesList.reduce((t, c) => t + c.achieved_sofar_capped, 0);
+  const weeklySoFarTarget = achievedChallengesList.reduce((t, c) => t + c.weekly_target_sofar, 0);
+  const weeklySoFarRate = weeklySoFarTarget ? +(weeklySoFarAchieved / weeklySoFarTarget).toFixed(3) : 0;
+
+  // 이번 주 전체 총 달성률
+  const weeklyFullAchieved = achievedChallengesList.reduce((t, c) => t + c.achieved_full_capped, 0);
+  const weeklyFullTarget = achievedChallengesList.reduce((t, c) => t + c.weekly_target_full, 0);
+  const weeklyFullRate = weeklyFullTarget ? +(weeklyFullAchieved / weeklyFullTarget).toFixed(3) : 0;
+
+  return {
+    achievedChallengesList,
+    today: { weeklySoFarAchieved, weeklySoFarTarget, weeklySoFarRate },
+    weekly: { weeklyFullAchieved, weeklyFullTarget, weeklyFullRate },
+  };
+}
