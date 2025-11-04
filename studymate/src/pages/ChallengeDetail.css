@@ -574,6 +574,18 @@
     color: #555;
 }
 
+<<<<<<< HEAD
+=======
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-size: 2rem;
+    color: #666;
+}
+
+>>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 /* 모바일 최적화 */
 @media (max-width: 480px) {
     .detail-content,
