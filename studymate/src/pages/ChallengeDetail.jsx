@@ -58,7 +58,7 @@ export default function ChallengeDetail() {
         const loadChallenge = async () => {
             setIsLoading(true);
             try {
-                const res = await fetchWithAuth(`${API_BASE}/challenges`);
+                const res = await fetchWithAuth(`${API_BASE}/challenges?page=1&limit=20`);
                 const found = res.challengesList?.find((c) => String(c.challenge_id) === String(id));
                 if (found) {
                     setChallenge(found);

@@ -23,7 +23,6 @@ export default function Achievement() {
                 const weekRate = parseFloat(weekRes?.week?.weeklyFullRate ?? 0);
                 const total = parseFloat(totalRes?.total?.totalRate ?? 0);
                 const day30 = parseFloat(day30Res?.day30?.day30Rate ?? 0);
-                console.log("day30Res: ",day30Res)
 
                 setWeeklyFullRate(weekRate);
                 setTotalRate(total);

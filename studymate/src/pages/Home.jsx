@@ -47,7 +47,8 @@ export default function Home() {
 
     const loadChallenges = async () => {
         try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges`);
+            const res = await fetchWithAuth(`${API_BASE}/challenges?page=1&limit=20`);
+
             const list = Array.isArray(res?.challengesList) ? res.challengesList : [];
             setChallenges(list);
             const initialLikes = {};
@@ -156,36 +157,35 @@ export default function Home() {
     return (
         <div className="home-container">
             <header className="home-header">
-    <div className="header-top">
-        {/* 새로고침 버튼 */}
-        <span className="refresh-emoji" onClick={handleRefresh}>
-            <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
-        </span>
-    </div>
+                <div className="header-top">
+                    {/* 새로고침 버튼 */}
+                    <span className="refresh-emoji" onClick={handleRefresh}>
+                        <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
+                    </span>
+                </div>
 
-    {/* 검색 영역 */}
-    <div className="search-bar">
-        <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-            <option value="challenges">챌린지</option>
-            <option value="users">사용자</option>
-        </select>
-        <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder={
-                searchType === 'challenges'
-                    ? '챌린지 제목이나 내용을 검색하세요'
-                    : '사용자 이름을 검색하세요'
-            }
-        />
-        <button onClick={handleSearch}>
-            <FontAwesomeIcon icon={faSearch} />
-        </button>
-    </div>
-</header>
-
+                {/* 검색 영역 */}
+                <div className="search-bar">
+                    <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+                        <option value="challenges">챌린지</option>
+                        <option value="users">사용자</option>
+                    </select>
+                    <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        placeholder={
+                            searchType === 'challenges'
+                                ? '챌린지 제목이나 내용을 검색하세요'
+                                : '사용자 이름을 검색하세요'
+                        }
+                    />
+                    <button onClick={handleSearch}>
+                        <FontAwesomeIcon icon={faSearch} />
+                    </button>
+                </div>
+            </header>
 
             <main className="home-content">
                 {searchType === 'challenges' ? (
