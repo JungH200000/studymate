@@ -76,20 +76,44 @@ export default function ChallengeDetail() {
         };
 
         const loadPosts = async () => {
-            try {
-                const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
-                if (res.ok && Array.isArray(res.postsList)) {
-                    const postsWithCheer = res.postsList.map((p) => ({
-                        ...p,
-                        cheer_by_me: !!p.cheer_by_me,
-                        cheer_count: p.cheer_count || 0,
-                    }));
-                    setPosts(postsWithCheer);
-                }
-            } catch (err) {
-                console.error('인증글 로딩 실패:', err);
-            }
-        };
+    try {
+        const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
+        if (res.ok && Array.isArray(res.postsList)) {
+            const posts = res.postsList;
+
+            // 중복 호출 방지를 위해 user_id 목록 추출
+            const uniqueUserIds = [...new Set(posts.map((p) => p.user_id))];
+
+            // 각 user_id에 대해 username 요청
+            const userMap = {};
+            await Promise.all(
+                uniqueUserIds.map(async (uid) => {
+                    try {
+                        const userRes = await fetchWithAuth(`${API_BASE}/users/${uid}`);
+                        if (userRes?.user?.username) {
+                            userMap[uid] = userRes.user.username;
+                        }
+                    } catch (err) {
+                        console.error(`❌ 사용자 ${uid} 정보 불러오기 실패`, err);
+                    }
+                })
+            );
+
+            // 게시글에 username 병합
+            const postsWithUser = posts.map((p) => ({
+                ...p,
+                cheer_by_me: !!p.cheer_by_me,
+                cheer_count: p.cheer_count || 0,
+                username: userMap[p.user_id] || '알 수 없음',
+            }));
+
+            setPosts(postsWithUser);
+        }
+    } catch (err) {
+        console.error('❌ 인증글 로딩 실패:', err);
+    }
+};
+
 
         loadChallenge();
         loadPosts();
@@ -514,6 +538,7 @@ export default function ChallengeDetail() {
                                             </button>
                                         )}
                                     </div>
+                                    <h4>{post.username}님</h4>
 
                                     {post.content?.goals?.length > 0 && (
                                         <div className="post-section goals-section">
