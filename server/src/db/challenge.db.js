@@ -249,3 +249,231 @@ export async function deleteLike({ user_id, challenge_id }) {
 
   return { liked_by_me: false, like_count: rows[0].like_count, deleted: rowCount > 0 };
 }
+
+/** 주간 달성률 */
+export async function weeklyAchieved({ user_id }) {
+  const sql = `
+    WITH kst_today AS (
+      SELECT (now() AT TIME ZONE 'Asia/Seoul')::date AS d
+    ),
+    wk AS (
+      SELECT 
+        date_trunc('week', d)::date AS start_d,
+        (date_trunc('week', d) + interval '6 day')::date AS end_d
+      FROM kst_today
+    ),
+    -- 이번 주에 사용자가 인증해야 하는 챌린지
+    cfg AS(
+      SELECT 
+        c.challenge_id, c.frequency_type, COALESCE(c.target_per_week, 7) AS tpw,
+        GREATEST(wk.start_d, c.start_date, pc.join_at::date) AS act_start,
+        LEAST(wk.end_d, COALESCE(c.end_date, wk.end_d)) AS act_end_week
+      FROM challenges c
+      JOIN participation pc on pc.challenge_id = c.challenge_id AND pc.user_id = $1
+      CROSS JOIN wk
+      WHERE c.start_date <= wk.end_d 
+        AND (c.end_date IS NULL OR c.end_date >= wk.start_d)
+        AND pc.join_at::date <= wk.end_d
+    ),
+    -- 오늘 날짜 추가
+    cut AS (
+      SELECT 
+        challenge_id, frequency_type, tpw, act_start, act_end_week,
+        LEAST(act_end_week, (now() AT TIME ZONE 'Asia/Seoul')::date) AS act_end_today
+    FROM cfg
+    ),
+    days AS (
+      SELECT 
+        challenge_id, frequency_type, tpw, act_start, act_end_week, act_end_today,
+        GREATEST(0, (act_end_week - act_start + 1))::int AS days_week,
+        GREATEST(0, (act_end_today - act_start + 1))::int AS days_sofar
+    FROM cut
+    ),
+    -- 주간 참여해야 하는 일 수 / 오늘까지 참여해야 하는 일 수
+    targets AS (
+      SELECT 
+        challenge_id, frequency_type, tpw, act_start, act_end_week, act_end_today, days_week, days_sofar,
+        CASE WHEN days_week <= 0 THEN 0
+             WHEN frequency_type = 'daily' THEN days_week
+             ELSE CEIL(tpw * days_week / 7.0)::int
+        END AS target_week,
+        CASE WHEN days_sofar <= 0 THEN 0
+             WHEN frequency_type = 'daily' THEN days_sofar
+             ELSE CEIL(tpw * days_sofar / 7.0)::int
+        END AS target_sofar
+      FROM days      
+    ),
+    -- 이번주 챌린지별 인증 횟수
+    achieved AS (
+      SELECT p.challenge_id, COUNT(DISTINCT p.posted_date_kst)::int AS cnt
+      FROM posts p
+      JOIN targets t ON t.challenge_id = p.challenge_id
+      WHERE p.user_id = $1
+        AND p.posted_date_kst BETWEEN t.act_start AND t.act_end_today
+      GROUP BY p.challenge_id
+    )
+    SELECT 
+      t.challenge_id, c.title, 
+      COALESCE(a.cnt, 0) AS achieved_sofar,
+      LEAST(COALESCE(a.cnt, 0), t.target_sofar) AS achieved_sofar_capped,
+      t.target_sofar AS weekly_target_sofar,
+      CASE WHEN t.target_sofar > 0
+           THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_sofar)::numeric / t.target_sofar, 3)
+           ELSE 0
+      END AS rate_sofar,
+      LEAST(COALESCE(a.cnt, 0), t.target_week) AS achieved_full_capped,
+      t.target_week AS weekly_target_full,
+      CASE WHEN t.target_week > 0
+           THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_week)::numeric / t.target_week, 3)
+           ELSE 0
+      END AS rate_fullweek,
+      GREATEST(t.target_week - LEAST(COALESCE(a.cnt, 0), t.target_week), 0) AS remaining_to_100,
+      GREATEST(t.days_week - t.days_sofar, 0) AS remaining_days
+    FROM targets t
+    LEFT JOIN achieved a USING (challenge_id)
+    LEFT JOIN challenges c ON t.challenge_id = c.challenge_id
+    ORDER BY t.challenge_id`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
+/** 전체 달성률 */
+export async function totalAchieved({ user_id }) {
+  const sql = `
+    WITH kst_today AS (
+      SELECT (now() AT TIME ZONE 'Asia/Seoul')::date AS d
+    ),
+    wk AS (
+      SELECT (date_trunc('week', d) - interval '1 day')::date AS last_sun
+      FROM kst_today
+    ),
+    cfg AS (
+      SELECT 
+        c.challenge_id, c.title, c.frequency_type,
+        COALESCE(c.target_per_week, 7) AS tpw,
+        GREATEST(c.start_date, pc.join_at::date) AS act_start,
+        LEAST(wk.last_sun, COALESCE(c.end_date, wk.last_sun)) AS act_end
+      FROM challenges c
+      JOIN participation pc ON c.challenge_id = pc.challenge_id AND pc.user_id = $1
+      CROSS JOIN wk
+      WHERE c.start_date <= wk.last_sun
+        AND (c.end_date IS NULL OR c.end_date >= c.start_date)
+        AND pc.join_at::date <= wk.last_sun
+    ),
+    span AS (
+      SELECT
+        challenge_id, title, frequency_type, tpw, act_start, act_end,
+        GREATEST(0, (act_end - act_start + 1))::int AS days_total
+    FROM cfg
+    ),
+    targets AS(
+      SELECT 
+        challenge_id, title, frequency_type, tpw, act_start, act_end, days_total,
+        CASE 
+          WHEN days_total <= 0 THEN 0
+          WHEN frequency_type = 'daily' THEN days_total
+          ELSE (floor(days_total / 7.0)::int) * tpw 
+                + LEAST(CEIL(tpw * ((days_total % 7)::numeric / 7.0))::int, (days_total % 7))
+        END AS target_total
+      FROM span
+    ),
+    achieved AS (
+      SELECT p.challenge_id, COUNT(DISTINCT p.posted_date_kst)::int AS cnt
+      FROM posts p
+      JOIN targets t ON t.challenge_id = p.challenge_id
+      WHERE p.user_id = $1
+        AND p.posted_date_kst Between t.act_start AND t.act_end
+      GROUP BY p.challenge_id
+    )
+    SELECT 
+      t.challenge_id, t.title,
+      COALESCE(a.cnt, 0) AS achieved,
+      LEAST(COALESCE(a.cnt, 0), t.target_total) AS achieved_capped,
+      t.target_total AS challenge_target_day,
+      CASE WHEN t.target_total > 0
+          THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_total)::numeric / t.target_total, 3)
+          ELSE 0
+      END AS total_rate,
+      GREATEST(t.target_total - LEAST(COALESCE(a.cnt, 0), t.target_total), 0) AS remaining_to_100
+    FROM targets t
+    LEFT JOIN achieved a USING (challenge_id)
+    ORDER BY t.challenge_id`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}
+
+/** 최근 30일 달성률 */
+export async function day30Achieved({ user_id }) {
+  const sql = `
+    WITH kst_today AS (
+      SELECT (now() AT TIME ZONE 'Asia/Seoul')::date AS d
+    ),
+    wk AS (
+      -- 오늘 포함 30일
+      SELECT
+        (d - interval '29 days')::date AS s,
+        d as e
+      FROM kst_today
+    ),
+    cfg AS (
+      SELECT 
+        c.challenge_id, c.title, c.frequency_type,
+        COALESCE(c.target_per_week, 7) AS tpw,
+        GREATEST(c.start_date, pc.join_at::date, wk.s) AS act_start,
+        LEAST(wk.e, COALESCE(c.end_date, wk.e)) AS act_end
+      FROM challenges c
+      JOIN participation pc ON c.challenge_id = pc.challenge_id AND pc.user_id = $1
+      CROSS JOIN wk
+      WHERE c.start_date <= wk.e
+        AND (c.end_date IS NULL OR c.end_date >= wk.s)
+        AND pc.join_at::date <= wk.e
+    ),
+    span AS (
+      SELECT
+        challenge_id, title, frequency_type, tpw, act_start, act_end,
+        GREATEST(0, (act_end - act_start + 1))::int AS days_total
+      FROM cfg
+    ),
+    targets AS(
+      SELECT 
+        challenge_id, title, frequency_type, tpw, act_start, act_end, days_total,
+        CASE 
+          WHEN days_total <= 0 THEN 0
+          WHEN frequency_type = 'daily' THEN days_total
+          ELSE (floor(days_total / 7.0)::int) * tpw + LEAST(CEIL(tpw * ((days_total % 7)::numeric / 7.0))::int, (days_total % 7))
+        END AS target_30d
+      FROM span
+    ),
+    achieved AS (
+      SELECT p.challenge_id, COUNT(DISTINCT p.posted_date_kst)::int AS cnt
+      FROM posts p
+      JOIN targets t ON t.challenge_id = p.challenge_id
+      WHERE p.user_id = $1
+        AND p.posted_date_kst Between t.act_start AND t.act_end
+      GROUP BY p.challenge_id
+    )
+    SELECT 
+      t.challenge_id, t.title,
+      COALESCE(a.cnt, 0) AS achieved_30d,
+      LEAST(COALESCE(a.cnt, 0), t.target_30d) AS achieved_30d_capped,
+      t.target_30d,
+      CASE WHEN t.target_30d > 0
+          THEN ROUND(LEAST(COALESCE(a.cnt, 0), t.target_30d)::numeric / t.target_30d, 3)
+          ELSE 0
+      END AS total_rate,
+      GREATEST(t.target_30d - LEAST(COALESCE(a.cnt, 0), t.target_30d), 0) AS remaining_to_100
+    FROM targets t
+    LEFT JOIN achieved a USING (challenge_id)
+    ORDER BY t.challenge_id`;
+  const params = [user_id];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}

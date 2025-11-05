@@ -50,19 +50,23 @@
 
 ## 4. 검색
 
-### GET : 챌린지 title 기준으로 검색
+- 옵션: 페이지네이션 `page=1&limit=20&sort=newest`
 
-- `/api/challenges?q=검색어&page=1&limit=20&sort=newest`
+### 챌린지 검색 : `GET /api/challenges?q=검색어
+
+- `/api/challenges?q=검색어`
+
+### 사용자 검색 : `GET /api/users?q=검색어
 
 ## 5. 인증글 피드
 
-### GET : 챌린지 기본 정보, 챌린지 좋아요/인증글 수/참여자 수, 챌린지 올린 사용자
+### 5.1 GET : 챌린지 기본 정보, 챌린지 좋아요/인증글 수/참여자 수, 챌린지 올린 사용자
 
 - `/api/challenges/:id`
 
 응답에 `author`, `like_count`, `post_count`, `participant_count` `liked_by_me`, `joined_by_me` 를 같이 포함
 
-### GET : 해당 챌린지의 인증글 목록(작성자, 응원 포함)
+### 5.2 GET : 해당 챌린지의 인증글 목록(작성자, 응원 포함)
 
 - `/api/challenges/:id/posts?page=1&limit=20&sort=newest`
 
@@ -77,13 +81,13 @@ author_progress: { achieved_this_week, target_per_week }
 { "title": "...", "goals": ["..."], "summary": "...", "references": "...", "insights": "...", "comment": "..." }
 ```
 
-### POST : 좋아요/응원 버튼 클릭, 참여 버튼 클릭
+### 5.3 POST : 좋아요/응원 버튼 클릭, 참여 버튼 클릭
 
 - 챌린지 참여 : `/api/challenges/:id/participants`
 - 챌린지 좋아요 : `/api/challenges/:id/likes`
 - 인증글 응원 : `/api/challenges/posts/:id/cheers`
 
-### DELETE : 좋아요/응원 취소, 참여 취소
+### 5.4 DELETE : 좋아요/응원 취소, 참여 취소
 
 - 챌린지 참여 : `/api/challenges/:id/participants`
 - 챌린지 좋아요 : `/api/challenges/:id/likes`
@@ -91,7 +95,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 좋아요/응원/참여 POST DELETE 응답에 갱신된 카운트와 상태를 돌려줘야 프론트가 추가 GET 없이 즉시 반영 가능: { like_count, liked_by_me }, { participant_count, joined_by_me}, { cheer_count, cheered_by_me }.
 
-### POST : 인증 글 게시
+### 5.5 POST : 인증 글 게시
 
 - `/api/challenges/:id/posts`
 
@@ -101,7 +105,7 @@ author_progress: { achieved_this_week, target_per_week }
 
 참여자만 게시 가능하도록 `joined_by_me` 체크
 
-### POST: 부적절한 인증글 신고
+### 5.6 POST: 부적절한 인증글 신고
 
 - `/api/reports/posts/:id`
 
@@ -109,42 +113,47 @@ author_progress: { achieved_this_week, target_per_week }
 
 ## 6. 사용자 페이지
 
-### GET : 본인 프로필, 팔로워, 달성률 재료
+### 6.1 유저 정보
 
-- `/api/me`
+- 챌린지와 인증글 목록을 불러올 때 해당 글의 작성자의 user_id와 username을 함께 가져왔었음
+- 상대방 페이지에서는 상대방 이메일이 출력되지 않도록 설정
 
-### GET : 본인 등록/참여 챌린지 목록
+#### 본인 정보 : `GET /api/me`
 
-- `/api/me/challenges?type=...`
+#### 상대방 정보 : `GET /api/users/:id`
 
-`type=created`, `type=joined`
+### 6.2 사용자가 생성/참여한 챌린지 목록
 
-목록은 페이지네이션 `/api/me/challenges?type=...&page=1&limit=20&sort=newest`
+- 챌린지와 인증글 목록을 불러올 때 해당 글의 작성자의 user_id와 username을 함께 가져왔었음
+- `joined_by_me`와 `liked_by_me`는 로그인 중인 본인이 챌린지에 참여 유무와 좋아요 유무를 나타냄(타 사용자 페이지에서도 마찬가지)
+- 옵션: 목록은 페이지네이션 `...&page=1&limit=20&sort=newest`
 
-### GET : 상대방 프로필, 팔로워, 달성률 재료
+#### 본인 : `GET /api/me/challenges?type=??`
 
-- `/api/users/:id`
+- type은 joined(참여)와 created(생성) 둘 중 하나
 
-### GET : 상대방 등록/참여 챌린지 목록
+#### 상대방 : `GET /api/users/:id/challenges?type=??`
 
-- `/api/users/:id/challenges?type=...`
+- type은 joined(참여)와 created(생성) 둘 중 하나
 
-`type=created`, `type=joined`
+### 6.3 팔로우
 
-목록은 페이지네이션 `/api/users/:id/challenges?type=...&page=1&limit=20&sort=newest`
+#### 팔로우 : `POST /api/users/:id/follow`
 
-### POST : 팔로우
+#### 언팔로우 : `DELETE /api/users/:id/follow`
 
-- `/api/users/:id/follows`
+#### 팔로워 목록 : `GET /api/users/:id/followers`
 
-### DELETE : 언팔로우
+- 나를 팔로우한 사용자들
 
-- `/api/users/:id/follows`
+#### 팔로잉 목록 : `GET /api/users/:id/followings`
 
-### GET : 팔로워 목록
+- 내가 팔로우한 사용자들
 
-- `/api/users/:id/followers`
+### 6.4 달성률
 
-### GET : 팔로잉 목록
+#### 이번 주 : `GET /api/challenges/:id/progress/week`
 
-- `/api/users/:id/followings`
+#### 전체 : `GET /api/challenges/:id/progress/total`
+
+#### 이번 달 : `GET /api/challenges/:id/progress/30days`
