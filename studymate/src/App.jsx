@@ -70,6 +70,14 @@ export default function App() {
                         </RequireAuth>
                     }
                 />
+                <Route
+                    path="/users/:id/achievement"
+                    element={
+                        <RequireAuth>
+                            <Achievement />
+                        </RequireAuth>
+                    }
+                />
             </Routes>
         </Router>
     );

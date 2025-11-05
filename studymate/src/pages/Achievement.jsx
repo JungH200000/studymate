@@ -17,7 +17,7 @@ export default function Achievement() {
                 const [weekRes, totalRes, day30Res] = await Promise.all([
                     fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/week`),
                     fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/total`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/30days`)
+                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/30days`),
                 ]);
 
                 const weekRate = parseFloat(weekRes?.week?.weeklyFullRate ?? 0);
@@ -41,7 +41,9 @@ export default function Achievement() {
 
     return (
         <div className="achievement-container">
-            <button className="back-button" onClick={handleGoBack}>뒤로가기</button>
+            <button className="back-button" onClick={handleGoBack}>
+                뒤로가기
+            </button>
             <h2>📊 내 챌린지 기록</h2>
             <AchievementChart totalRate={totalRate} day30Rate={day30Rate} />
         </div>
