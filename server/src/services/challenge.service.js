@@ -1,6 +1,7 @@
 // src/services/challenge.service.js
 // 비지니스 로직
 import * as challengeDB from '../db/challenge.db.js';
+import { verifyUser } from '../db/user.db.js';
 
 export async function createChallenge({
   title,
@@ -139,4 +140,82 @@ export async function postLike({ user_id, challenge_id }) {
 /** 챌린지 좋아요 취소 */
 export async function deleteLike({ user_id, challenge_id }) {
   return await challengeDB.deleteLike({ user_id, challenge_id });
+}
+
+/** 주간 달성률 */
+export async function weeklyAchieved({ user_id }) {
+  const isUser = await verifyUser({ user_id });
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  /** 주간 챌린지별 달성률 */
+  const achievedChallengesList = await challengeDB.weeklyAchieved({ user_id });
+
+  // 이번 주 시작일 ~ 오늘까지 달성률
+  const weeklySoFarAchieved = achievedChallengesList.reduce((t, c) => t + c.achieved_sofar_capped, 0);
+  const weeklySoFarTarget = achievedChallengesList.reduce((t, c) => t + c.weekly_target_sofar, 0);
+  const weeklySoFarRate = weeklySoFarTarget ? +(weeklySoFarAchieved / weeklySoFarTarget).toFixed(3) : 0;
+
+  // 이번 주 전체 총 달성률
+  const weeklyFullAchieved = achievedChallengesList.reduce((t, c) => t + c.achieved_full_capped, 0);
+  const weeklyFullTarget = achievedChallengesList.reduce((t, c) => t + c.weekly_target_full, 0);
+  const weeklyFullRate = weeklyFullTarget ? +(weeklyFullAchieved / weeklyFullTarget).toFixed(3) : 0;
+
+  return {
+    achievedChallengesList,
+    today: { weeklySoFarAchieved, weeklySoFarTarget, weeklySoFarRate },
+    weekly: { weeklyFullAchieved, weeklyFullTarget, weeklyFullRate },
+  };
+}
+
+/** 전체 달성률 */
+export async function totalAchieved({ user_id }) {
+  const isUser = await verifyUser({ user_id });
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  /** 전체 챌린지별 달성률 */
+  const achievedChallengesList = await challengeDB.totalAchieved({ user_id });
+
+  // 전체 달성률
+  const totalAchieved = achievedChallengesList.reduce((t, c) => t + c.achieved_capped, 0);
+  const totalTarget = achievedChallengesList.reduce((t, c) => t + c.challenge_target_day, 0);
+  const totalRate = totalTarget ? +(totalAchieved / totalTarget).toFixed(3) : 0;
+
+  return {
+    achievedChallengesList,
+    total: { totalAchieved, totalTarget, totalRate },
+  };
+}
+
+/** 최근 30일 달성률 */
+export async function day30Achieved({ user_id }) {
+  const isUser = await verifyUser({ user_id });
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  /** 최근 30일 달성률 */
+  const achievedChallengesList = await challengeDB.day30Achieved({ user_id });
+
+  // 최근 30일 전체 달성률
+  const day30Achieved = achievedChallengesList.reduce((t, c) => t + c.achieved_30d_capped, 0);
+  const day30Target = achievedChallengesList.reduce((t, c) => t + c.target_30d, 0);
+  const day30Rate = day30Target ? +(day30Achieved / day30Target).toFixed(3) : 0;
+
+  return {
+    achievedChallengesList,
+    day30: { day30Achieved, day30Target, day30Rate },
+  };
 }

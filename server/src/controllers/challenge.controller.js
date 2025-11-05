@@ -1,6 +1,7 @@
 // src/controllers/challenge.controller.js
 // 요청-응답 처리
 import * as challengeService from '../services/challenge.service.js';
+import { validate } from 'uuid';
 
 /** 챌린지 등록 */
 export const createChallenge = async (req, res) => {
@@ -129,5 +130,63 @@ export const deleteLike = async (req, res) => {
     challenge_id,
     ...like,
     message: '좋아요가 취소되었습니다.',
+  });
+};
+
+/** 주간 달성률 */
+export const weeklyAchieved = async (req, res) => {
+  const user_id = req.params.id;
+  if (!validate(user_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
+
+  const { achievedChallengesList, today, weekly } = await challengeService.weeklyAchieved({ user_id });
+
+  return res.status(200).json({
+    ok: true,
+    today,
+    weekly,
+    achievedChallengesList,
+  });
+};
+
+/** 전체 달성률 */
+export const totalAchieved = async (req, res) => {
+  const user_id = req.params.id;
+  if (!validate(user_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
+
+  const { achievedChallengesList, total } = await challengeService.totalAchieved({ user_id });
+
+  return res.status(200).json({
+    ok: true,
+    total,
+    achievedChallengesList,
+  });
+};
+
+/** 최근 30일 달성률 */
+export const day30Achieved = async (req, res) => {
+  const user_id = req.params.id;
+  if (!validate(user_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
+
+  const { achievedChallengesList, day30 } = await challengeService.day30Achieved({ user_id });
+
+  return res.status(200).json({
+    ok: true,
+    day30,
+    achievedChallengesList,
   });
 };
