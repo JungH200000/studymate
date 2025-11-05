@@ -11,6 +11,7 @@ import OtherProfile from './pages/OtherProfile';
 import ChallengeDetail from './pages/ChallengeDetail';
 import FollowerList from './pages/FollowerList';
 import FollowingList from './pages/FollowingList';
+import Achievement from './pages/achievement';
 
 export default function App() {
     return (
@@ -58,6 +59,14 @@ export default function App() {
                     element={
                         <RequireAuth>
                             <ChallengeDetail />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/users/:id/achievement"
+                    element={
+                        <RequireAuth>
+                            <Achievement />
                         </RequireAuth>
                     }
                 />

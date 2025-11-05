@@ -24,7 +24,6 @@ export default function FollowingList() {
                 setLoading(false);
             }
         };
-
         loadFollowings();
     }, [id]);
 
