@@ -16,7 +16,6 @@
     top: 0;
     left: 0;
     width: 100%;
-<<<<<<< HEAD
     height: 80px;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
@@ -74,191 +73,6 @@
 /* 메인 콘텐츠 */
 .home-content {
     margin-top: 100px;
-=======
-    height: 135px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(15px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    border-bottom: 1px solid #ffd6d6;
-    z-index: 10;
-    box-shadow: 0 2px 12px rgba(255, 123, 123, 0.08);
-    padding: 12px 0 0;
-}
-
-/* 헤더 내부 컨텐츠 래퍼 (검색창, 새로고침 버튼 포함) */
-.header-content-wrapper {
-    width: 90%;
-    max-width: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 14px;
-    gap: 10px;
-}
-
-/* 새로고침 아이콘 스타일 - 더 미니멀하게 */
-.refresh-emoji {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    cursor: pointer;
-    background: transparent;
-    border: 2px solid #ffe6e6;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-}
-
-.refresh-emoji:hover {
-    background: linear-gradient(135deg, #fff0f0, #ffe6e6);
-    border-color: #ffd6d6;
-    transform: scale(1.05);
-}
-
-.refresh-icon {
-    color: #ff9a9e;
-    font-size: 1.1rem;
-    transition: transform 0.3s ease;
-}
-
-.refresh-emoji:hover .refresh-icon {
-    transform: rotate(180deg);
-    color: #ff7b7b;
-}
-
-/* 검색 그룹 컨테이너 */
-.search-group {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-    margin: 0;
-    background: #ffffff;
-    border: 2px solid #ffe6e6;
-    border-radius: 22px;
-    box-shadow: 0 2px 8px rgba(255, 123, 123, 0.06);
-    max-width: 500px;
-    height: 44px;
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-.search-group:focus-within {
-    border-color: #ff9a9e;
-    box-shadow: 0 4px 12px rgba(255, 123, 123, 0.15);
-}
-
-.search-input {
-    flex-grow: 1;
-    border: none;
-    outline: none;
-    font-size: 0.95rem;
-    color: #444;
-    background-color: transparent;
-    padding: 0 16px;
-    height: 100%;
-    font-weight: 500;
-}
-
-.search-input::placeholder {
-    color: #bbb;
-    font-weight: 400;
-}
-
-/* 검색 버튼 스타일 */
-.search-button {
-    background: linear-gradient(135deg, #ff9a9e, #ff7b7b);
-    color: white;
-    border: none;
-    height: 44px;
-    width: 50px;
-    border-radius: 0 20px 20px 0;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.search-button:hover {
-    background: linear-gradient(135deg, #ff7b7b, #ff6b6b);
-}
-
-.search-button:active {
-    transform: scale(0.95);
-}
-
-/* 검색 탭 스타일 */
-.search-tabs-container {
-    width: 90%;
-    max-width: 600px;
-    display: flex;
-    justify-content: center;
-    border-bottom: 2px solid #f5f5f5;
-    margin-top: 2px;
-}
-
-.search-tab {
-    background: none;
-    border: none;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #bbb;
-    padding: 10px 24px;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
-    margin: 0 8px;
-    outline: none;
-    letter-spacing: -0.3px;
-}
-
-.search-tab.active {
-    color: #ff7b7b;
-    border-bottom: 3px solid #ff7b7b;
-}
-
-.search-tab:hover:not(.active) {
-    color: #ff9a9e;
-    background: rgba(255, 154, 158, 0.05);
-}
-
-/* 작성탭 이동 텍스트 */
-.write-button {
-    text-align: center;
-    width: auto;
-    flex-shrink: 0;
-}
-
-.challenge-question {
-    margin: 0;
-    font-size: 13px;
-    color: #ff7b7b;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 10px 12px;
-    background: linear-gradient(135deg, #fff0f0, #ffe6e6);
-    border-radius: 18px;
-    white-space: nowrap;
-}
-
-.challenge-question:hover {
-    color: #ff4d4d;
-    background: linear-gradient(135deg, #ffe6e6, #ffd6d6);
-    transform: translateY(-1px);
-}
-
-/* 메인 콘텐츠 */
-.home-content {
-    margin-top: 150px;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -272,23 +86,14 @@
     max-width: 600px;
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
     gap: 20px;
-=======
-    gap: 18px;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 /* 챌린지 카드 */
 .challenge-card {
     background: white;
-<<<<<<< HEAD
     border-radius: 20px;
     box-shadow: 0 8px 24px rgba(255, 123, 123, 0.1);
-=======
-    border-radius: 18px;
-    box-shadow: 0 4px 16px rgba(255, 123, 123, 0.08);
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
     padding: 20px 18px;
     display: flex;
     flex-direction: column;
@@ -298,38 +103,8 @@
 }
 
 .challenge-card:hover {
-<<<<<<< HEAD
     transform: translateY(-5px);
     box-shadow: 0 10px 28px rgba(255, 123, 123, 0.25);
-=======
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(255, 123, 123, 0.18);
-}
-
-/* 사용자 카드 */
-.user-card {
-    background: white;
-    border-radius: 18px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 16px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    border-left: 4px solid #ff9a9e;
-}
-
-.user-card:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.user-card .card-title.user-card-info {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #888;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 /* 카드 애니메이션 */
@@ -362,16 +137,7 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
-<<<<<<< HEAD
     box-shadow: 0 2px 6px rgba(255, 123, 123, 0.3);
-=======
-    box-shadow: 0 2px 8px rgba(255, 123, 123, 0.25);
-    transition: transform 0.2s ease;
-}
-
-.profile-icon:hover {
-    transform: scale(1.05);
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 /* 사용자 정보 */
@@ -379,10 +145,6 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
-=======
-    gap: 2px;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 .card-username {
@@ -392,11 +154,7 @@
 }
 
 .card-title {
-<<<<<<< HEAD
     font-size: 1.2rem;
-=======
-    font-size: 1.15rem;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
     font-weight: 800;
     color: #ff6b6b;
     letter-spacing: -0.3px;
@@ -408,30 +166,9 @@
     cursor: pointer;
     transition: transform 0.2s ease, color 0.2s ease;
 }
-<<<<<<< HEAD
 .delete-icon:hover {
     color: #ff4d4d;
     transform: scale(1.2);
-=======
-
-.delete-icon:hover {
-    color: #ff4d4d;
-    transform: scale(1.15);
-}
-
-/* 신고 버튼 */
-.report-button {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0;
-    transition: transform 0.2s ease;
-}
-
-.report-button:hover {
-    transform: scale(1.15);
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 /* 카드 내용 */
@@ -444,11 +181,7 @@
     padding: 12px;
 }
 
-<<<<<<< HEAD
 /* 날짜 및 빈도 */
-=======
-/* 카드 정보 */
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 .card-info {
     font-size: 0.85rem;
     color: #777;
@@ -460,53 +193,30 @@
     color: #ff8a8a;
     font-weight: 700;
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 .frequency-weekly {
     color: #ffb86b;
     font-weight: 700;
 }
 
-<<<<<<< HEAD
 /* 좋아요 & 참가 영역 */
-=======
-/* 좋아요 섹션 */
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 .like-section {
     display: flex;
     align-items: center;
     gap: 10px;
-<<<<<<< HEAD
     padding-top: 6px;
     border-top: 1px solid #ffe6e6;
-=======
-    padding-top: 8px;
-    border-top: 1px solid #f5f5f5;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
     margin-top: 4px;
 }
 
 .like-icon,
-<<<<<<< HEAD
 .join-icon {
     font-size: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
-=======
-.join-icon,
-.stat-icon {
-    font-size: 19px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #a0a0a0;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 .like-icon:hover,
 .join-icon:hover {
-<<<<<<< HEAD
     transform: scale(1.25);
 }
 
@@ -514,34 +224,13 @@
 .like-icon.liked {
     color: #ff7b7b;
 }
-=======
-    transform: scale(1.15);
-}
-
-.like-icon.liked {
-    color: #ff7b7b;
-}
-
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 .join-icon.joined {
     color: #71c17d;
 }
 
-<<<<<<< HEAD
 /* 카운트 */
 .like-count,
 .join-count {
-=======
-.stat-icon {
-    color: #90a4ae;
-    cursor: default;
-    margin-left: auto;
-}
-
-.like-count,
-.join-count,
-.stat-count {
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
     font-size: 14px;
     font-weight: 600;
     color: #555;
@@ -553,92 +242,14 @@
     color: #888;
     margin-top: 40px;
     font-weight: 500;
-<<<<<<< HEAD
-=======
-    font-size: 0.95rem;
-}
-
-/* 로딩 스피너 */
-.loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    font-size: 2rem;
-    color: #ff9a9e;
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
 
 /* 모바일 대응 */
 @media (max-width: 480px) {
-<<<<<<< HEAD
     .challenge-card {
         padding: 16px;
     }
     .card-title {
         font-size: 1.05rem;
     }
-=======
-    .home-header {
-        height: 130px;
-        padding: 10px 0 0;
-    }
-
-    .home-content {
-        margin-top: 145px;
-    }
-
-    .header-content-wrapper {
-        gap: 8px;
-        padding-bottom: 12px;
-    }
-
-    .refresh-emoji {
-        width: 36px;
-        height: 36px;
-        border-width: 1.5px;
-    }
-
-    .refresh-icon {
-        font-size: 1rem;
-    }
-
-    .search-group {
-        height: 40px;
-        border-width: 1.5px;
-        border-radius: 20px;
-    }
-
-    .search-input {
-        font-size: 0.9rem;
-        padding: 0 14px;
-    }
-
-    .search-button {
-        height: 40px;
-        width: 46px;
-        font-size: 0.95rem;
-        border-radius: 0 18.5px 18.5px 0;
-    }
-
-    .search-tab {
-        font-size: 0.9rem;
-        padding: 9px 18px;
-        margin: 0 4px;
-    }
-
-    .challenge-card,
-    .user-card {
-        padding: 16px;
-        border-radius: 16px;
-    }
-
-    .card-title {
-        font-size: 1.05rem;
-    }
-
-    .post-list {
-        gap: 16px;
-    }
->>>>>>> f4b281355fc310b24668d17cebed65189de67db1
 }
