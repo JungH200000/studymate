@@ -129,11 +129,6 @@ export default function Profile({ setTab }) {
         navigate(`/users/${userId}/achievement`);
     };
 
-    const handleMyStatsClick = () => {
-        if (!userId) return;
-        navigate(`/users/${userId}/achievement`);
-    };
-
     const currentList = activeTab === 'created' ? createdChallenges : joinedChallenges;
 
     return (
