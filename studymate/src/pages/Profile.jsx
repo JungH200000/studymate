@@ -16,9 +16,11 @@ export default function Profile({ setTab }) {
     const [userId, setUserId] = useState('');
     const [createdChallenges, setCreatedChallenges] = useState([]);
     const [joinedChallenges, setJoinedChallenges] = useState([]);
+    const [progressMap, setProgressMap] = useState({});
+
+    // 팔로우 통계
     const [followerCount, setFollowerCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
-    const [progressMap, setProgressMap] = useState({});
 
     useEffect(() => {
         const loadUserInfo = async () => {
@@ -29,6 +31,7 @@ export default function Profile({ setTab }) {
                     setEmail(data.user.email || '');
                     setUserId(data.user.user_id || '');
 
+                    // user_id를 받은 후 팔로우 통계 로드
                     if (data.user.user_id) {
                         loadFollowStats(data.user.user_id);
                     }
@@ -88,12 +91,10 @@ export default function Profile({ setTab }) {
             } catch (err) {
                 console.error('❌ 사용자 인증률 요청 실패:', err);
             }
-        }
+        };
 
         loadUserProgress();
     }, [joinedChallenges]);
-
-
 
     const handleChallengeClick = (id) => {
         navigate(`/challenge/${id}`);
@@ -157,7 +158,6 @@ export default function Profile({ setTab }) {
                         <span className="stat-item clickable" onClick={handleMyStatsClick}>
                             내 기록
                         </span>
-
                     </div>
                 </div>
 
@@ -197,21 +197,27 @@ export default function Profile({ setTab }) {
                         >
                             <h4>{challenge.title}</h4>
                             <p>{challenge.content}</p>
+
                             {activeTab === 'joined' && progressMap[challenge.challenge_id] && (
                                 <div className="challenge-progress">
-                                    남은 인증: {progressMap[challenge.challenge_id].remaining_to_100}회 / 남은 일수: {progressMap[challenge.challenge_id].remaining_days}일
+                                    남은 인증: {progressMap[challenge.challenge_id].remaining_to_100}회 / 남은 일수:{' '}
+                                    {progressMap[challenge.challenge_id].remaining_days}일
                                     <br />
-                                    주간 달성률: {(parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100).toFixed(1)}%
+                                    주간 달성률:{' '}
+                                    {(parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100).toFixed(1)}%
                                     <div className="challenge-progress-bar">
-                                    <div
-                                        className="progress-fill"
-                                        style={{
-                                        width: `${(parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100).toFixed(1)}%`,
-                                        }}
-                                    ></div>
+                                        <div
+                                            className="progress-fill"
+                                            style={{
+                                                width: `${(
+                                                    parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100
+                                                ).toFixed(1)}%`,
+                                            }}
+                                        ></div>
                                     </div>
                                 </div>
-                                )}
+                            )}
+
                             <div className="challenge-icons">
                                 <FontAwesomeIcon
                                     icon={faThumbsUp}

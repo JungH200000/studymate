@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import BottomNav from '../components/BottomNav';
@@ -10,6 +10,7 @@ import {
     faTrash,
     faRotateRight,
     faFileAlt,
+    faSpinner,
     faSearch,
 } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsUp as regularThumbsUp } from '@fortawesome/free-regular-svg-icons';
@@ -23,9 +24,11 @@ export default function Home() {
     const [users, setUsers] = useState([]);
     const [likes, setLikes] = useState({});
     const [participants, setParticipants] = useState({});
+
     const [userId, setUserId] = useState(null);
-    const [searchType, setSearchType] = useState('challenges'); // 'challenges' | 'users'
-    const [query, setQuery] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchType, setSearchType] = useState('challenge');
     const navigate = useNavigate();
 
     const formatDate = (isoString) => {
@@ -38,19 +41,17 @@ export default function Home() {
         });
     };
 
-    useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-        if (storedUser.user_id) setUserId(storedUser.user_id);
-
-        loadChallenges();
-    }, []);
-
-    const loadChallenges = async () => {
+    // 챌린지 검색/로딩 함수
+    const loadChallenges = useCallback(async (query = '') => {
+        setIsLoading(true);
         try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges?page=1&limit=20`);
-
+            const url = `${API_BASE}/challenges${query ? `?q=${query}` : ''}?page=1&limit=20`;
+            const res = await fetchWithAuth(url);
             const list = Array.isArray(res?.challengesList) ? res.challengesList : [];
+
             setChallenges(list);
+
+            // 좋아요와 참여 상태 초기화
             const initialLikes = {};
             const initialParticipants = {};
             list.forEach((c) => {
@@ -67,210 +68,337 @@ export default function Home() {
             setParticipants(initialParticipants);
         } catch (err) {
             console.error('챌린지 가져오기 실패:', err);
+            setChallenges([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    // 사용자 검색/로딩 함수
+    const loadUsers = useCallback(async (query = '') => {
+        setIsLoading(true);
+        try {
+            const url = `${API_BASE}/users${query ? `?q=${query}` : ''}`;
+            const res = await fetchWithAuth(url);
+            const list = Array.isArray(res?.searchUsers) ? res.searchUsers : [];
+
+            setUsers(list);
+        } catch (err) {
+            console.error('사용자 가져오기 실패:', err);
+            setUsers([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    // 검색 버튼 클릭 핸들러
+    const handleSearch = useCallback(() => {
+        const query = searchQuery.trim();
+
+        if (searchType === 'challenge') {
+            loadChallenges(query);
+            setUsers([]);
+        } else if (searchType === 'user') {
+            loadUsers(query);
+            setChallenges([]);
+        }
+    }, [searchQuery, searchType, loadChallenges, loadUsers]);
+
+    // 초기 로딩
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        if (storedUser.user_id) setUserId(storedUser.user_id);
+
+        loadChallenges();
+    }, [loadChallenges]);
+
+    // 검색 타입 변경 시
+    useEffect(() => {
+        setSearchQuery('');
+        setUsers([]);
+        setChallenges([]);
+
+        if (searchType === 'challenge') {
+            loadChallenges('');
+        } else if (searchType === 'user') {
+            loadUsers('');
+        }
+    }, [searchType, loadChallenges, loadUsers]);
+
+    // 좋아요 토글
+    const toggleLike = async (challengeId, e) => {
+        e.stopPropagation();
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        const currentState = likes[challengeId];
+        const isLiked = currentState?.liked || false;
+
+        // 낙관적 업데이트 (즉시 UI 반영)
+        setLikes((prev) => ({
+            ...prev,
+            [challengeId]: {
+                liked: !isLiked,
+                count: isLiked ? Math.max(0, (prev[challengeId]?.count || 1) - 1) : (prev[challengeId]?.count || 0) + 1,
+            },
+        }));
+
+        try {
+            if (isLiked) {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+                    method: 'DELETE',
+                });
+            } else {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+                    method: 'POST',
+                });
+            }
+        } catch (err) {
+            console.error('좋아요 처리 실패:', err);
+            // 실패 시 원래 상태로 롤백
+            setLikes((prev) => ({
+                ...prev,
+                [challengeId]: currentState,
+            }));
+            alert(`좋아요 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
+    };
+
+    // 참여 토글
+    const toggleParticipation = async (challengeId, e) => {
+        e.stopPropagation();
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        const currentState = participants[challengeId];
+        const isJoined = currentState?.joined || false;
+
+        // 낙관적 업데이트 (즉시 UI 반영)
+        setParticipants((prev) => ({
+            ...prev,
+            [challengeId]: {
+                joined: !isJoined,
+                count: isJoined
+                    ? Math.max(0, (prev[challengeId]?.count || 1) - 1)
+                    : (prev[challengeId]?.count || 0) + 1,
+            },
+        }));
+
+        try {
+            if (isJoined) {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+                    method: 'DELETE',
+                });
+            } else {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+                    method: 'POST',
+                });
+            }
+        } catch (err) {
+            console.error('참여 처리 실패:', err);
+            // 실패 시 원래 상태로 롤백
+            setParticipants((prev) => ({
+                ...prev,
+                [challengeId]: currentState,
+            }));
+            alert(`참여 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
+    };
+
+    // 챌린지 삭제
+    const handleDelete = async (challengeId, e) => {
+        e.stopPropagation();
+        if (!window.confirm('정말 이 챌린지를 삭제하시겠습니까?')) return;
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        try {
+            await fetchWithAuth(`${API_BASE}/challenges/${challengeId}`, {
+                method: 'DELETE',
+            });
+            setChallenges((prev) => prev.filter((c) => c.challenge_id !== challengeId));
+            alert('챌린지가 삭제되었습니다.');
+        } catch (err) {
+            console.error('챌린지 삭제 실패:', err);
+            alert(`챌린지 삭제에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
+    };
+
+    // 챌린지 신고
+    const handleReportChallenge = async (challengeId, e) => {
+        e.stopPropagation();
+        if (!userId) return alert('로그인이 필요합니다.');
+
+        const reason = prompt('신고 사유를 입력해주세요:');
+        if (!reason || !reason.trim()) return;
+
+        try {
+            await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: reason.trim() }),
+            });
+            alert('신고가 접수되었습니다.');
+        } catch (err) {
+            console.error('신고 실패:', err);
+            alert(`신고 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
         }
     };
 
     const handleRefresh = () => window.location.reload();
 
-    const handleSearch = async () => {
-        if (!query.trim()) {
-            // 검색어 없으면 전체 목록 다시 불러오기
-            setUsers([]);
-            loadChallenges();
-            return;
-        }
+    const placeholderText =
+        searchType === 'challenge' ? '제목 또는 사용자를 검색해보세요.' : '사용자 이름을 검색해보세요';
 
-        try {
-            if (searchType === 'challenges') {
-                const res = await fetchWithAuth(`${API_BASE}/challenges?q=${encodeURIComponent(query)}`);
-                setChallenges(res?.challengesList || []);
-            } else {
-                const res = await fetchWithAuth(`${API_BASE}/users?q=${encodeURIComponent(query)}`);
-                setUsers(res?.searchUsers || []);
-            }
-        } catch (err) {
-            console.error('검색 실패:', err);
-        }
-    };
+    // 사용자 카드 렌더링 함수
+    const renderUserCard = (user) => (
+        <div className="user-card" key={user.user_id} onClick={() => navigate(`/profile/${user.user_id}`)}>
+            <div className="card-top">
+                <FontAwesomeIcon icon={faUser} className="profile-icon" />
+                <div className="user-info">
+                    <div className="card-username">{user.username || '익명'}</div>
+                    <div className="card-title user-card-info">가입일: {formatDate(user.created_at)}</div>
+                </div>
+            </div>
+        </div>
+    );
 
-    const toggleLike = async (challengeId, e) => {
-        e.stopPropagation();
-        if (!userId) return alert('로그인이 필요합니다.');
-        const liked = likes[challengeId]?.liked;
-        try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
-                method: liked ? 'DELETE' : 'POST',
-            });
-            if (res?.ok) {
-                setLikes((prev) => {
-                    const current = prev[challengeId];
-                    const newLiked = res.liked_by_me ?? !current.liked;
-                    const newCount = Number(res.like_count ?? current.count + (newLiked ? 1 : -1));
-                    return {
-                        ...prev,
-                        [challengeId]: { liked: newLiked, count: newCount },
-                    };
-                });
-            }
-        } catch (err) {
-            console.error('좋아요 실패:', err);
-        }
-    };
+    // 챌린지 카드 렌더링 함수
+    const renderChallengeCard = (challenge) => (
+        <div
+            className="challenge-card"
+            key={challenge.challenge_id}
+            onClick={() => navigate(`/challenge/${challenge.challenge_id}`)}
+        >
+            <div className="card-top">
+                <FontAwesomeIcon
+                    icon={faUser}
+                    className="profile-icon"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (challenge.creator_id === userId) {
+                            navigate('/profile');
+                        } else {
+                            navigate(`/profile/${challenge.creator_id}`);
+                        }
+                    }}
+                />
+                <div className="user-info">
+                    <div className="card-username">{challenge.author_username || '익명'}</div>
+                    <div className="card-title">{challenge.title}</div>
+                </div>
 
-    const toggleParticipation = async (challengeId, e) => {
-        e.stopPropagation();
-        if (!userId) return alert('로그인이 필요합니다.');
-        const joined = participants[challengeId]?.joined;
-        try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
-                method: joined ? 'DELETE' : 'POST',
-            });
-            if (res?.ok) {
-                setParticipants((prev) => {
-                    const current = prev[challengeId];
-                    const newJoined = res.joined_by_me ?? !current.joined;
-                    const newCount = Number(res.participant_count ?? current.count + (newJoined ? 1 : -1));
-                    return {
-                        ...prev,
-                        [challengeId]: { joined: newJoined, count: newCount },
-                    };
-                });
-            }
-        } catch (err) {
-            console.error('참가 실패:', err);
-        }
-    };
+                {challenge.creator_id === userId ? (
+                    <FontAwesomeIcon
+                        icon={faTrash}
+                        className="delete-icon"
+                        onClick={(e) => handleDelete(challenge.challenge_id, e)}
+                    />
+                ) : (
+                    <button className="report-button" onClick={(e) => handleReportChallenge(challenge.challenge_id, e)}>
+                        🚨
+                    </button>
+                )}
+            </div>
 
-    const handleDelete = async (challengeId, e) => {
-        e.stopPropagation();
-        if (!window.confirm('정말 삭제하시겠습니까?')) return;
-        try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/${challengeId}`, { method: 'DELETE' });
-            if (res?.ok) {
-                setChallenges((prev) => prev.filter((c) => c.challenge_id !== challengeId));
-            }
-        } catch (err) {
-            console.error('삭제 실패:', err);
-        }
-    };
+            {challenge.content && <div className="card-content">{challenge.content}</div>}
+
+            <div className="card-info">
+                <span className={challenge.frequency_type === 'daily' ? 'frequency-daily' : 'frequency-weekly'}>
+                    {challenge.frequency_type === 'daily' ? '일일' : `주 ${challenge.target_per_week}회`}
+                </span>
+                <span>
+                    {formatDate(challenge.start_date)}
+                    {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ''}
+                </span>
+            </div>
+
+            <div className="like-section">
+                <FontAwesomeIcon
+                    icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
+                    onClick={(e) => toggleLike(challenge.challenge_id, e)}
+                    className={`like-icon ${likes[challenge.challenge_id]?.liked ? 'liked' : ''}`}
+                />
+                <span className="like-count">{likes[challenge.challenge_id]?.count || 0}</span>
+
+                <FontAwesomeIcon
+                    icon={faUserPlus}
+                    onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
+                    className={`join-icon ${participants[challenge.challenge_id]?.joined ? 'joined' : ''}`}
+                />
+                <span className="join-count">{participants[challenge.challenge_id]?.count || 0}</span>
+
+                <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
+                <span className="stat-count">{challenge.post_count || 0}</span>
+            </div>
+        </div>
+    );
 
     return (
         <div className="home-container">
             <header className="home-header">
-                <div className="header-top">
-                    {/* 새로고침 버튼 */}
+                <div className="header-content-wrapper">
                     <span className="refresh-emoji" onClick={handleRefresh}>
                         <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
                     </span>
+
+                    <div className="search-group">
+                        <input
+                            type="text"
+                            placeholder={placeholderText}
+                            className="search-input"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearch();
+                                }
+                            }}
+                        />
+                        <button className="search-button" onClick={handleSearch}>
+                            <FontAwesomeIcon icon={faSearch} />
+                        </button>
+                    </div>
                 </div>
 
-                {/* 검색 영역 */}
-                <div className="search-bar">
-                    <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-                        <option value="challenges">챌린지</option>
-                        <option value="users">사용자</option>
-                    </select>
-                    <input
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        placeholder={
-                            searchType === 'challenges'
-                                ? '챌린지 제목이나 내용을 검색하세요'
-                                : '사용자 이름을 검색하세요'
-                        }
-                    />
-                    <button onClick={handleSearch}>
-                        <FontAwesomeIcon icon={faSearch} />
+                <div className="search-tabs-container">
+                    <button
+                        className={`search-tab ${searchType === 'challenge' ? 'active' : ''}`}
+                        onClick={() => setSearchType('challenge')}
+                    >
+                        챌린지 검색
+                    </button>
+                    <button
+                        className={`search-tab ${searchType === 'user' ? 'active' : ''}`}
+                        onClick={() => setSearchType('user')}
+                    >
+                        사용자 검색
                     </button>
                 </div>
             </header>
 
             <main className="home-content">
-                {searchType === 'challenges' ? (
-                    <div className="post-list">
-                        {challenges.length === 0 && <p>검색 결과가 없습니다.</p>}
-                        {challenges.map((challenge) => (
-                            <div
-                                className="challenge-card"
-                                key={challenge.challenge_id}
-                                onClick={() => navigate(`/challenge/${challenge.challenge_id}`)}
-                            >
-                                <div className="card-top">
-                                    <FontAwesomeIcon
-                                        icon={faUser}
-                                        className="profile-icon"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (challenge.creator_id === userId) navigate('/profile');
-                                            else navigate(`/profile/${challenge.creator_id}`);
-                                        }}
-                                    />
-                                    <div className="user-info">
-                                        <div className="card-username">{challenge.author_username || '익명'}</div>
-                                        <div className="card-title">{challenge.title}</div>
-                                    </div>
-                                    {challenge.creator_id === userId && (
-                                        <FontAwesomeIcon
-                                            icon={faTrash}
-                                            className="delete-icon"
-                                            onClick={(e) => handleDelete(challenge.challenge_id, e)}
-                                        />
-                                    )}
-                                </div>
-                                {challenge.content && <div className="card-content">{challenge.content}</div>}
-                                <div className="card-info">
-                                    <span
-                                        className={
-                                            challenge.frequency_type === 'daily'
-                                                ? 'frequency-daily'
-                                                : 'frequency-weekly'
-                                        }
-                                    >
-                                        {challenge.frequency_type === 'daily'
-                                            ? '일일'
-                                            : `주 ${challenge.target_per_week}회`}
-                                    </span>
-                                    <span>
-                                        {formatDate(challenge.start_date)}
-                                        {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ''}
-                                    </span>
-                                </div>
-                                <div className="like-section">
-                                    <FontAwesomeIcon
-                                        icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
-                                        onClick={(e) => toggleLike(challenge.challenge_id, e)}
-                                        className={`like-icon ${likes[challenge.challenge_id]?.liked ? 'liked' : ''}`}
-                                    />
-                                    <span>{likes[challenge.challenge_id]?.count || 0}</span>
-                                    <FontAwesomeIcon
-                                        icon={faUserPlus}
-                                        onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
-                                        className={`join-icon ${
-                                            participants[challenge.challenge_id]?.joined ? 'joined' : ''
-                                        }`}
-                                    />
-                                    <span>{participants[challenge.challenge_id]?.count || 0}</span>
-                                    <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
-                                    <span>{challenge.post_count || 0}</span>
-                                </div>
-                            </div>
-                        ))}
+                {isLoading && (searchQuery || searchType) ? (
+                    <div className="loading-spinner">
+                        <FontAwesomeIcon icon={faSpinner} spin />
                     </div>
                 ) : (
-                    <div className="user-list">
-                        {users.length === 0 && <p>검색 결과가 없습니다.</p>}
-                        {users.map((u) => (
-                            <div
-                                key={u.user_id}
-                                className="user-card"
-                                onClick={() => navigate(`/profile/${u.user_id}`)}
-                            >
-                                <FontAwesomeIcon icon={faUser} className="user-icon" />
-                                <span>{u.username}</span>
-                            </div>
-                        ))}
+                    <div className="post-list">
+                        {searchType === 'challenge' && challenges.length > 0 && challenges.map(renderChallengeCard)}
+                        {searchType === 'user' && users.length > 0 && users.map(renderUserCard)}
+
+                        {searchType === 'challenge' && challenges.length === 0 && (
+                            <p className="tab-message">
+                                {searchQuery
+                                    ? `'${searchQuery}'에 해당하는 챌린지가 없습니다.`
+                                    : '등록된 챌린지가 없습니다.'}
+                            </p>
+                        )}
+
+                        {searchType === 'user' && users.length === 0 && (
+                            <p className="tab-message">
+                                {searchQuery
+                                    ? `'${searchQuery}'에 해당하는 사용자가 없습니다.`
+                                    : '등록된 사용자가 없습니다.'}
+                            </p>
+                        )}
                     </div>
                 )}
             </main>

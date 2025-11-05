@@ -65,4 +65,3 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0 }) {
         </div>
     );
 }
-
