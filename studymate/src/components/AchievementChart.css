@@ -1,0 +1,13 @@
+.achievement-chart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.chart-block {
+    width: 300px;
+    height: 300px;
+    position: relative;
+}

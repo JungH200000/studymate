@@ -33,7 +33,7 @@ export default function FollowerList() {
         if (userId === myId) {
             navigate('/profile');
         } else {
-            navigate(`/users/${userId}`);
+            navigate(`/profile/${userId}`);
         }
     };
 

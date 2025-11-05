@@ -500,3 +500,30 @@
         gap: 16px;
     }
 }
+/* 모바일 터치 하이라이트 제거 */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 버튼 및 탭 포커스/액티브 기본 스타일 제거 */
+button,
+a,
+div,
+.search-tab,
+.tab-button {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+button:focus,
+button:active,
+a:focus,
+a:active,
+.search-tab:focus,
+.search-tab:active,
+.tab-button:focus,
+.tab-button:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}

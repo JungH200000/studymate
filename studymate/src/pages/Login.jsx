@@ -45,7 +45,6 @@ export default function Login() {
             const data = res.data;
 
             if (data.ok) {
-                console.log('✅ 저장할 유저 정보:', data.user);
                 localStorage.setItem(
                     'user',
                     JSON.stringify({

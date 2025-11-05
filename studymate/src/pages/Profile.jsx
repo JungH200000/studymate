@@ -16,6 +16,7 @@ export default function Profile({ setTab }) {
     const [userId, setUserId] = useState('');
     const [createdChallenges, setCreatedChallenges] = useState([]);
     const [joinedChallenges, setJoinedChallenges] = useState([]);
+    const [progressMap, setProgressMap] = useState({});
 
     // 팔로우 통계
     const [followerCount, setFollowerCount] = useState(0);
@@ -74,6 +75,27 @@ export default function Profile({ setTab }) {
         loadChallenges();
     }, []);
 
+    useEffect(() => {
+        if (joinedChallenges.length === 0) return;
+
+        const loadUserProgress = async () => {
+            try {
+                const res = await fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/week`);
+                if (res?.achievedChallengesList) {
+                    const map = {};
+                    res.achievedChallengesList.forEach((item) => {
+                        map[item.challenge_id] = item;
+                    });
+                    setProgressMap(map);
+                }
+            } catch (err) {
+                console.error('❌ 사용자 인증률 요청 실패:', err);
+            }
+        };
+
+        loadUserProgress();
+    }, [joinedChallenges]);
+
     const handleChallengeClick = (id) => {
         navigate(`/challenge/${id}`);
     };
@@ -103,6 +125,11 @@ export default function Profile({ setTab }) {
         navigate(`/users/${userId}/followings`);
     };
 
+    const handleMyStatsClick = () => {
+        if (!userId) return;
+        navigate(`/users/${userId}/achievement`);
+    };
+
     const currentList = activeTab === 'created' ? createdChallenges : joinedChallenges;
 
     return (
@@ -126,6 +153,10 @@ export default function Profile({ setTab }) {
                         <span className="stat-divider">·</span>
                         <span className="stat-item clickable" onClick={handleFollowingClick}>
                             팔로잉 <strong>{followingCount}</strong>
+                        </span>
+                        <span className="stat-divider">·</span>
+                        <span className="stat-item clickable" onClick={handleMyStatsClick}>
+                            내 기록
                         </span>
                     </div>
                 </div>
@@ -166,6 +197,26 @@ export default function Profile({ setTab }) {
                         >
                             <h4>{challenge.title}</h4>
                             <p>{challenge.content}</p>
+
+                            {activeTab === 'joined' && progressMap[challenge.challenge_id] && (
+                                <div className="challenge-progress">
+                                    남은 인증: {progressMap[challenge.challenge_id].remaining_to_100}회 / 남은 일수:{' '}
+                                    {progressMap[challenge.challenge_id].remaining_days}일
+                                    <br />
+                                    주간 달성률:{' '}
+                                    {(parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100).toFixed(1)}%
+                                    <div className="challenge-progress-bar">
+                                        <div
+                                            className="progress-fill"
+                                            style={{
+                                                width: `${(
+                                                    parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100
+                                                ).toFixed(1)}%`,
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="challenge-icons">
                                 <FontAwesomeIcon

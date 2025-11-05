@@ -45,28 +45,27 @@ export default function Home() {
     const loadChallenges = useCallback(async (query = '') => {
         setIsLoading(true);
         try {
-            const url = `${API_BASE}/challenges${query ? `?q=${query}` : ''}`;
+            const url = `${API_BASE}/challenges${query ? `?q=${query}` : ''}?page=1&limit=20`;
             const res = await fetchWithAuth(url);
             const list = Array.isArray(res?.challengesList) ? res.challengesList : [];
 
             setChallenges(list);
 
-            if (!query) {
-                const initialLikes = {};
-                const initialParticipants = {};
-                list.forEach((c) => {
-                    initialLikes[c.challenge_id] = {
-                        liked: !!c.liked_by_me,
-                        count: c.like_count || 0,
-                    };
-                    initialParticipants[c.challenge_id] = {
-                        joined: !!c.joined_by_me,
-                        count: c.participant_count || 0,
-                    };
-                });
-                setLikes(initialLikes);
-                setParticipants(initialParticipants);
-            }
+            // 좋아요와 참여 상태 초기화
+            const initialLikes = {};
+            const initialParticipants = {};
+            list.forEach((c) => {
+                initialLikes[c.challenge_id] = {
+                    liked: !!c.liked_by_me,
+                    count: c.like_count || 0,
+                };
+                initialParticipants[c.challenge_id] = {
+                    joined: !!c.joined_by_me,
+                    count: c.participant_count || 0,
+                };
+            });
+            setLikes(initialLikes);
+            setParticipants(initialParticipants);
         } catch (err) {
             console.error('챌린지 가져오기 실패:', err);
             setChallenges([]);
@@ -92,20 +91,20 @@ export default function Home() {
         }
     }, []);
 
-    // 🌟 검색 버튼 클릭 핸들러 (API 호출을 담당합니다)
+    // 검색 버튼 클릭 핸들러
     const handleSearch = useCallback(() => {
         const query = searchQuery.trim();
 
         if (searchType === 'challenge') {
             loadChallenges(query);
-            setUsers([]); // 사용자 목록 초기화
+            setUsers([]);
         } else if (searchType === 'user') {
             loadUsers(query);
-            setChallenges([]); // 챌린지 목록 초기화
+            setChallenges([]);
         }
     }, [searchQuery, searchType, loadChallenges, loadUsers]);
 
-    // 🌟 1. 초기 로딩 (컴포넌트 마운트 시 한 번만 전체 챌린지 로드)
+    // 초기 로딩
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
         if (storedUser.user_id) setUserId(storedUser.user_id);
@@ -113,52 +112,134 @@ export default function Home() {
         loadChallenges();
     }, [loadChallenges]);
 
-    // 🌟 2. 검색 타입(탭) 변경 시, 검색어와 목록을 초기화하고 전체 목록을 로드
+    // 검색 타입 변경 시
     useEffect(() => {
-        // 검색 탭이 바뀌면 이전 검색 결과를 지우고, 검색어를 비웁니다.
         setSearchQuery('');
         setUsers([]);
         setChallenges([]);
 
-        // 해당 탭의 전체 목록을 로드합니다.
         if (searchType === 'challenge') {
             loadChallenges('');
         } else if (searchType === 'user') {
             loadUsers('');
         }
-    }, [searchType, loadChallenges, loadUsers]); // searchType 변경에만 반응합니다.
+    }, [searchType, loadChallenges, loadUsers]);
 
-    // ❌ 기존 자동 검색 useEffect 로직은 삭제되었습니다.
-    /*
-    useEffect(() => {
-        // 이 로직이 자동 검색을 실행했기 때문에 삭제합니다.
-    }, [searchType, searchQuery, loadChallenges, loadUsers]);
-    */
-
-    // 챌린지 삭제/좋아요/참가/신고 로직 (변경 없음)
+    // 좋아요 토글
     const toggleLike = async (challengeId, e) => {
         e.stopPropagation();
         if (!userId) return alert('로그인이 필요합니다.');
-        // ... (기존 로직 유지) ...
+
+        const currentState = likes[challengeId];
+        const isLiked = currentState?.liked || false;
+
+        // 낙관적 업데이트 (즉시 UI 반영)
+        setLikes((prev) => ({
+            ...prev,
+            [challengeId]: {
+                liked: !isLiked,
+                count: isLiked ? Math.max(0, (prev[challengeId]?.count || 1) - 1) : (prev[challengeId]?.count || 0) + 1,
+            },
+        }));
+
+        try {
+            if (isLiked) {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+                    method: 'DELETE',
+                });
+            } else {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+                    method: 'POST',
+                });
+            }
+        } catch (err) {
+            console.error('좋아요 처리 실패:', err);
+            // 실패 시 원래 상태로 롤백
+            setLikes((prev) => ({
+                ...prev,
+                [challengeId]: currentState,
+            }));
+            alert(`좋아요 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
     };
 
+    // 참여 토글
     const toggleParticipation = async (challengeId, e) => {
         e.stopPropagation();
         if (!userId) return alert('로그인이 필요합니다.');
-        // ... (기존 로직 유지) ...
+
+        const currentState = participants[challengeId];
+        const isJoined = currentState?.joined || false;
+
+        // 낙관적 업데이트 (즉시 UI 반영)
+        setParticipants((prev) => ({
+            ...prev,
+            [challengeId]: {
+                joined: !isJoined,
+                count: isJoined
+                    ? Math.max(0, (prev[challengeId]?.count || 1) - 1)
+                    : (prev[challengeId]?.count || 0) + 1,
+            },
+        }));
+
+        try {
+            if (isJoined) {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+                    method: 'DELETE',
+                });
+            } else {
+                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+                    method: 'POST',
+                });
+            }
+        } catch (err) {
+            console.error('참여 처리 실패:', err);
+            // 실패 시 원래 상태로 롤백
+            setParticipants((prev) => ({
+                ...prev,
+                [challengeId]: currentState,
+            }));
+            alert(`참여 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
     };
 
+    // 챌린지 삭제
     const handleDelete = async (challengeId, e) => {
         e.stopPropagation();
         if (!window.confirm('정말 이 챌린지를 삭제하시겠습니까?')) return;
         if (!userId) return alert('로그인이 필요합니다.');
-        // ... (기존 로직 유지) ...
+
+        try {
+            await fetchWithAuth(`${API_BASE}/challenges/${challengeId}`, {
+                method: 'DELETE',
+            });
+            setChallenges((prev) => prev.filter((c) => c.challenge_id !== challengeId));
+            alert('챌린지가 삭제되었습니다.');
+        } catch (err) {
+            console.error('챌린지 삭제 실패:', err);
+            alert(`챌린지 삭제에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
     };
 
+    // 챌린지 신고
     const handleReportChallenge = async (challengeId, e) => {
         e.stopPropagation();
         if (!userId) return alert('로그인이 필요합니다.');
-        // ... (기존 로직 유지) ...
+
+        const reason = prompt('신고 사유를 입력해주세요:');
+        if (!reason || !reason.trim()) return;
+
+        try {
+            await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: reason.trim() }),
+            });
+            alert('신고가 접수되었습니다.');
+        } catch (err) {
+            console.error('신고 실패:', err);
+            alert(`신고 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+        }
     };
 
     const handleRefresh = () => window.location.reload();
@@ -166,7 +247,7 @@ export default function Home() {
     const placeholderText =
         searchType === 'challenge' ? '제목 또는 사용자를 검색해보세요.' : '사용자 이름을 검색해보세요';
 
-    // 🌟 사용자 카드 렌더링 함수
+    // 사용자 카드 렌더링 함수
     const renderUserCard = (user) => (
         <div className="user-card" key={user.user_id} onClick={() => navigate(`/profile/${user.user_id}`)}>
             <div className="card-top">
@@ -179,7 +260,7 @@ export default function Home() {
         </div>
     );
 
-    // 🌟 챌린지 카드 렌더링 함수 (기존 로직 유지)
+    // 챌린지 카드 렌더링 함수
     const renderChallengeCard = (challenge) => (
         <div
             className="challenge-card"
@@ -258,7 +339,6 @@ export default function Home() {
                         <FontAwesomeIcon icon={faRotateRight} className="refresh-icon" />
                     </span>
 
-                    {/* 🌟 검색 입력 필드 및 버튼을 포함하는 새로운 구조 */}
                     <div className="search-group">
                         <input
                             type="text"
@@ -266,22 +346,18 @@ export default function Home() {
                             className="search-input"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            // Enter 키를 눌렀을 때 검색 실행
                             onKeyPress={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSearch();
                                 }
                             }}
                         />
-                        {/* 🌟 검색 버튼 추가 */}
                         <button className="search-button" onClick={handleSearch}>
                             <FontAwesomeIcon icon={faSearch} />
                         </button>
                     </div>
-                    {/* --------------------------- */}
                 </div>
 
-                {/* 🌟 검색 탭 */}
                 <div className="search-tabs-container">
                     <button
                         className={`search-tab ${searchType === 'challenge' ? 'active' : ''}`}
@@ -296,7 +372,6 @@ export default function Home() {
                         사용자 검색
                     </button>
                 </div>
-                {/* --------------------------- */}
             </header>
 
             <main className="home-content">
@@ -306,13 +381,9 @@ export default function Home() {
                     </div>
                 ) : (
                     <div className="post-list">
-                        {/* 챌린지 검색 결과 렌더링 */}
                         {searchType === 'challenge' && challenges.length > 0 && challenges.map(renderChallengeCard)}
-
-                        {/* 사용자 검색 결과 렌더링 */}
                         {searchType === 'user' && users.length > 0 && users.map(renderUserCard)}
 
-                        {/* 결과 없음 메시지 */}
                         {searchType === 'challenge' && challenges.length === 0 && (
                             <p className="tab-message">
                                 {searchQuery
