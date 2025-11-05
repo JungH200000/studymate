@@ -590,7 +590,7 @@ export default function ChallengeDetail() {
 
                                     <div className="post-footer">
                                         <div className="post-meta">
-                                            <span className="post-user">👤 {post.username}</span>
+                                            <span className="post-user">👤 {post.author_username}</span>
                                             <span className="post-date">
                                                 {new Date(post.created_at).toLocaleDateString('ko-KR', {
                                                     month: 'long',
