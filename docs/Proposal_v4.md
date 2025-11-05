@@ -12,7 +12,7 @@
 
 [자료1] 신종호 서울대 교육학과 교수는 자기주도 학습이 흔히 실패하는 이유로 "공부 목적의식의 부재, 흥미 결여, 혼자 공부하기의 난이도"를 지적합니다.
 
-한편, 최근 5년 사이 학생의 주의/집중 관련 지원 필요도도 커지고 있습니다. [자료2] 국민건강보험공단 자료에 따르면 ADHD 진단 학생 수가 2017년 5만 3천명에서 2021년 10만명으로 두 배 가까이 늘었습니다. 여기에 더해 [자료3] 과학기술정보통신부 통계에서는 청소년 스마트폰 과의존 위험군 비율이 42.6%로 나타나 디지털 환경이 오히려 주의 분산을 키우고 있습니다.
+한편, 과학기술정보통신부 통계에서는 청소년 스마트폰 과의존 위험군 비율이 42.6%로 나타나 디지털 환경이 오히려 주의 분산을 키우고 있습니다. 여기에 더해 최근 5년 사이 학생의 주의/집중 관련 지원 필요도도 커지고 있습니다. 국민건강보험공단 자료에 따르면 ADHD 진료 실인원 학생 수가 2018년 3만 8천명에서 2022년 6만 4천명으로 두 배 가까이 늘었습니다.
 
 그런데 지금 학생들이 가장 많이 사용하는 도구인 SNS는 학습 목표/진도/동기 설계 기능이 부족하고, 습관앱은 동료 기반 상호작용이 약해 꾸준함을 만들기 어렵습니다. 결국 핵심은 혼자 공부하는 구조에 있다고 보았습니다.
 
@@ -21,8 +21,8 @@
 (시장성도 있습니다. [자료4] 글로벌 '습관 추적 앱' 시장은 2024년 17억 달러에서 2033년 55억 달러로 성장 전망됩니다.)
 
 [자료1]: https://www.donga.com/news/article/all/20220811/114924611/1
-[자료2]: https://www.khan.co.kr/article/202303021200001
-[자료3]: https://iitp.kr/kr/1/knowledge/statisticsView.it?identifier=02-008-250328-000001&masterCode=publication&searClassCode=K_STAT_01
+[자료2]: https://iitp.kr/kr/1/knowledge/statisticsView.it?identifier=02-008-250328-000001&masterCode=publication&searClassCode=K_STAT_01
+[자료3]: https://www.seoul.co.kr/news/plan/heart-report/2024/02/26/20240226008005
 [자료4]: https://straitsresearch.com/report/habit-tracking-apps-market?utm_source=chatgpt.com
 
 ### 3. 주요 기능
