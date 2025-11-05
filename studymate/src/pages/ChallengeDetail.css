@@ -155,9 +155,8 @@
     line-height: 1.7;
     margin: 0;
     padding: 16px;
-    background: #fafafa;
+    background: #fef5f5;
     border-radius: 12px;
-    border-left: 3px solid #ff7b7b;
 }
 
 .challenge-info {
@@ -602,7 +601,7 @@
 .post-section {
     margin-bottom: 16px;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #fafcff 0%, #faf9fb 100%);
+    background: #fef5f5;
     border-radius: 14px;
     border: 1px solid #f0f0f5;
     transition: all 0.2s ease;
@@ -670,7 +669,7 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #ff7b7b;
+    color: #ff6b6b;
     font-weight: 700;
     font-size: 16px;
 }

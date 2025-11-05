@@ -156,7 +156,7 @@ export default function Profile({ setTab }) {
                         </span>
                         <span className="stat-divider">·</span>
                         <span className="stat-item clickable" onClick={handleMyStatsClick}>
-                            내 기록
+                            달성률
                         </span>
                     </div>
                 </div>
