@@ -22,7 +22,7 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0 }) {
         datasets: [
             {
                 data: [totalRatePercent, totalRemaining],
-                backgroundColor: ['#4CAF50', '#BDBDBD'],
+                backgroundColor: ['#4CAF50', '#FFDAB9'],
                 borderWidth: 1,
             },
         ],
@@ -34,7 +34,7 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0 }) {
         datasets: [
             {
                 data: [day30RatePercent, day30Remaining],
-                backgroundColor: ['#2196F3', '#BDBDBD'],
+                backgroundColor: ['#2196F3', '#E0F7F4'],
                 borderWidth: 1,
             },
         ],
