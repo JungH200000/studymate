@@ -78,7 +78,6 @@ export default function ChallengeDetail() {
         const loadPosts = async () => {
             try {
                 const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
-                console.log("res: ",res)
                 if (res.ok && Array.isArray(res.postsList)) {
                     const postsWithCheer = res.postsList.map((p) => ({
                         ...p,
