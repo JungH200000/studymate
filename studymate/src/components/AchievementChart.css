@@ -11,3 +11,22 @@
     height: 300px;
     position: relative;
 }
+
+.color-empty {
+    fill: #eee;
+}
+.color-scale-0 {
+    fill: #d6e685;
+}
+.color-scale-1 {
+    fill: #8cc665;
+}
+.color-scale-2 {
+    fill: #44a340;
+}
+.color-scale-3 {
+    fill: #1e6823;
+}
+.color-scale-4 {
+    fill: #00441b;
+}

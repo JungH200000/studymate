@@ -4,7 +4,6 @@ import axios from 'axios';
 import BottomNav from '../components/BottomNav';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { fetchWithAuth } from '../api/auth';
 import './Profile.css';
 
