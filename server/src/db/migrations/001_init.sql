@@ -83,7 +83,7 @@ create table if not exists posts (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 피드용
+-- 인증글 목록
 -- WHERE challenge_id? ORDER BY created_at DESC LIMIT 20
 create index if not exists post_challenge_idx on posts (challenge_id, created_at DESC);
 
