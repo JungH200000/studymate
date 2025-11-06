@@ -4,6 +4,7 @@ import axios from 'axios';
 import BottomNav from '../components/BottomNav';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { fetchWithAuth } from '../api/auth';
 import './Profile.css';
 
@@ -61,6 +62,7 @@ export default function Profile({ setTab }) {
         };
 
         const loadChallenges = async () => {
+            setIsLoading(true);
             setIsLoading(true);
             try {
                 const created = await fetchWithAuth('http://127.0.0.1:3000/api/me/challenges?type=created');
@@ -189,61 +191,62 @@ export default function Profile({ setTab }) {
 
             {/* 챌린지 목록 */}
             <div className="challenge-list-container">
-                {isLoading ? (
-                    <div className="loading-spinner">
-                        <FontAwesomeIcon icon={faSpinner} spin />
-                    </div>
-                ) : currentList.length === 0 ? (
-                    <p>{activeTab === 'created' ? '생성한 챌린지가 없습니다.' : '참여한 챌린지가 없습니다.'}</p>
-                ) : (
-                    currentList.map((challenge) => (
-                        <div
-                            key={challenge.challenge_id}
-                            className={`challenge-card ${challenge.joined_by_me ? 'joined' : ''} ${
-                                challenge.liked_by_me ? 'liked' : ''
-                            }`}
-                            onClick={() => handleChallengeClick(challenge.challenge_id)}
-                        >
-                            <h4>{challenge.title}</h4>
-                            <p>{challenge.content}</p>
+    {isLoading ? (
+        <div className="loading-spinner">
+            <FontAwesomeIcon icon={faSpinner} spin />
+        </div>
+    ) : currentList.length === 0 ? (
+        <p>{activeTab === 'created' ? '생성한 챌린지가 없습니다.' : '참여한 챌린지가 없습니다.'}</p>
+    ) : (
+        currentList.map((challenge) => (
+            <div
+                key={challenge.challenge_id}
+                className={`challenge-card ${challenge.joined_by_me ? 'joined' : ''} ${
+                    challenge.liked_by_me ? 'liked' : ''
+                }`}
+                onClick={() => handleChallengeClick(challenge.challenge_id)}
+            >
+                <h4>{challenge.title}</h4>
+                <p>{challenge.content}</p>
 
-                            {activeTab === 'joined' && progressMap[challenge.challenge_id] && (
-                                <div className="challenge-progress">
-                                    남은 인증: {progressMap[challenge.challenge_id].remaining_to_100}회 / 남은 일수:{' '}
-                                    {progressMap[challenge.challenge_id].remaining_days}일
-                                    <br />
-                                    주간 달성률:{' '}
-                                    {(parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100).toFixed(1)}%
-                                    <div className="challenge-progress-bar">
-                                        <div
-                                            className="progress-fill"
-                                            style={{
-                                                width: `${(
-                                                    parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100
-                                                ).toFixed(1)}%`,
-                                            }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="challenge-icons">
-                                <FontAwesomeIcon
-                                    icon={faThumbsUp}
-                                    className={`like-icon ${challenge.liked_by_me ? 'liked' : ''}`}
-                                />
-                                <span>{challenge.like_count}</span>
-
-                                <FontAwesomeIcon
-                                    icon={faUserPlus}
-                                    className={`join-icon ${challenge.joined_by_me ? 'joined' : ''}`}
-                                />
-                                <span>{challenge.participant_count}</span>
-                            </div>
+                {activeTab === 'joined' && progressMap[challenge.challenge_id] && (
+                    <div className="challenge-progress">
+                        남은 인증: {progressMap[challenge.challenge_id].remaining_to_100}회 / 남은 일수:{' '}
+                        {progressMap[challenge.challenge_id].remaining_days}일
+                        <br />
+                        주간 달성률:{' '}
+                        {(parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100).toFixed(1)}%
+                        <div className="challenge-progress-bar">
+                            <div
+                                className="progress-fill"
+                                style={{
+                                    width: `${(
+                                        parseFloat(progressMap[challenge.challenge_id].rate_fullweek) * 100
+                                    ).toFixed(1)}%`,
+                                }}
+                            ></div>
                         </div>
-                    ))
+                    </div>
                 )}
+
+                <div className="challenge-icons">
+                    <FontAwesomeIcon
+                        icon={faThumbsUp}
+                        className={`like-icon ${challenge.liked_by_me ? 'liked' : ''}`}
+                    />
+                    <span>{challenge.like_count}</span>
+
+                    <FontAwesomeIcon
+                        icon={faUserPlus}
+                        className={`join-icon ${challenge.joined_by_me ? 'joined' : ''}`}
+                    />
+                    <span>{challenge.participant_count}</span>
+                </div>
             </div>
+        ))
+    )}
+</div>
+
 
 
             <BottomNav setTab={setTab} />

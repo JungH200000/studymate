@@ -25,6 +25,7 @@ export default function OtherProfile() {
         const loadUser = async () => {
             try {
                 setIsLoading(true);
+                setIsLoading(true);
                 // 1. 사용자 기본 정보 로드
                 const userData = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}`);
                 if (userData?.user?.username) {
@@ -207,8 +208,8 @@ export default function OtherProfile() {
                         </div>
                     ))
                 )}
-
             </div>
+
 
             <BottomNav setTab={() => {}} />
         </div>

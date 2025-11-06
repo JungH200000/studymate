@@ -20,7 +20,7 @@ export default function Achievement() {
                     fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/30days`),
                 ]);
 
-                const weekRate = parseFloat(weekRes?.week?.weeklyFullRate ?? 0);
+                const weekRate = parseFloat(weekRes?.weekly?.weeklyFullRate ?? 0);
                 const total = parseFloat(totalRes?.total?.totalRate ?? 0);
                 const day30 = parseFloat(day30Res?.day30?.day30Rate ?? 0);
 
@@ -41,10 +41,32 @@ export default function Achievement() {
 
     return (
         <div className="achievement-container">
-            <button className="back-button" onClick={handleGoBack}>
-                뒤로가기
-            </button>
-            <h2>📊 내 챌린지 기록</h2>
+            {/* 상단 헤더 바: 뒤로가기 버튼과 제목 배치 */}
+            <div className="header-bar">
+                <button className="back-button" onClick={handleGoBack}>
+                    <span className="back-icon">←</span>
+                </button>
+                <h2 className="page-title">📊 내 챌린지 기록</h2>
+            </div>
+
+            <div className="rate-stats-grid">
+                <div className="stat-card weekly">
+                    <p className="stat-label">이번 주 인증률</p>
+                    {/* ✅ 소수점 제거: toFixed(0) 적용 */}
+                    <p className="stat-value">{(weeklyFullRate * 100).toFixed(0)}%</p>
+                </div>
+                <div className="stat-card day30">
+                    <p className="stat-label">30일 인증률</p>
+                    {/* ✅ 소수점 제거: toFixed(0) 적용 */}
+                    <p className="stat-value">{(day30Rate * 100).toFixed(0)}%</p>
+                </div>
+                <div className="stat-card total">
+                    <p className="stat-label">전체 인증률</p>
+                    {/* ✅ 소수점 제거: toFixed(0) 적용 */}
+                    <p className="stat-value">{(totalRate * 100).toFixed(0)}%</p>
+                </div>
+            </div>
+
             <AchievementChart totalRate={totalRate} day30Rate={day30Rate} />
         </div>
     );
