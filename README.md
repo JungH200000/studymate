@@ -12,16 +12,18 @@
 
 ## 역할 분담
 
-- **Frontent**: 김지훈, 한진환
-- **Backend**: 박정현
+- 박정현 : UI/UX 설계, Server 설계 및 구현, DB 설계 및 구현, PPT 제작
+- 김지훈 : UI/UX 설계, Frontend 구현, UI/UX 구현
+- 한진환 : UI/UX 설계, Frontend 구현
 
 ---
 
 ## 기술 스택
 
 - **Frontend**: React, Morpheus(유라클)
-- **Backend**: Node.js(Express)
-- **DB**: PostgreSQL, Supabase
+- **Sever**: Node.js(Express), JWT
+- **DB**: PostgreSQL(Supabase)
+- **Dev Tool**: VS Code, Android Studio, Postman
 
 ---
 
