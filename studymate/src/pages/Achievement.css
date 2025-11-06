@@ -1,6 +1,6 @@
 .achievement-container {
     padding: 20px;
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
     background: #fef5f5;
 }

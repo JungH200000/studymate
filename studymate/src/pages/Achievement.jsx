@@ -6,12 +6,33 @@ import './Achievement.css';
 
 export default function Achievement() {
     const navigate = useNavigate();
+    const { id: userId } = useParams();
     const [weeklyFullRate, setWeeklyFullRate] = useState(0);
     const [totalRate, setTotalRate] = useState(0);
     const [day30Rate, setDay30Rate] = useState(0);
-    const { id: userId } = useParams();
+    const [userPosts, setUserPosts] = useState([]);
 
     useEffect(() => {
+        const loadUserPosts = async () => {
+            try {
+                const weekRes = await fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/week`);
+                const challengeIds = weekRes?.achievedChallengesList?.map((c) => c.challenge_id) ?? [];
+
+                const postPromises = challengeIds.map((id) =>
+                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${id}/posts`)
+                );
+                const postResults = await Promise.all(postPromises);
+
+                const allPosts = postResults.flatMap(
+                    (res) => res?.postsList?.filter((post) => post.user_id === userId) ?? []
+                );
+
+                setUserPosts(allPosts);
+            } catch (err) {
+                console.error('❌ 인증글 불러오기 실패:', err);
+            }
+        };
+
         const loadAchievementRates = async () => {
             try {
                 const [weekRes, totalRes, day30Res] = await Promise.all([
@@ -32,6 +53,7 @@ export default function Achievement() {
             }
         };
 
+        loadUserPosts();
         loadAchievementRates();
     }, [userId]);
 
@@ -67,7 +89,7 @@ export default function Achievement() {
                 </div>
             </div>
 
-            <AchievementChart totalRate={totalRate} day30Rate={day30Rate} />
+            <AchievementChart totalRate={totalRate} day30Rate={day30Rate} posts={userPosts} userId={userId} />
         </div>
     );
 }
