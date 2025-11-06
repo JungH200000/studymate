@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faThumbsUp as solidThumbsUp, faUserPlus, faUserMinus } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faThumbsUp as solidThumbsUp, faUserPlus, faUserMinus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import BottomNav from '../components/BottomNav';
 import './Profile.css'; // Profile.css를 공유하여 사용
 
@@ -24,6 +24,7 @@ export default function OtherProfile() {
     useEffect(() => {
         const loadUser = async () => {
             try {
+                setIsLoading(true);
                 // 1. 사용자 기본 정보 로드
                 const userData = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}`);
                 if (userData?.user?.username) {
@@ -59,6 +60,8 @@ export default function OtherProfile() {
             } catch (err) {
                 console.error('❌ 사용자 정보 요청 실패:', err);
                 // navigate('/home'); // 에러 시 홈으로 이동은 그대로 유지
+            }finally {
+                setIsLoading(false);
             }
         };
 
@@ -170,7 +173,11 @@ export default function OtherProfile() {
 
             {/* 챌린지 목록 (Profile.jsx와 동일) */}
             <div className="challenge-list-container">
-                {currentList.length === 0 ? (
+                {isLoading ? (
+                    <div className="loading-spinner">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                    </div>
+                ) : currentList.length === 0 ? (
                     <p>{activeTab === 'created' ? '생성한 챌린지가 없습니다.' : '참여한 챌린지가 없습니다.'}</p>
                 ) : (
                     currentList.map((challenge) => (
@@ -200,6 +207,7 @@ export default function OtherProfile() {
                         </div>
                     ))
                 )}
+
             </div>
 
             <BottomNav setTab={() => {}} />

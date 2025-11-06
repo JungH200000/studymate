@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BottomNav from '../components/BottomNav';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { fetchWithAuth } from '../api/auth';
 import './Profile.css';
 
@@ -17,6 +17,7 @@ export default function Profile({ setTab }) {
     const [createdChallenges, setCreatedChallenges] = useState([]);
     const [joinedChallenges, setJoinedChallenges] = useState([]);
     const [progressMap, setProgressMap] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     // 팔로우 통계
     const [followerCount, setFollowerCount] = useState(0);
@@ -60,6 +61,7 @@ export default function Profile({ setTab }) {
         };
 
         const loadChallenges = async () => {
+            setIsLoading(true);
             try {
                 const created = await fetchWithAuth('http://127.0.0.1:3000/api/me/challenges?type=created');
                 const joined = await fetchWithAuth('http://127.0.0.1:3000/api/me/challenges?type=joined');
@@ -68,6 +70,8 @@ export default function Profile({ setTab }) {
                 if (joined?.challengesList) setJoinedChallenges(joined.challengesList);
             } catch (err) {
                 console.error('❌ 챌린지 목록 요청 실패:', err);
+            }finally {
+                setIsLoading(false);
             }
         };
 
@@ -167,6 +171,7 @@ export default function Profile({ setTab }) {
             </div>
 
             {/* 탭 */}
+            
             <div className="challenge-tabs">
                 <div
                     className={`tab-item ${activeTab === 'created' ? 'active' : ''}`}
@@ -184,7 +189,11 @@ export default function Profile({ setTab }) {
 
             {/* 챌린지 목록 */}
             <div className="challenge-list-container">
-                {currentList.length === 0 ? (
+                {isLoading ? (
+                    <div className="loading-spinner">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                    </div>
+                ) : currentList.length === 0 ? (
                     <p>{activeTab === 'created' ? '생성한 챌린지가 없습니다.' : '참여한 챌린지가 없습니다.'}</p>
                 ) : (
                     currentList.map((challenge) => (
@@ -235,6 +244,7 @@ export default function Profile({ setTab }) {
                     ))
                 )}
             </div>
+
 
             <BottomNav setTab={setTab} />
         </div>
