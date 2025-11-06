@@ -36,7 +36,7 @@
 
 #### 3.2 학습 인증
 
-- 챌린지 참가자는 하루 한 번, JSON 기반 인증 카드를 작성해 목표/요약/자료/학습 시간 등 학습 기록을 자유롭게 남김
+- 챌린지 참가자는 하루 한 번, JSON 기반 인증글을 작성해 목표/요약/자료/학습 시간 등 학습 기록을 자유롭게 남김
 - 서버가 참여 여부와 날짜 중복을 검증해 미참가자나 하루 1회 제한을 넘는 업로드를 차단, 공정한 인증 흐름을 보장
 - 업로드 직후 챌린지 전체 인증 수와 나의 누적/주간 실적, 주간 목표 대비 진행률을 계산해 달성 현황에 반영
 - 인증 피드는 최신순/페이지네이션으로 제공되며 각 글의 응원 수, 응원자 목록, 내 응원 여부를 함께 보여 학습 공유를 도움
@@ -70,12 +70,13 @@
 
 ### 6. 역할 분담
 
-- Frontend: 김지훈, 한진환
-- Backend: 박정현
+- 박정현 : UI/UX 설계, Server 설계 및 구현, DB 설계 및 구현, PPT 제작
+- 김지훈 : UI/UX 설계, Frontend 구현, UI/UX 구현
+- 한진환 : UI/UX 설계, Frontend 구현
 
 ### 7. 기술 스택
 
 - Frontend: React, Morpheus(유라클)
 - Server: Node.js(Express)
-- DB: PostgreSQL, Supabase
+- DB: PostgreSQL(Supabase)
 - Dev Tool : VS Code, Android Studio, Postman
