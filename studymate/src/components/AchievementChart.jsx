@@ -53,8 +53,8 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0, posts =
 
     // 잔디형 캘린더 데이터 생성
     const today = new Date();
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(today.getDate() - 90);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 90);
 
     const heatmapValues = posts
         .filter((post) => post.user_id === userId)
@@ -77,13 +77,15 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0, posts =
 
     const getColorClass = (value) => {
         if (!value || !value.count) return 'color-empty';
-        const ratio = value.count / maxCount;
 
-        if (ratio > 0.8) return 'color-scale-4';
-        if (ratio > 0.6) return 'color-scale-3';
-        if (ratio > 0.4) return 'color-scale-2';
-        if (ratio > 0.2) return 'color-scale-1';
-        return 'color-scale-0';
+        const count = value.count;
+
+        if (count >= 5) return 'color-scale-5';
+        if (count === 4) return 'color-scale-4';
+        if (count === 3) return 'color-scale-3';
+        if (count === 2) return 'color-scale-2';
+        if (count === 1) return 'color-scale-1';
+        return 'color-empty'; // 0회
     };
 
     return (
@@ -95,14 +97,25 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0, posts =
                 <Pie data={day30Data} options={options('최근 30일 챌린지 달성률')} />
             </div>
             <div className="chart-block">
-                <h3>최근 90일 인증 활동</h3>
+                <h3>최근 인증 활동</h3>
                 <CalendarHeatmap
-                    startDate={ninetyDaysAgo}
+                    startDate={thirtyDaysAgo}
                     endDate={today}
                     values={heatmapValues}
                     classForValue={getColorClass}
                     showWeekdayLabels
                 />
+                <div className="heatmap-legend">
+                <div className="legend-scale">
+                        <span>less</span>
+                        <span className="color-box color-empty"></span>
+                        <span className="color-box color-scale-1"></span>
+                        <span className="color-box color-scale-2"></span>
+                        <span className="color-box color-scale-3"></span>
+                        <span className="color-box color-scale-4"></span>
+                        <span>more</span>
+                    </div>
+                </div>
             </div>
         </div>
     );
