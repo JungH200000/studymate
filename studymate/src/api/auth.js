@@ -1,11 +1,12 @@
 // src/api/auth.js
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from './config';
 
 export const refreshAccessToken = async () => {
     try {
         const res = await axios.post(
-            'http://127.0.0.1:3000/api/auth/refresh',
+            'http://10.0.2.2:3000/api/auth/refresh',
             {},
             {
                 withCredentials: true,
@@ -27,11 +28,17 @@ export const refreshAccessToken = async () => {
 };
 
 export const fetchWithAuth = async (url, options = {}) => {
+    if (!url || typeof url !== 'string') {
+        throw new Error(`fetchWithAuth: 유효하지 않은 URL입니다 → ${url}`);
+    }
+
     let token = localStorage.getItem('accessToken');
+    const isAbsolute = /^https?:\/\//.test(url);
+    const fullUrl = isAbsolute ? url : `${API_BASE}${url}`;
 
     try {
         const config = {
-            url,
+            url: fullUrl,
             method: options.method || 'GET',
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -41,7 +48,6 @@ export const fetchWithAuth = async (url, options = {}) => {
             withCredentials: true,
         };
 
-        // body가 있을 때만 data 추가
         if (options.body !== undefined && options.body !== null) {
             config.data = options.body;
         }
@@ -55,7 +61,7 @@ export const fetchWithAuth = async (url, options = {}) => {
 
             try {
                 const retryConfig = {
-                    url,
+                    url: fullUrl,
                     method: options.method || 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,

@@ -5,6 +5,7 @@ import BottomNav from '../components/BottomNav';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightFromBracket, faUser, faThumbsUp, faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { fetchWithAuth } from '../api/auth';
+import { API_BASE } from '../api/config';
 import './Profile.css';
 
 export default function Profile({ setTab }) {
@@ -26,7 +27,7 @@ export default function Profile({ setTab }) {
     useEffect(() => {
         const loadUserInfo = async () => {
             try {
-                const data = await fetchWithAuth('http://127.0.0.1:3000/api/me');
+                const data = await fetchWithAuth(`${API_BASE}/api/me`);
                 if (data?.user) {
                     setNickname(data.user.username || '닉네임');
                     setEmail(data.user.email || '');
@@ -45,8 +46,8 @@ export default function Profile({ setTab }) {
         const loadFollowStats = async (user_id) => {
             try {
                 const [followers, followings] = await Promise.all([
-                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${user_id}/followers`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${user_id}/followings`),
+                    fetchWithAuth(`${API_BASE}/api/users/${user_id}/followers`),
+                    fetchWithAuth(`${API_BASE}/api/users/${user_id}/followings`),
                 ]);
 
                 if (followers?.followerCount !== undefined) {
@@ -64,8 +65,8 @@ export default function Profile({ setTab }) {
             setIsLoading(true);
             setIsLoading(true);
             try {
-                const created = await fetchWithAuth('http://127.0.0.1:3000/api/me/challenges?type=created');
-                const joined = await fetchWithAuth('http://127.0.0.1:3000/api/me/challenges?type=joined');
+                const created = await fetchWithAuth(`${API_BASE}/api/me/challenges?type=created`);
+                const joined = await fetchWithAuth(`${API_BASE}/api/me/challenges?type=joined`);
 
                 if (created?.challengesList) setCreatedChallenges(created.challengesList);
                 if (joined?.challengesList) setJoinedChallenges(joined.challengesList);
@@ -85,7 +86,7 @@ export default function Profile({ setTab }) {
 
         const loadUserProgress = async () => {
             try {
-                const res = await fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/week`);
+                const res = await fetchWithAuth(`${API_BASE}/api/challenges/${userId}/progress/week`);
                 if (res?.achievedChallengesList) {
                     const map = {};
                     res.achievedChallengesList.forEach((item) => {
@@ -110,7 +111,7 @@ export default function Profile({ setTab }) {
         if (!confirmLogout) return;
 
         try {
-            await axios.post('http://127.0.0.1:3000/api/auth/logout', {}, { withCredentials: true });
+            await axios.post(`${API_BASE}/api/auth/logout`, {}, { withCredentials: true });
         } catch (err) {
             console.error('❌ 로그아웃 요청 실패:', err);
         }
@@ -138,6 +139,7 @@ export default function Profile({ setTab }) {
     const handleRankingClick = () => {
         if (!userId) return;
         navigate(`/users/${userId}/ranking`);
+        
     };
 
     const currentList = activeTab === 'created' ? createdChallenges : joinedChallenges;

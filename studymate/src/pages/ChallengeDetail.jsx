@@ -14,9 +14,8 @@ import {
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsUp as regularThumb } from '@fortawesome/free-regular-svg-icons';
+import { API_BASE } from '../api/config';
 import './ChallengeDetail.css';
-
-const API_BASE = 'http://127.0.0.1:3000/api';
 
 export default function ChallengeDetail() {
     const { id } = useParams();
@@ -62,7 +61,7 @@ export default function ChallengeDetail() {
         const loadChallenge = async () => {
             setIsLoading(true);
             try {
-                const res = await fetchWithAuth(`${API_BASE}/challenges?page=1&limit=20`);
+                const res = await fetchWithAuth(`${API_BASE}/api/challenges?page=1&limit=20`);
                 const found = res.challengesList?.find((c) => String(c.challenge_id) === String(id));
                 if (found) {
                     setChallenge(found);
@@ -78,7 +77,7 @@ export default function ChallengeDetail() {
 
         const loadPosts = async () => {
             try {
-                const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`);
+                const res = await fetchWithAuth(`${API_BASE}/api/challenges/${id}/posts`);
                 if (res.ok && Array.isArray(res.postsList)) {
                     const postsWithCheer = res.postsList.map((p) => ({
                         ...p,
@@ -160,7 +159,7 @@ export default function ChallengeDetail() {
         const method = likes.liked ? 'DELETE' : 'POST';
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/likes`, { method });
+            const res = await fetchWithAuth(`${API_BASE}/api/challenges/${id}/likes`, { method });
             if (res?.ok) {
                 setLikes({ liked: res.liked_by_me, count: parseInt(res.like_count, 10) });
             } else {
@@ -177,7 +176,7 @@ export default function ChallengeDetail() {
         const method = participants.joined ? 'DELETE' : 'POST';
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/participants`, { method });
+            const res = await fetchWithAuth(`${API_BASE}/api/challenges/${id}/participants`, { method });
             if (res?.ok) {
                 setParticipants({ joined: res.joined_by_me, count: parseInt(res.participant_count, 10) });
             } else {

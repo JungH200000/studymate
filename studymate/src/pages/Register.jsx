@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE } from '../api/config';
 import "./Auth.css";
 
 const EMOJIS = ["✏️", "📚", "📝", "📖", "🖍️"];
@@ -28,7 +29,7 @@ const handleSignup = async (e) => {
   e.preventDefault();
   
   try {
-    const response = await axios.post("http://127.0.0.1:3000/api/auth/register", {
+    const response = await axios.post(`${API_BASE}/api/auth/register`, {
       username,
       email,
       password,

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE } from '../api/config';
 import './FollowList.css'; // 동일한 스타일 사용
 
 export default function LikeList() {
@@ -15,7 +16,7 @@ export default function LikeList() {
     useEffect(() => {
         const loadLikes = async () => {
             try {
-                const data = await fetchWithAuth('http://127.0.0.1:3000/api/challenges?page=1&limit=100');
+                const data = await fetchWithAuth(`${API_BASE}/api/challenges?page=1&limit=100`);
                 const list = Array.isArray(data?.challengesList) ? data.challengesList : [];
                 const challenge = list.find((c) => c.challenge_id === challengeId);
 

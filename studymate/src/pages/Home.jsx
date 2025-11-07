@@ -14,9 +14,8 @@ import {
     faSearch,
 } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsUp as regularThumbsUp } from '@fortawesome/free-regular-svg-icons';
+import { API_BASE } from '../api/config';
 import './Home.css';
-
-const API_BASE = 'http://127.0.0.1:3000/api';
 
 export default function Home() {
     const [tab, setTab] = useState('home');
@@ -45,7 +44,12 @@ export default function Home() {
     const loadChallenges = useCallback(async (query = '') => {
         setIsLoading(true);
         try {
-            const url = `${API_BASE}/challenges${query ? `?q=${query}` : ''}?page=1&limit=20`;
+            const params = new URLSearchParams();
+            if (query) params.append('q', query);
+            params.append('page', '1');
+            params.append('limit', '20');
+
+            const url = `${API_BASE}/api/challenges?${params.toString()}`;
             const res = await fetchWithAuth(url);
             const list = Array.isArray(res?.challengesList) ? res.challengesList : [];
 
@@ -78,7 +82,7 @@ export default function Home() {
     const loadUsers = useCallback(async (query = '') => {
         setIsLoading(true);
         try {
-            const url = `${API_BASE}/users${query ? `?q=${query}` : ''}`;
+            const url = `${API_BASE}/api/users${query ? `?q=${query}` : ''}`;
             const res = await fetchWithAuth(url);
             const list = Array.isArray(res?.searchUsers) ? res.searchUsers : [];
 
@@ -144,11 +148,11 @@ export default function Home() {
 
         try {
             if (isLiked) {
-                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+                await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/likes`, {
                     method: 'DELETE',
                 });
             } else {
-                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/likes`, {
+                await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/likes`, {
                     method: 'POST',
                 });
             }
@@ -184,11 +188,11 @@ export default function Home() {
 
         try {
             if (isJoined) {
-                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+                await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/participants`, {
                     method: 'DELETE',
                 });
             } else {
-                await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/participants`, {
+                await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/participants`, {
                     method: 'POST',
                 });
             }
@@ -210,7 +214,7 @@ export default function Home() {
         if (!userId) return alert('로그인이 필요합니다.');
 
         try {
-            await fetchWithAuth(`${API_BASE}/challenges/${challengeId}`, {
+            await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}`, {
                 method: 'DELETE',
             });
             setChallenges((prev) => prev.filter((c) => c.challenge_id !== challengeId));
@@ -230,7 +234,7 @@ export default function Home() {
         if (!reason || !reason.trim()) return;
 
         try {
-            await fetchWithAuth(`${API_BASE}/challenges/${challengeId}/report`, {
+            await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason: reason.trim() }),

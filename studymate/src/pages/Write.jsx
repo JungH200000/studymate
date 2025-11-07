@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Write.css';
 import { fetchWithAuth } from '../api/auth';
+import { API_BASE } from '../api/config';
 
 export default function Write() {
     const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function Write() {
         };
 
         try {
-            const res = await fetchWithAuth('http://localhost:3000/api/challenges', {
+            const res = await fetchWithAuth(`${API_BASE}/api/challenges`, {
                 method: 'POST',
                 body: payload,
             });

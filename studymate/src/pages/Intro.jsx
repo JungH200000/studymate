@@ -8,7 +8,7 @@ export default function Intro() {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate("/login");
-    }, 3000); // 3초 후 이동
+    }, 1000); // 3초 후 이동
 
     return () => clearTimeout(timer);
   }, [navigate]);

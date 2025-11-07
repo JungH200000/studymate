@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faUser } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE } from '../api/config';
 import './FollowList.css';
 
 export default function Ranking() {
@@ -14,11 +15,11 @@ export default function Ranking() {
     useEffect(() => {
         const loadRanking = async () => {
             try {
-                const followingsRes = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/followings`);
+                const followingsRes = await fetchWithAuth(`${API_BASE}/api/users/${id}/followings`);
                 const followings = followingsRes?.followingList || [];
 
                 // 본인 정보 가져오기
-                const meRes = await fetchWithAuth(`http://127.0.0.1:3000/api/me`);
+                const meRes = await fetchWithAuth(`${API_BASE}/api/me`);
                 const myId = meRes?.user?.user_id;
                 const myName = meRes?.user?.username;
 
@@ -33,7 +34,7 @@ export default function Ranking() {
                 const results = await Promise.all(
                     allUsers.map(async (user) => {
                         const challengeRes = await fetchWithAuth(
-                            `http://127.0.0.1:3000/api/challenges/${user.userId}/progress/30days`
+                            `${API_BASE}/api/challenges/${user.userId}/progress/30days`
                         );
                         const achieved = challengeRes?.day30?.day30Achieved || 0;
                         return {
@@ -62,6 +63,7 @@ export default function Ranking() {
 
     const handleUserClick = (userId) => {
         const myId = JSON.parse(localStorage.getItem('user'))?.user_id;
+        console.log(myId)
         if (userId === myId) {
             navigate('/profile');
         } else {

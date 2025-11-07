@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../api/auth';
 import { useParams, useNavigate } from 'react-router-dom';
 import AchievementChart from '../components/AchievementChart';
+import { API_BASE } from '../api/config';
 import './Achievement.css';
 
 export default function Achievement() {
@@ -15,11 +16,11 @@ export default function Achievement() {
     useEffect(() => {
         const loadUserPosts = async () => {
             try {
-                const weekRes = await fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/week`);
+                const weekRes = await fetchWithAuth(`${API_BASE}/api/challenges/${userId}/progress/week`);
                 const challengeIds = weekRes?.achievedChallengesList?.map((c) => c.challenge_id) ?? [];
 
                 const postPromises = challengeIds.map((id) =>
-                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${id}/posts`)
+                    fetchWithAuth(`${API_BASE}/api/challenges/${id}/posts`)
                 );
                 const postResults = await Promise.all(postPromises);
 
@@ -37,9 +38,9 @@ export default function Achievement() {
         const loadAchievementRates = async () => {
             try {
                 const [weekRes, totalRes, day30Res] = await Promise.all([
-                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/week`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/total`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/challenges/${userId}/progress/30days`),
+                    fetchWithAuth(`${API_BASE}/api/challenges/${userId}/progress/week`),
+                    fetchWithAuth(`${API_BASE}/api/challenges/${userId}/progress/total`),
+                    fetchWithAuth(`${API_BASE}/api/challenges/${userId}/progress/30days`),
                 ]);
 
                 const weekRate = parseFloat(weekRes?.weekly?.weeklyFullRate ?? 0);
