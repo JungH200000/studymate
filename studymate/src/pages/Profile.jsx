@@ -135,6 +135,11 @@ export default function Profile({ setTab }) {
         navigate(`/users/${userId}/achievement`);
     };
 
+    const handleRankingClick = () => {
+        if (!userId) return;
+        navigate(`/users/${userId}/ranking`);
+    };
+
     const currentList = activeTab === 'created' ? createdChallenges : joinedChallenges;
 
     return (
@@ -162,6 +167,10 @@ export default function Profile({ setTab }) {
                         <span className="stat-divider">·</span>
                         <span className="stat-item clickable" onClick={handleMyStatsClick}>
                             달성률
+                        </span>
+                        <span className="stat-divider">·</span>
+                        <span className="stat-item clickable" onClick={handleRankingClick}>
+                            랭킹
                         </span>
                     </div>
                 </div>

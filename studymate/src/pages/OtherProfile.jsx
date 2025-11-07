@@ -209,8 +209,6 @@ export default function OtherProfile() {
                     ))
                 )}
             </div>
-
-
             <BottomNav setTab={() => {}} />
         </div>
     );

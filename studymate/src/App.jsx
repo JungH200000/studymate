@@ -14,6 +14,7 @@ import FollowingList from './pages/FollowingList';
 import Achievement from './pages/Achievement';
 import LikeList from './pages/LikeList';
 import ParticipantList from './pages/ParticipantList';
+import Ranking from './pages/Ranking';
 
 export default function App() {
     return (
@@ -26,6 +27,7 @@ export default function App() {
                 <Route path="/users/:id/followings" element={<FollowingList />} />
                 <Route path="/likes/:challengeId" element={<LikeList />} />
                 <Route path="/participants/:challengeId" element={<ParticipantList />} />
+                <Route path="/users/:id/ranking" element={<Ranking />} />
 
                 <Route
                     path="/home"
