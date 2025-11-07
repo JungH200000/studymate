@@ -61,7 +61,12 @@ export default function Ranking() {
     };
 
     const handleUserClick = (userId) => {
-        navigate(`/profile/${userId}`);
+        const myId = JSON.parse(localStorage.getItem('user'))?.user_id;
+        if (userId === myId) {
+            navigate('/profile');
+        } else {
+            navigate(`/profile/${userId}`);
+        }
     };
 
     return (
