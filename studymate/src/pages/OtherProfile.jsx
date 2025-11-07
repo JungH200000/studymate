@@ -10,6 +10,7 @@ import {
     faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import BottomNav from '../components/BottomNav';
+import { API_BASE } from '../api/config';
 import './Profile.css'; // Profile.css를 공유하여 사용
 
 export default function OtherProfile() {
@@ -31,8 +32,9 @@ export default function OtherProfile() {
         const loadUser = async () => {
             try {
                 setIsLoading(true);
+                setIsLoading(true);
                 // 1. 사용자 기본 정보 로드
-                const userData = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}`);
+                const userData = await fetchWithAuth(`${API_BASE}/api/users/${id}`);
                 if (userData?.user?.username) {
                     setNickname(userData.user.username);
                 }
@@ -40,10 +42,10 @@ export default function OtherProfile() {
                 // 2. 챌린지 및 팔로우 통계 병렬 로드
                 const [created, joined, followers, followings] = await Promise.all([
                     // followings 추가
-                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/challenges?type=created`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/challenges?type=joined`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/followers`),
-                    fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/followings`), // 팔로잉 로드 추가
+                    fetchWithAuth(`${API_BASE}/api/users/${id}/challenges?type=created`),
+                    fetchWithAuth(`${API_BASE}/api/users/${id}/challenges?type=joined`),
+                    fetchWithAuth(`${API_BASE}/api/users/${id}/followers`),
+                    fetchWithAuth(`${API_BASE}/api/users/${id}/followings`), // 팔로잉 로드 추가
                 ]);
 
                 if (created?.challengesList) setCreatedChallenges(created.challengesList);
@@ -79,7 +81,7 @@ export default function OtherProfile() {
 
         setIsLoading(true);
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/follows`, {
+            const response = await fetchWithAuth(`${API_BASE}/api/users/${id}/follows`, {
                 method: 'POST',
             });
 
@@ -100,7 +102,7 @@ export default function OtherProfile() {
 
         setIsLoading(true);
         try {
-            const response = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/follows`, {
+            const response = await fetchWithAuth(`${API_BASE}/api/users/${id}/follows`, {
                 method: 'DELETE',
             });
 
@@ -214,7 +216,6 @@ export default function OtherProfile() {
                     ))
                 )}
             </div>
-
             <BottomNav setTab={() => {}} />
         </div>
     );

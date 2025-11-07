@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE } from '../api/config';
 import './Auth.css';
 
 const emojis = ['✏️', '📚', '📝', '📖', '🖍️'];
@@ -36,11 +37,7 @@ export default function Login() {
         }
 
         try {
-            const res = await axios.post(
-                'http://127.0.0.1:3000/api/auth/login',
-                { email, password },
-                { withCredentials: true }
-            );
+            const res = await axios.post(`${API_BASE}/api/auth/login`, { email, password }, { withCredentials: true });
 
             const data = res.data;
 
