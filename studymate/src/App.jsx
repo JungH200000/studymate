@@ -12,6 +12,8 @@ import ChallengeDetail from './pages/ChallengeDetail';
 import FollowerList from './pages/FollowerList';
 import FollowingList from './pages/FollowingList';
 import Achievement from './pages/Achievement';
+import LikeList from './pages/LikeList';
+import ParticipantList from './pages/ParticipantList';
 
 export default function App() {
     return (
@@ -22,6 +24,9 @@ export default function App() {
                 <Route path="/register" element={<Signup />} />
                 <Route path="/users/:id/followers" element={<FollowerList />} />
                 <Route path="/users/:id/followings" element={<FollowingList />} />
+                <Route path="/likes/:challengeId" element={<LikeList />} />
+                <Route path="/participants/:challengeId" element={<ParticipantList />} />
+
                 <Route
                     path="/home"
                     element={

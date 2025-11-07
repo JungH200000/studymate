@@ -316,15 +316,30 @@ export default function Home() {
                     onClick={(e) => toggleLike(challenge.challenge_id, e)}
                     className={`like-icon ${likes[challenge.challenge_id]?.liked ? 'liked' : ''}`}
                 />
-                <span className="like-count">{likes[challenge.challenge_id]?.count || 0}</span>
+                <span
+                    className="like-count"
+                    onClick={(e) => {
+                        e.stopPropagation(); // 이벤트 전파 방지
+                        navigate(`/likes/${challenge.challenge_id}`);
+                    }}
+                >
+                    {likes[challenge.challenge_id]?.count || 0}
+                </span>
 
                 <FontAwesomeIcon
                     icon={faUserPlus}
                     onClick={(e) => toggleParticipation(challenge.challenge_id, e)}
                     className={`join-icon ${participants[challenge.challenge_id]?.joined ? 'joined' : ''}`}
                 />
-                <span className="join-count">{participants[challenge.challenge_id]?.count || 0}</span>
-
+                <span
+                    className="join-count"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/participants/${challenge.challenge_id}`);
+                    }}
+                >
+                    {participants[challenge.challenge_id]?.count || 0}
+                </span>
                 <FontAwesomeIcon icon={faFileAlt} className="stat-icon" />
                 <span className="stat-count">{challenge.post_count || 0}</span>
             </div>
