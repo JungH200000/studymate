@@ -48,7 +48,8 @@ studymate/server/
 │ ├─ utils/
 │ │ ├─ asyncHandler.js
 │ │ ├─ auth.validators.js
-│ │ └─ jwt.js
+│ │ ├─ jwt.js
+│ │ └─ rankCache.js
 │ │
 │ ├─ env.js
 │ └─ server.js
