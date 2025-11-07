@@ -55,6 +55,7 @@ export default function Achievement() {
         };
 
         loadUserPosts();
+        loadUserPosts();
         loadAchievementRates();
     }, [userId]);
 

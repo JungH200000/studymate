@@ -166,11 +166,11 @@ export default function Profile({ setTab }) {
                         </span>
                         <span className="stat-divider">·</span>
                         <span className="stat-item clickable" onClick={handleMyStatsClick}>
-                            달성률
+                            🏆
                         </span>
                         <span className="stat-divider">·</span>
                         <span className="stat-item clickable" onClick={handleRankingClick}>
-                            랭킹
+                            🏅
                         </span>
                     </div>
                 </div>
