@@ -474,7 +474,15 @@ export default function ChallengeDetail() {
                                     onClick={toggleLike}
                                     className={`like-icon ${likes.liked ? 'liked' : ''}`}
                                 />
-                                <span className="like-count">{likes.count}</span>
+                                <span
+                                    className="like-count"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // 상위 클릭 이벤트 방지
+                                        navigate(`/likes/${id}`); // 해당 챌린지 ID로 좋아요 목록 페이지 이동
+                                    }}
+                                >
+                                    {likes.count}
+                                </span>
                             </div>
 
                             <div className="icon-wrapper">
@@ -483,7 +491,15 @@ export default function ChallengeDetail() {
                                     onClick={toggleParticipation}
                                     className={`join-icon ${participants.joined ? 'joined' : ''}`}
                                 />
-                                <span className="join-count">{participants.count}</span>
+                                <span
+                                    className="join-count"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // 상위 클릭 이벤트 방지
+                                        navigate(`/participants/${id}`); // 해당 챌린지 ID로 좋아요 목록 페이지 이동
+                                    }}
+                                >
+                                    {participants.count}
+                                </span>
                             </div>
 
                             <div className="icon-wrapper">
