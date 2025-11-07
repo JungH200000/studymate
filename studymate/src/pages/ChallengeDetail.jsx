@@ -29,6 +29,7 @@ export default function ChallengeDetail() {
     const [userId, setUserId] = useState(null);
     const [activeTab, setActiveTab] = useState('detail');
     const [showPostModal, setShowPostModal] = useState(false);
+    const [expandedPosts, setExpandedPosts] = useState({});
 
     const [formData, setFormData] = useState({
         title: '',
@@ -94,6 +95,13 @@ export default function ChallengeDetail() {
         loadChallenge();
         loadPosts();
     }, [id]);
+
+    const toggleExpanded = (postId) => {
+        setExpandedPosts((prev) => ({
+            ...prev,
+            [postId]: !prev[postId],
+        }));
+    };
 
     const convertToMinutes = (hours, minutes) => {
         const h = parseInt(hours || '0', 10) || 0;
@@ -491,124 +499,149 @@ export default function ChallengeDetail() {
                     <div className="posts-tab">
                         <div className="posts-list">
                             {posts.length === 0 && <p className="no-posts-message">아직 인증 글이 없습니다.</p>}
-                            {posts.map((post) => (
-                                <div key={post.post_id} className="post-card">
-                                    <div className="post-header">
-                                        <div className="post-title-section">
-                                            {post.content?.title && (
-                                                <h3 className="post-title">📝 {post.content.title}</h3>
+                            {posts.map((post) => {
+                                const isExpanded = expandedPosts[post.post_id] || false;
+
+                                return (
+                                    <div key={post.post_id} className="post-card">
+                                        <div className="post-header">
+                                            <div className="post-title-section">
+                                                {post.content?.title && (
+                                                    <h3 className="post-title">📝 {post.content.title}</h3>
+                                                )}
+                                            </div>
+                                            {userId && post.user_id === userId ? (
+                                                <FontAwesomeIcon
+                                                    icon={faTrash}
+                                                    className="delete-icon"
+                                                    onClick={(e) => handleDeletePost(post.post_id, e)}
+                                                />
+                                            ) : (
+                                                <button
+                                                    className="report-button"
+                                                    onClick={(e) => handleReportPost(post.post_id, e)}
+                                                >
+                                                    🚨
+                                                </button>
                                             )}
                                         </div>
-                                        {userId && post.user_id === userId ? (
-                                            <FontAwesomeIcon
-                                                icon={faTrash}
-                                                className="delete-icon"
-                                                onClick={(e) => handleDeletePost(post.post_id, e)}
-                                            />
-                                        ) : (
+
+                                        {post.content?.goals?.length > 0 && (
+                                            <div className="post-section goals-section">
+                                                <div className="section-header">🎯 학습 목표</div>
+                                                <ul className="post-goals">
+                                                    {post.content.goals.map((g, i) => (
+                                                        <li key={i}>{g}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        {post.content?.summary && (
+                                            <div className="post-section summary-section">
+                                                <div className="section-header">📝 학습 요약</div>
+                                                <p className="section-content">{post.content.summary}</p>
+                                            </div>
+                                        )}
+
+                                        {/* 더보기 버튼 */}
+                                        {(post.content?.takeaways ||
+                                            post.content?.studyDurationText ||
+                                            post.content?.materials?.textbook ||
+                                            post.content?.nextSteps?.length > 0 ||
+                                            post.content?.tags?.length > 0) && (
                                             <button
-                                                className="report-button"
-                                                onClick={(e) => handleReportPost(post.post_id, e)}
+                                                className="expand-button"
+                                                onClick={() => toggleExpanded(post.post_id)}
                                             >
-                                                🚨
+                                                {isExpanded ? '접기 ▲' : '더보기 ▼'}
                                             </button>
                                         )}
-                                    </div>
 
-                                    {post.content?.goals?.length > 0 && (
-                                        <div className="post-section goals-section">
-                                            <div className="section-header">🎯 학습 목표</div>
-                                            <ul className="post-goals">
-                                                {post.content.goals.map((g, i) => (
-                                                    <li key={i}>{g}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
+                                        {/* 접을 수 있는 컨텐츠 */}
+                                        {isExpanded && (
+                                            <div className="expandable-content">
+                                                {post.content?.takeaways && (
+                                                    <div className="post-section takeaways-section">
+                                                        <div className="section-header">💡 배운 점</div>
+                                                        <p className="section-content">{post.content.takeaways}</p>
+                                                    </div>
+                                                )}
 
-                                    {post.content?.summary && (
-                                        <div className="post-section summary-section">
-                                            <div className="section-header">📝 학습 요약</div>
-                                            <p className="section-content">{post.content.summary}</p>
-                                        </div>
-                                    )}
-
-                                    {post.content?.takeaways && (
-                                        <div className="post-section takeaways-section">
-                                            <div className="section-header">💡 배운 점</div>
-                                            <p className="section-content">{post.content.takeaways}</p>
-                                        </div>
-                                    )}
-
-                                    <div className="post-info-grid">
-                                        {post.content?.studyDurationText && (
-                                            <div className="post-section duration-section">
-                                                <div className="section-header">⏱️ 학습시간</div>
-                                                <p className="section-content">{post.content.studyDurationText}</p>
-                                            </div>
-                                        )}
-
-                                        {post.content?.materials?.textbook && (
-                                            <div className="post-section textbook-section">
-                                                <div className="section-header">📚 교재</div>
-                                                <p className="section-content">
-                                                    {post.content.materials.textbook.name}
-                                                    {post.content.materials.textbook.pageStart && (
-                                                        <span className="page-info">
-                                                            {' '}
-                                                            (p.{post.content.materials.textbook.pageStart}
-                                                            {post.content.materials.textbook.pageEnd &&
-                                                                `-${post.content.materials.textbook.pageEnd}`}
-                                                            )
-                                                        </span>
+                                                <div className="post-info-grid">
+                                                    {post.content?.studyDurationText && (
+                                                        <div className="post-section duration-section">
+                                                            <div className="section-header">⏱️ 학습시간</div>
+                                                            <p className="section-content">
+                                                                {post.content.studyDurationText}
+                                                            </p>
+                                                        </div>
                                                     )}
-                                                </p>
+
+                                                    {post.content?.materials?.textbook && (
+                                                        <div className="post-section textbook-section">
+                                                            <div className="section-header">📚 교재</div>
+                                                            <p className="section-content">
+                                                                {post.content.materials.textbook.name}
+                                                                {post.content.materials.textbook.pageStart && (
+                                                                    <span className="page-info">
+                                                                        {' '}
+                                                                        (p.{post.content.materials.textbook.pageStart}
+                                                                        {post.content.materials.textbook.pageEnd &&
+                                                                            `-${post.content.materials.textbook.pageEnd}`}
+                                                                        )
+                                                                    </span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {post.content?.nextSteps?.length > 0 && (
+                                                    <div className="post-section nextsteps-section">
+                                                        <div className="section-header">📌 다음 학습 계획</div>
+                                                        <ul className="post-nextsteps">
+                                                            {post.content.nextSteps.map((s, i) => (
+                                                                <li key={i}>{s}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                {post.content?.tags?.length > 0 && (
+                                                    <div className="post-tags">
+                                                        {post.content.tags.map((tag, i) => (
+                                                            <span key={i} className="tag">
+                                                                #{tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
-                                    </div>
 
-                                    {post.content?.nextSteps?.length > 0 && (
-                                        <div className="post-section nextsteps-section">
-                                            <div className="section-header">📌 다음 학습 계획</div>
-                                            <ul className="post-nextsteps">
-                                                {post.content.nextSteps.map((s, i) => (
-                                                    <li key={i}>{s}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {post.content?.tags?.length > 0 && (
-                                        <div className="post-tags">
-                                            {post.content.tags.map((tag, i) => (
-                                                <span key={i} className="tag">
-                                                    #{tag}
+                                        <div className="post-footer">
+                                            <div className="post-meta">
+                                                <span className="post-user">👤 {post.author_username}</span>
+                                                <span className="post-date">
+                                                    {new Date(post.created_at).toLocaleDateString('ko-KR', {
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                    })}
                                                 </span>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="post-footer">
-                                        <div className="post-meta">
-                                            <span className="post-user">👤 {post.author_username}</span>
-                                            <span className="post-date">
-                                                {new Date(post.created_at).toLocaleDateString('ko-KR', {
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                })}
-                                            </span>
-                                        </div>
-                                        <div className="cheer-wrapper">
-                                            <FontAwesomeIcon
-                                                icon={post.cheer_by_me ? solidThumb : regularThumb}
-                                                onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
-                                                className={`cheer-icon ${post.cheer_by_me ? 'cheered' : ''}`}
-                                            />
-                                            <span className="cheer-count">{post.cheer_count}</span>
+                                            </div>
+                                            <div className="cheer-wrapper">
+                                                <FontAwesomeIcon
+                                                    icon={post.cheer_by_me ? solidThumb : regularThumb}
+                                                    onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
+                                                    className={`cheer-icon ${post.cheer_by_me ? 'cheered' : ''}`}
+                                                />
+                                                <span className="cheer-count">{post.cheer_count}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}

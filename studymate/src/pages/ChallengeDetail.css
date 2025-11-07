@@ -563,7 +563,7 @@
 .post-card {
     background: white;
     border-radius: 16px;
-    padding: 0;
+    padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border: 1px solid #eee;
     transition: all 0.3s ease;
@@ -572,6 +572,53 @@
 
 .post-card:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* 더보기 버튼 - 새로 추가된 부분 */
+.expand-button {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 16px 0;
+    background: linear-gradient(135deg, #fff9f7 0%, #fef5f5 100%);
+    border: 1px solid #ffe6e6;
+    border-radius: 10px;
+    color: #ff7b7b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.expand-button:hover {
+    background: linear-gradient(135deg, #ff7b7b 0%, #ffb199 100%);
+    color: white;
+    border-color: #ff7b7b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 123, 123, 0.3);
+}
+
+/* 접을 수 있는 컨텐츠 - 새로 추가된 부분 */
+.expandable-content {
+    animation: slideDown 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 2000px;
+        transform: translateY(0);
+    }
 }
 
 /* 카드 헤더 */
@@ -907,36 +954,9 @@
 }
 
 /* 탭 포커스/클릭 기본 테두리 제거 */
-.tabs button:focus,
-.tabs button:active,
-.tabs button:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-/* 탭 공통 스타일 */
-.tab-button {
-    border: 1px solid #ddd;
-    background: #ffffff;
-    color: #555;
-    padding: 10px;
-    font-weight: 500;
-    border-radius: 10px; /* 기존 감성 유지하며 조금만 부드럽게 */
-}
-
-/* 활성 탭 스타일 */
-.tab-button.active {
-    background: #ffecec;
-    border: 1px solid #ffb2b2;
-    color: #ff6b6b !important;
-    font-weight: 700;
-}
-
-/* 클릭/포커스 시 기본 라인/펌프 효과 제거 */
 .tab-button:focus,
 .tab-button:active,
 .tab-button:focus-visible {
     outline: none !important;
     box-shadow: none !important;
-    border-color: #ffb2b2 !important; /* 테두리 컬러 유지 */
 }

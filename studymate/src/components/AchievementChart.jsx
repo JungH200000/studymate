@@ -108,16 +108,8 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0, posts =
 
     return (
         <div className="achievement-chart-container">
-            {/* 전체 누적 달성률 차트 */}
-            <div className="chart-block">
-                <Pie data={totalData} options={options('전체 챌린지 누적 달성률')} />
-            </div>
-
-            {/* 최근 30일 달성률 차트 */}
-            <div className="chart-block">
-                <Pie data={day30Data} options={options('최근 30일 챌린지 달성률')} />
-            </div>
-            <div className="chart-block">
+            {/* 최근 인증 활동 */}
+            <div className="chart-block calendar-block">
                 <h3>최근 인증 활동</h3>
                 <CalendarHeatmap
                     startDate={thirtyDaysAgo}
@@ -137,6 +129,16 @@ export default function AchievementChart({ totalRate = 0, day30Rate = 0, posts =
                         <span>more</span>
                     </div>
                 </div>
+            </div>
+
+            {/* 최근 30일 달성률 차트 */}
+            <div className="chart-block pie-block">
+                <Pie data={day30Data} options={options('최근 30일 챌린지 달성률')} />
+            </div>
+
+            {/* 전체 누적 달성률 차트 */}
+            <div className="chart-block pie-block">
+                <Pie data={totalData} options={options('전체 챌린지 누적 달성률')} />
             </div>
         </div>
     );

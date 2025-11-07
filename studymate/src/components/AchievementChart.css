@@ -10,30 +10,27 @@
 
 /* ✅ Chart Block에 시각적 요소 추가 */
 .chart-block {
-    width: 300px;
-    min-height: 300px;
+    width: 100%;
+    max-width: 320px;
     position: relative;
 
     /* 차트 주변을 꾸미는 스타일 */
     background-color: #ffffff; /* 흰색 배경 */
     border-radius: 16px; /* 부드러운 모서리 */
-    padding: 15px; /* 내부 여백 */
+    padding: 20px; /* 내부 여백 */
     box-shadow: 0 8px 16px rgba(255, 107, 122, 0.15); /* 핑크 계열의 부드러운 그림자 */
     transition: transform 0.3s ease; /* 호버 애니메이션 */
 }
 
-/* ✅ 캘린더 블록도 동일한 크기로 */
-.chart-block:last-child {
-    width: 300px; /* ✅ 파이 차트와 동일한 너비 */
-    min-height: auto;
-    height: auto;
-    padding: 20px;
+/* ✅ 파이 차트 블록 - 고정된 높이 */
+.pie-block {
+    height: 350px;
 }
 
-.chart-block:hover {
-    /* 마우스를 올렸을 때 살짝 들어 올리는 효과 */
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(255, 107, 122, 0.25);
+/* ✅ 캘린더 블록 - 자동 높이 */
+.calendar-block {
+    height: auto;
+    min-height: 250px;
 }
 
 /* ✅ 캘린더 제목 스타일 */
@@ -157,7 +154,11 @@
         width: 320px;
     }
 
-    .chart-block:last-child {
-        width: 320px; /* ✅ 동일한 너비로 통일 */
+    .pie-block {
+        height: 380px;
+    }
+
+    .calendar-block {
+        min-height: 280px;
     }
 }
