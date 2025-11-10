@@ -302,7 +302,18 @@ export default function Home() {
                 )}
             </div>
 
-            {challenge.content && <div className="card-content">{challenge.content}</div>}
+            {challenge.content && (
+                <div className="card-content">
+                    {challenge.content.description && <p>{challenge.content.description}</p>}
+                    {Array.isArray(challenge.content.tags) && (
+                    <ul>
+                        {challenge.content.tags.map((tag, idx) => (
+                        <li key={idx}>{tag}</li>
+                        ))}
+                    </ul>
+                    )}
+                </div>
+                )}
 
             <div className="card-info">
                 <span className={challenge.frequency_type === 'daily' ? 'frequency-daily' : 'frequency-weekly'}>

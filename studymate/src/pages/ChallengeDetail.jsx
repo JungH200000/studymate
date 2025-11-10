@@ -443,7 +443,21 @@ export default function ChallengeDetail() {
                             )}
                         </div>
 
-                        <p className="challenge-description">{challenge.content}</p>
+                        <div className="challenge-content">
+                            {challenge.content?.description && (
+                                <p className="challenge-description">{challenge.content.description}</p>
+                            )}
+
+                            {Array.isArray(challenge.content?.tags) && challenge.content.tags.length > 0 && (
+                                <div className="challenge-tags">
+                                {challenge.content.tags.map((tag, idx) => (
+                                    <span key={idx} className="tag">
+                                    #{tag}
+                                    </span>
+                                ))}
+                                </div>
+                            )}
+                        </div>
 
                         <div className="challenge-info">
                             <div className="info-row">

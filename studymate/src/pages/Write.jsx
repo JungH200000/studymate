@@ -8,7 +8,8 @@ import { API_BASE } from '../api/config';
 export default function Write() {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [description, setDescription] = useState('');
+    const [tag, setTag] = useState('');
     const [frequencyType, setFrequencyType] = useState('daily');
     const [targetPerWeek, setTargetPerWeek] = useState(1);
     const [startDate, setStartDate] = useState('');
@@ -19,37 +20,46 @@ export default function Write() {
     };
 
     const handlePost = async () => {
-        if (!title) return alert('챌린지 제목을 입력하세요.');
-        if (frequencyType === 'weekly' && (!targetPerWeek || targetPerWeek < 1))
-            return alert('주간 빈도를 1회 이상으로 입력하세요.');
-        if (!startDate) return alert('시작일을 입력하세요.');
+    if (!title) return alert('챌린지 제목을 입력하세요.');
+    if (frequencyType === 'weekly' && (!targetPerWeek || targetPerWeek < 1))
+        return alert('주간 빈도를 1회 이상으로 입력하세요.');
+    if (!startDate) return alert('시작일을 입력하세요.');
 
-        const payload = {
-            title,
-            content,
-            frequency_type: frequencyType,
-            target_per_week: frequencyType === 'weekly' ? targetPerWeek : null,
-            start_date: startDate,
-            end_date: endDate || null,
-        };
+    const content =
+        description || tag
+            ? {
+                  description: description || null,
+                  tags: tag ? tag.split(',').map((t) => t.trim()) : [],
+              }
+            : null;
 
-        try {
-            const res = await fetchWithAuth(`${API_BASE}/api/challenges`, {
-                method: 'POST',
-                body: payload,
-            });
-
-            if (res?.ok) {
-                alert('챌린지 등록 완료!');
-                navigate('/home');
-            } else {
-                alert(res?.message || '챌린지 등록 실패');
-            }
-        } catch (err) {
-            console.error('등록 오류:', err);
-            alert('챌린지 등록 중 오류가 발생했습니다.');
-        }
+    const payload = {
+        title,
+        content,
+        frequency_type: frequencyType,
+        target_per_week: frequencyType === 'weekly' ? targetPerWeek : null,
+        start_date: startDate,
+        end_date: endDate || null,
     };
+
+    try {
+        const res = await fetchWithAuth(`${API_BASE}/api/challenges`, {
+            method: 'POST',
+            body: payload,
+        });
+
+        if (res?.ok) {
+            alert('챌린지 등록 완료!');
+            navigate('/home');
+        } else {
+            alert(res?.message || '챌린지 등록 실패');
+        }
+    } catch (err) {
+        console.error('등록 오류:', err);
+        alert('챌린지 등록 중 오류가 발생했습니다.');
+    }
+};
+
 
     return (
         <div className="write-container">
@@ -71,9 +81,17 @@ export default function Write() {
 
                 <textarea
                     placeholder="챌린지 내용을 입력하세요"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     className="write-content"
+                />
+
+                <input
+                    type="text"
+                    placeholder="태그를 쉼표로 구분하여 입력하세요 (예: 공부,자격증)"
+                    value={tag}
+                    onChange={(e) => setTag(e.target.value)}
+                    className="write-tags"
                 />
 
                 <div className="write-frequency">
