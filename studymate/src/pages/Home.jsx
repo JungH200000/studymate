@@ -335,15 +335,19 @@ export default function Home() {
                     </button>
                 )}
             </div>
-
             <div className="challenge-content">
                 {challenge.content?.description && (
+                    // 🚨 1. 챌린지 본문 <p> 태그에 'challenge-description' 클래스 추가
+                    // 이 클래스를 Home.css에서 margin: 0; 처리하여 불필요한 기본 여백을 제거합니다.
                     <p className="challenge-description">{challenge.content.description}</p>
                 )}
 
                 {Array.isArray(challenge.content?.tags) && challenge.content.tags.length > 0 && (
+                    // 🚨 2. 태그 목록 <div> 태그에 'challenge-tags' 클래스 추가
                     <div className="challenge-tags">
                         {challenge.content.tags.map((tag, idx) => (
+                            // 🚨 3. 개별 태그 <span> 태그에 'tag' 클래스 추가
+                            // 이 클래스가 Home.css에서 캡슐 디자인을 적용하는 핵심 요소입니다.
                             <span key={idx} className="tag">
                                 #{tag}
                             </span>
@@ -361,7 +365,6 @@ export default function Home() {
                     {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ''}
                 </span>
             </div>
-
             <div className="like-section">
                 <FontAwesomeIcon
                     icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}

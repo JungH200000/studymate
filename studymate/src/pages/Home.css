@@ -353,6 +353,40 @@
     padding: 12px;
 }
 
+.challenge-content {
+    /* 본문과 태그 사이의 간격 설정 */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 여기서 10px의 간격이 생깁니다 */
+    padding: 0 4px; /* 좌우 여백 살짝 */
+}
+
+/* 챌린지 본문 스타일 */
+.challenge-description {
+    margin: 0; /* <p> 태그의 기본 마진 제거 */
+    /* 현재 Home.jsx에서는 이 클래스를 challenge.content.description을 감싸는 <p>에 적용해야 합니다. */
+}
+
+/* 챌린지 태그 컨테이너 스타일 */
+.challenge-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* 태그들 사이의 간격 */
+    margin-top: 0;
+}
+
+/* 개별 태그 스타일 */
+.challenge-tags .tag {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ff9a9e;
+    background: #ffeef0;
+    padding: 4px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    border: 1px solid #ffd6d6;
+}
+
 /* 카드 정보 */
 .card-info {
     font-size: 0.85rem;
