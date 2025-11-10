@@ -23,24 +23,33 @@
   "ok": true,
   "page": "1",
   "limit": "50",
-  "count": 3,
+  "count": 6,
   "entries": [
-    {
-      "user_id": "192c8f1f-cb13-4fb4-8bb5-76fc32625d99",
-      "username": "testUser1",
-      "achieved_30d": "5",
-      "expected_30d": "11",
-      "rate": "0.455",
-      "ranking": 1,
-      "delta": 0
-    },
     {
       "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
       "username": "park",
       "achieved_30d": "16",
-      "expected_30d": "43",
-      "rate": "0.372",
+      "expected_30d": "52",
+      "rate": "0.308",
+      "ranking": 1,
+      "delta": 0
+    },
+    {
+      "user_id": "192c8f1f-cb13-4fb4-8bb5-76fc32625d99",
+      "username": "testUser1",
+      "achieved_30d": "5",
+      "expected_30d": "23",
+      "rate": "0.217",
       "ranking": 2,
+      "delta": 0
+    },
+    {
+      "user_id": "138ad92c-01c1-432e-b3f2-ef909207218c",
+      "username": "지훈",
+      "achieved_30d": "10",
+      "expected_30d": "49",
+      "rate": "0.204",
+      "ranking": 3,
       "delta": 0
     },
     {
@@ -49,7 +58,25 @@
       "achieved_30d": "0",
       "expected_30d": "1",
       "rate": "0.000",
-      "ranking": 3,
+      "ranking": 4,
+      "delta": 0
+    },
+    {
+      "user_id": "0aca5b9b-4c40-448c-a228-bb87c05c7439",
+      "username": "sw",
+      "achieved_30d": "0",
+      "expected_30d": "15",
+      "rate": "0.000",
+      "ranking": 5,
+      "delta": 0
+    },
+    {
+      "user_id": "d038811c-48ce-4a71-93fe-12714c119996",
+      "username": "한진환",
+      "achieved_30d": "0",
+      "expected_30d": "3",
+      "rate": "0.000",
+      "ranking": 6,
       "delta": 0
     }
   ]
@@ -63,25 +90,43 @@
   "ok": true,
   "page": "1",
   "limit": "50",
-  "count": 3,
+  "count": 6,
   "entries": [
-    {
-      "user_id": "192c8f1f-cb13-4fb4-8bb5-76fc32625d99",
-      "username": "testUser1",
-      "achieved_30d": "5",
-      "expected_30d": "11",
-      "rate": "0.455",
-      "ranking": 1,
-      "delta": 1
-    },
     {
       "user_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a",
       "username": "park",
-      "achieved_30d": "16",
-      "expected_30d": "43",
-      "rate": "0.372",
+      "achieved_30d": "19",
+      "expected_30d": "54",
+      "rate": "0.352",
+      "ranking": 1,
+      "delta": 0
+    },
+    {
+      "user_id": "d038811c-48ce-4a71-93fe-12714c119996",
+      "username": "한진환",
+      "achieved_30d": "1",
+      "expected_30d": "3",
+      "rate": "0.333",
       "ranking": 2,
-      "delta": 1
+      "delta": 4
+    },
+    {
+      "user_id": "192c8f1f-cb13-4fb4-8bb5-76fc32625d99",
+      "username": "testUser1",
+      "achieved_30d": "6",
+      "expected_30d": "24",
+      "rate": "0.250",
+      "ranking": 3,
+      "delta": -1
+    },
+    {
+      "user_id": "138ad92c-01c1-432e-b3f2-ef909207218c",
+      "username": "지훈",
+      "achieved_30d": "11",
+      "expected_30d": "50",
+      "rate": "0.220",
+      "ranking": 4,
+      "delta": -1
     },
     {
       "user_id": "e9b76740-4002-4094-8d84-9f2690cda4a8",
@@ -89,8 +134,17 @@
       "achieved_30d": "0",
       "expected_30d": "1",
       "rate": "0.000",
-      "ranking": 3,
-      "delta": -2
+      "ranking": 5,
+      "delta": -1
+    },
+    {
+      "user_id": "0aca5b9b-4c40-448c-a228-bb87c05c7439",
+      "username": "sw",
+      "achieved_30d": "0",
+      "expected_30d": "15",
+      "rate": "0.000",
+      "ranking": 6,
+      "delta": -1
     }
   ]
 }
