@@ -26,4 +26,6 @@ router.get('/:id/progress/week', requireAuth, asyncHandler(challengeController.w
 router.get('/:id/progress/total', requireAuth, asyncHandler(challengeController.totalAchieved));
 router.get('/:id/progress/30days', requireAuth, asyncHandler(challengeController.day30Achieved));
 
+router.get('/rankings', requireAuth, asyncHandler(challengeController.getRanking));
+
 export default router;

@@ -219,3 +219,16 @@ export async function day30Achieved({ user_id }) {
     day30: { day30Achieved, day30Target, day30Rate },
   };
 }
+
+/** 최근 30일 달성률 기준으로 랭킹 얻기 */
+export async function getRanking({ user_id, limit, offset }) {
+  const isUser = await verifyUser({ user_id });
+  if (!isUser) {
+    const error = new Error('사용자를 찾을 수 없습니다.');
+    error.status = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  return await challengeDB.getRanking({ user_id, limit, offset });
+}

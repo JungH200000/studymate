@@ -2,6 +2,7 @@
 // 요청-응답 처리
 import * as challengeService from '../services/challenge.service.js';
 import { validate } from 'uuid';
+import { rankCache } from '../utils/rankCache.js';
 
 /** 챌린지 등록 */
 export const createChallenge = async (req, res) => {
@@ -188,5 +189,62 @@ export const day30Achieved = async (req, res) => {
     ok: true,
     day30,
     achievedChallengesList,
+  });
+};
+
+/** 최근 30일 달성률 기준으로 랭킹 얻기 */
+export const getRanking = async (req, res) => {
+  // query
+  const { page = 1, limit = 50 } = req.query;
+  const pageNum = Number(page) || 1;
+  const limitNum = Number(limit) || 10; // 가져올 개수
+  const offset = (pageNum - 1) * limitNum; // 건너뛸 개수
+  if (!Number.isInteger(pageNum) || pageNum < 1) {
+    const error = new Error('page는 1 이상의 정수');
+    error.status = 400;
+    error.code = 'INVALID_QUERY';
+    throw error;
+  }
+  if (!Number.isInteger(limitNum) || limitNum < 1) {
+    const error = new Error('limit은 1 이상의 정수');
+    error.status = 400;
+    error.code = 'INVALID_QUERY';
+    throw error;
+  }
+
+  // user_id
+  const { id: user_id } = req.user;
+  if (!validate(user_id)) {
+    const error = new Error('정확하지 않은 UUID입니다.');
+    error.status = 400;
+    error.code = 'INVALID_UUID';
+    throw error;
+  }
+
+  /** 현재 랭킹 */
+  const rankingList = await challengeService.getRanking({ user_id, limit: limitNum, offset });
+
+  const key = `rank:${user_id}`;
+
+  /** user_id에 따라 이전 랭킹 조회 */
+  const prev = rankCache.get(key); // { at, map }
+  const prevMap = prev?.map || new Map();
+
+  /** 순위 변동 계산 (부호 없으면 상승, -면 하락) */
+  const entries = rankingList.map((rank) => {
+    const prevPos = prevMap.get(rank.user_id);
+    const delta = typeof prevPos === 'number' ? prevPos - rank.ranking : 0; // 새로 보이는 유저는 0
+    return { ...rank, delta };
+  });
+
+  const nextMap = new Map(entries.map((e) => [e.user_id, e.ranking]));
+  rankCache.set(key, { at: Date.now(), map: nextMap });
+
+  return res.status(200).json({
+    ok: true,
+    page,
+    limit,
+    count: entries.length,
+    entries,
   });
 };

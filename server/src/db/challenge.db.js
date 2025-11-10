@@ -477,3 +477,100 @@ export async function day30Achieved({ user_id }) {
 
   return rows;
 }
+
+/** 최근 30일 달성률 기준으로 랭킹 얻기 */
+export async function getRanking({ user_id, limit, offset }) {
+  const sql = `
+    WITH kst AS (
+      SELECT (now() AT TIME ZONE 'Asia/Seoul')::date AS d
+    ),
+    win AS (
+      SELECT d, (d - interval '29 days')::date AS s
+      FROM kst
+    ),
+    net AS (
+      -- 사용자 + 팔로잉 + 팔로워
+      SELECT $1::uuid AS user_id
+      UNION
+      SELECT f.followee_id FROM Follows f WHERE f.follower_id = $1
+      UNION
+      SELECT f.follower_id FROM Follows f WHERE f.followee_id = $1
+    ),
+    cfg AS (
+      SELECT
+        p.user_id, c.challenge_id, c.frequency_type,
+        COALESCE(c.target_per_week, 7) AS tpw,
+        GREATEST(c.start_date, p.join_at::date, w.s) AS act_start,
+        LEAST(COALESCE(c.end_date, w.d), w.d) AS act_end
+      FROM participation p
+      JOIN challenges c ON c.challenge_id = p.challenge_id
+      JOIN win w ON TRUE
+      WHERE p.user_id IN (SELECT user_id FROM net)
+        AND c.start_date <= w.d
+        AND (c.end_date IS NULL OR w.s <= c.end_date)
+        AND p.join_at::date <= w.d
+    ),
+    span AS (
+      SELECT
+        user_id, challenge_id, frequency_type, tpw, act_start, act_end, 
+        GREATEST(0, (act_end - act_start + 1))::int AS days_total
+    FROM cfg
+    WHERE act_end >= act_start
+    ),
+    targets AS (
+      SELECT
+        user_id, challenge_id, frequency_type, tpw, act_start, act_end, days_total,
+        CASE
+          WHEN days_total <= 0 THEN 0
+          WHEN frequency_type = 'daily' THEN days_total
+          ELSE (floor(days_total / 7.0)::int) * tpw
+                + LEAST(CEIL(tpw * ((days_total % 7)::numeric / 7.0))::int, (days_total % 7))
+        END AS target_30d
+      FROM span
+    ),
+    ach AS (
+      SELECT 
+        p.user_id, p.challenge_id,
+        COUNT(DISTINCT p.posted_date_kst)::int AS cnt
+      FROM posts p
+      JOIN targets t ON t.user_id = p.user_id AND t.challenge_id = p.challenge_id
+      WHERE p.posted_date_kst BETWEEN t.act_start AND t.act_end
+      GROUP BY p.user_id, p.challenge_id
+    ),
+    per_ch AS (
+      SELECT
+        t.user_id, t.challenge_id,
+        LEAST(COALESCE(a.cnt, 0), t.target_30d) AS achieved_capped,
+        t.target_30d
+      FROM targets t
+      LEFT JOIN ach a ON a.user_id = t.user_id AND a.challenge_id = t.challenge_id
+    ),
+    ranked AS (
+      SELECT
+        user_id,
+        SUM(achieved_capped)::numeric AS achieved_30d,
+        SUM(target_30d)::numeric AS expected_30d,
+        CASE WHEN SUM(target_30d) > 0
+            THEN ROUND(SUM(achieved_capped)::numeric / SUM(target_30d), 3)
+            ELSE NULL
+        END AS rate
+      FROM per_ch
+      GROUP BY user_id
+    )
+    SELECT 
+      r.user_id, u.username, r.achieved_30d, r.expected_30d, r.rate,
+      (ROW_NUMBER() OVER (
+        ORDER BY 
+          rate DESC NULLS LAST,
+          r.achieved_30d DESC,
+          username ASC
+      ))::int AS ranking
+    FROM ranked r
+    LEFT JOIN users u ON r.user_id = u.user_id
+    LIMIT $2 OFFSET $3`;
+  const params = [user_id, limit, offset];
+
+  const { rows } = await query(sql, params);
+
+  return rows;
+}

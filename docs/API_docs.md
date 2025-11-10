@@ -58,7 +58,7 @@
 
 ### 사용자 검색 : `GET /api/users?q=검색어
 
-## 5. 인증글 피드
+## 5. 인증글 목록
 
 ### 5.1 GET : 챌린지 기본 정보, 챌린지 좋아요/인증글 수/참여자 수, 챌린지 올린 사용자
 
@@ -70,7 +70,7 @@
 
 - `/api/challenges/:id/posts?page=1&limit=20&sort=newest`
 
-인증 피드 글은 posts와 users JOIN으로 가져옴
+인증글 목록은 posts와 users JOIN으로 가져옴
 
 각 인증글에 post_id, content, created_at, author, cheer_count, cheered_by_me 포함.
 
@@ -157,3 +157,9 @@ author_progress: { achieved_this_week, target_per_week }
 #### 전체 : `GET /api/challenges/:id/progress/total`
 
 #### 이번 달 : `GET /api/challenges/:id/progress/30days`
+
+## 7. 달성률 랭킹
+
+- `/api/challenges/rankings`
+
+- 옵션: 페이지네이션 `...?page=1&limit=50`
