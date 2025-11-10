@@ -8,7 +8,8 @@ import { API_BASE } from '../api/config';
 export default function Write() {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [description, setDescription] = useState('');
+    const [tag, setTag] = useState('');
     const [frequencyType, setFrequencyType] = useState('daily');
     const [targetPerWeek, setTargetPerWeek] = useState(1);
     const [startDate, setStartDate] = useState('');
@@ -23,6 +24,14 @@ export default function Write() {
         if (frequencyType === 'weekly' && (!targetPerWeek || targetPerWeek < 1))
             return alert('주간 빈도를 1회 이상으로 입력하세요.');
         if (!startDate) return alert('시작일을 입력하세요.');
+
+        const content =
+            description || tag
+                ? {
+                      description: description || null,
+                      tags: tag ? tag.split(',').map((t) => t.trim()) : [],
+                  }
+                : null;
 
         const payload = {
             title,
@@ -71,10 +80,20 @@ export default function Write() {
 
                 <textarea
                     placeholder="챌린지 내용을 입력하세요"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     className="write-content"
                 />
+                <div className="write-tag-group">
+                    <label>태그</label>
+                    <input
+                        type="text"
+                        placeholder="태그를 쉼표로 구분하여 입력하세요."
+                        value={tag}
+                        onChange={(e) => setTag(e.target.value)}
+                        className="write-tags"
+                    />
+                </div>
 
                 <div className="write-frequency">
                     <label>빈도 유형</label>

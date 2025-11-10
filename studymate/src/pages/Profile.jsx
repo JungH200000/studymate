@@ -216,7 +216,21 @@ export default function Profile({ setTab }) {
                             onClick={() => handleChallengeClick(challenge.challenge_id)}
                         >
                             <h4>{challenge.title}</h4>
-                            <p>{challenge.content}</p>
+                            <div className="challenge-content">
+                                {challenge.content?.description && (
+                                    <p className="challenge-description">{challenge.content.description}</p>
+                                )}
+
+                                {Array.isArray(challenge.content?.tags) && challenge.content.tags.length > 0 && (
+                                    <div className="challenge-tags">
+                                        {challenge.content.tags.map((tag, idx) => (
+                                            <span key={idx} className="tag">
+                                                #{tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
                             {activeTab === 'joined' && progressMap[challenge.challenge_id] && (
                                 <div className="challenge-progress">

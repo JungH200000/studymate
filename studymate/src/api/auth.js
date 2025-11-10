@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export const refreshAccessToken = async () => {
     try {
         const res = await axios.post(
-            'http://127.0.0.1:3000/api/auth/refresh',
+            'http://10.2.7.68:5173/api/auth/refresh',
             {},
             {
                 withCredentials: true,
@@ -77,7 +77,7 @@ export const fetchWithAuth = async (url, options = {}) => {
             }
         } else {
             console.error('❌ 인증 요청 실패:', err);
-            return null;
+            return err.response?.data || null;
         }
     }
 };

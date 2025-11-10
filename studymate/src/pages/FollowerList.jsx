@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE } from '../api/config';
 import './FollowList.css';
 
 export default function FollowerList() {
@@ -14,7 +15,7 @@ export default function FollowerList() {
     useEffect(() => {
         const loadFollowers = async () => {
             try {
-                const data = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/followers`);
+                const data = await fetchWithAuth(`${API_BASE}/api/users/${id}/followers`);
                 if (data?.followerList) {
                     setFollowers(data.followerList);
                 }

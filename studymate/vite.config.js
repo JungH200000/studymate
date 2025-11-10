@@ -7,7 +7,7 @@ export default defineConfig({
         host: true, // 외부 접근 허용
         proxy: {
             '/api': {
-                target: 'http:/10.2.7.68/:3000',
+                target: 'http://10.2.7.68:3000',
                 changeOrigin: true,
             },
         },

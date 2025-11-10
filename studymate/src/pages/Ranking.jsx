@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -7,7 +7,6 @@ import { API_BASE } from '../api/config';
 import './FollowList.css';
 
 export default function Ranking() {
-    const { id } = useParams();
     const navigate = useNavigate();
     const [rankingList, setRankingList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,38 +14,10 @@ export default function Ranking() {
     useEffect(() => {
         const loadRanking = async () => {
             try {
-                const followingsRes = await fetchWithAuth(`${API_BASE}/api/users/${id}/followings`);
-                const followings = followingsRes?.followingList || [];
+                const res = await fetchWithAuth(`${API_BASE}/api/challenges/rankings?page=1&limit=50`);
+                const entries = res?.entries || [];
 
-                // 본인 정보 가져오기
-                const meRes = await fetchWithAuth(`${API_BASE}/api/me`);
-                const myId = meRes?.user?.user_id;
-                const myName = meRes?.user?.username;
-
-                const allUsers = [
-                    ...followings.map((user) => ({
-                        userId: user.followee_id,
-                        username: user.followername,
-                    })),
-                    { userId: myId, username: myName }, // 본인 추가
-                ];
-
-                const results = await Promise.all(
-                    allUsers.map(async (user) => {
-                        const challengeRes = await fetchWithAuth(
-                            `${API_BASE}/api/challenges/${user.userId}/progress/30days`
-                        );
-                        const achieved = challengeRes?.day30?.day30Achieved || 0;
-                        return {
-                            username: user.username,
-                            userId: user.userId,
-                            achieved,
-                        };
-                    })
-                );
-
-                results.sort((a, b) => b.achieved - a.achieved);
-                setRankingList(results);
+                setRankingList(entries);
             } catch (err) {
                 console.error('❌ 랭킹 정보 요청 실패:', err);
             } finally {
@@ -55,7 +26,7 @@ export default function Ranking() {
         };
 
         loadRanking();
-    }, [id]);
+    }, []);
 
     const handleBack = () => {
         navigate(-1);
@@ -63,12 +34,17 @@ export default function Ranking() {
 
     const handleUserClick = (userId) => {
         const myId = JSON.parse(localStorage.getItem('user'))?.user_id;
-        console.log(myId);
         if (userId === myId) {
             navigate('/profile');
         } else {
             navigate(`/profile/${userId}`);
         }
+    };
+
+    const formatRankingWithDelta = (ranking, delta) => {
+        if (delta > 0) return `${ranking}위 (⬆${delta})`;
+        if (delta < 0) return `${ranking}위 (⬇${Math.abs(delta)})`;
+        return `${ranking}위`;
     };
 
     return (
@@ -85,16 +61,19 @@ export default function Ranking() {
                 ) : rankingList.length === 0 ? (
                     <p className="empty-message">랭킹 정보가 없습니다.</p>
                 ) : (
-                    rankingList.map((user, index) => (
-                        <div key={user.userId} className="follow-item" onClick={() => handleUserClick(user.userId)}>
+                    rankingList.map((user) => (
+                        <div key={user.user_id} className="follow-item" onClick={() => handleUserClick(user.user_id)}>
                             <div className="follow-item-icon">
                                 <FontAwesomeIcon icon={faUser} />
                             </div>
                             <div className="follow-item-info">
                                 <span className="follow-item-name">
-                                    {index + 1}위 · {user.username}
+                                    {formatRankingWithDelta(user.ranking, user.delta)} . {user.username}
                                 </span>
-                                <span className="follow-item-sub"> 최근 30일 달성: {user.achieved}회</span>
+                                <br />
+                                <span className="follow-item-sub">
+                                    달성률: {(parseFloat(user.rate) * 100).toFixed(1)}%
+                                </span>
                             </div>
                         </div>
                     ))

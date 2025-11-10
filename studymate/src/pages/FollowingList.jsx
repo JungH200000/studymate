@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE } from '../api/config';
 import './FollowList.css';
 
 export default function FollowingList() {
@@ -14,7 +15,7 @@ export default function FollowingList() {
     useEffect(() => {
         const loadFollowings = async () => {
             try {
-                const data = await fetchWithAuth(`http://127.0.0.1:3000/api/users/${id}/followings`);
+                const data = await fetchWithAuth(`${API_BASE}/api/users/${id}/followings`);
                 if (data?.followingList) {
                     setFollowings(data.followingList);
                 }
@@ -47,7 +48,7 @@ export default function FollowingList() {
             <div className="follow-list-header">
                 <FontAwesomeIcon icon={faArrowLeft} className="back-button" onClick={handleBack} />
                 <h2>팔로잉</h2>
-                <div style={{ width: '24px' }}></div>
+                <div style={{ width: '36px' }}></div>
             </div>
 
             {/* 목록 */}

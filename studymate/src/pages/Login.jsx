@@ -38,9 +38,10 @@ export default function Login() {
 
         try {
             const res = await axios.post(`${API_BASE}/api/auth/login`, { email, password }, { withCredentials: true });
-
+            console.log('res: ', res);
             const data = res.data;
 
+            console.log('data: ', data);
             if (data.ok) {
                 localStorage.setItem(
                     'user',

@@ -226,23 +226,57 @@ export default function Home() {
     };
 
     // 챌린지 신고
+    // 챌린지 신고
     const handleReportChallenge = async (challengeId, e) => {
         e.stopPropagation();
         if (!userId) return alert('로그인이 필요합니다.');
 
-        const reason = prompt('신고 사유를 입력해주세요:');
-        if (!reason || !reason.trim()) return;
+        const reason = prompt('챌린지 신고 사유를 입력해주세요 (5~500자)');
+
+        // 🌟 1. 프런트엔드 유효성 검사 추가 (prompt는 취소 시 null을 반환합니다)
+        if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
+            if (reason !== null) {
+                // 사용자가 취소한 경우가 아닐 때만 경고
+                return alert('신고 사유는 5~500자여야 합니다.');
+            }
+            return;
+        }
 
         try {
-            await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/report`, {
+            const res = await fetchWithAuth(`${API_BASE}/api/reports/challenges/${challengeId}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reason: reason.trim() }),
+                body: JSON.stringify({ content: reason.trim() }),
             });
-            alert('신고가 접수되었습니다.');
+
+            // 2. 응답이 성공(2xx)이거나, fetchWithAuth에서 에러가 던져지지 않은 경우
+            if (res?.ok) {
+                alert('챌린지가 신고되었습니다.');
+            } else {
+                // fetchWithAuth가 상태 코드와 관계없이 응답 본문을 반환했을 경우의 처리
+                switch (res?.code) {
+                    case 'ERR_ALREADY_REPORTED':
+                        alert('이미 신고한 챌린지입니다.');
+                        break;
+                    case 'INVALID_REPORT_INPUT':
+                        alert('신고 사유는 5~500자여야 합니다.');
+                        break;
+                    default:
+                        alert(res?.message || '신고 처리 중 오류가 발생했습니다.');
+                }
+            }
         } catch (err) {
-            console.error('신고 실패:', err);
-            alert(`신고 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
+            console.error('챌린지 신고 실패:', err);
+
+            // 🌟🌟 3. catch 블록에서 HTTP 상태 코드를 확인하여 409를 처리합니다.
+            const statusCode = err.response?.status;
+
+            if (statusCode === 409) {
+                // 409 Conflict 에러 처리: 이미 신고한 경우
+                alert('이미 신고한 챌린지입니다.');
+            } else {
+                // 그 외 모든 오류 처리 (400, 500 등)
+                alert(err.response?.data?.message || '신고 요청 중 오류가 발생했습니다.');
+            }
         }
     };
 
@@ -302,7 +336,21 @@ export default function Home() {
                 )}
             </div>
 
-            {challenge.content && <div className="card-content">{challenge.content}</div>}
+            <div className="challenge-content">
+                {challenge.content?.description && (
+                    <p className="challenge-description">{challenge.content.description}</p>
+                )}
+
+                {Array.isArray(challenge.content?.tags) && challenge.content.tags.length > 0 && (
+                    <div className="challenge-tags">
+                        {challenge.content.tags.map((tag, idx) => (
+                            <span key={idx} className="tag">
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="card-info">
                 <span className={challenge.frequency_type === 'daily' ? 'frequency-daily' : 'frequency-weekly'}>
