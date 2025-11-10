@@ -234,10 +234,10 @@ export default function Home() {
         if (!reason || !reason.trim()) return;
 
         try {
-            await fetchWithAuth(`${API_BASE}/api/challenges/${challengeId}/report`, {
+            await fetchWithAuth(`${API_BASE}/api/reports/challenges/${challengeId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reason: reason.trim() }),
+                body: JSON.stringify({ content: reason.trim() }),
             });
             alert('신고가 접수되었습니다.');
         } catch (err) {

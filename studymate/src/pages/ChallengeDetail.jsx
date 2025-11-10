@@ -192,7 +192,7 @@ export default function ChallengeDetail() {
         const method = cheerByMe ? 'DELETE' : 'POST';
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/posts/${postId}/cheers`, { method });
+            const res = await fetchWithAuth(`${API_BASE}/api/challenges/posts/${postId}/cheers`, { method });
             if (!res || typeof res.cheer_by_me !== 'boolean') {
                 alert(res?.message || '응원 요청에 실패했습니다.');
                 return;
@@ -219,14 +219,15 @@ export default function ChallengeDetail() {
         }
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/reports/challenges/${id}`, {
+            const res = await fetchWithAuth(`${API_BASE}/api/reports/challenges/${id}`, {
                 method: 'POST',
                 body: JSON.stringify({ content: reason.trim() }),
             });
 
-            if (res?.ok) {
+            if (res?.status === 200) {
                 alert('챌린지가 신고되었습니다.');
-            } else {
+            }
+            else {
                 switch (res?.code) {
                     case 'ERR_ALREADY_REPORTED':
                         alert('이미 신고한 챌린지입니다.');
@@ -254,7 +255,7 @@ export default function ChallengeDetail() {
         }
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/reports/posts/${postId}`, {
+            const res = await fetchWithAuth(`${API_BASE}/api/reports/posts/${postId}`, {
                 method: 'POST',
                 body: JSON.stringify({ content: reason.trim() }),
             });
@@ -285,7 +286,7 @@ export default function ChallengeDetail() {
         if (!userId) return alert('로그인이 필요합니다.');
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/challenges/posts/${postId}`, {
+            const res = await fetchWithAuth(`${API_BASE}/api/challenges/posts/${postId}`, {
                 method: 'DELETE',
             });
 
@@ -311,7 +312,7 @@ export default function ChallengeDetail() {
 
         try {
             const payload = { content };
-            const res = await fetchWithAuth(`${API_BASE}/challenges/${id}/posts`, {
+            const res = await fetchWithAuth(`${API_BASE}/api/challenges/${id}/posts`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });

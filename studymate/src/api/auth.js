@@ -6,7 +6,7 @@ import { API_BASE } from './config';
 export const refreshAccessToken = async () => {
     try {
         const res = await axios.post(
-            'http://10.0.2.2:3000/api/auth/refresh',
+            'http://192.168.123.178:3000',
             {},
             {
                 withCredentials: true,
@@ -83,7 +83,7 @@ export const fetchWithAuth = async (url, options = {}) => {
             }
         } else {
             console.error('❌ 인증 요청 실패:', err);
-            return null;
+             return err.response?.data || null;
         }
     }
 };
