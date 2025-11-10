@@ -1,4 +1,6 @@
--- created Supabase SQL Editor (2025-10-20)
+```sql
+-- 001_init.sql
+
 BEGIN;
 
 create extension if not exists "pgcrypto";
@@ -90,7 +92,6 @@ create index if not exists post_challenge_idx on posts (challenge_id, created_at
 -- WHERE user_id=? ORDER BY created_at DESC LIMIT 20
 create index if not exists post_user_idx on posts (user_id, created_at DESC);
 
-
 -- 5) CHALLENGE_LIKES와 POST_CHEERS
 create table if not exists challenge_likes (
 	user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
@@ -134,3 +135,50 @@ create table if not exists reports (
 create index if not exists reports_target_idx ON reports (target_type, target_id);
 
 COMMIT;
+
+```
+
+```sql
+-- 002_postsIndex.sql
+-- post table에 index 추가 (25-10-29)
+
+BEGIN;
+
+create index if not exists post_idx on posts (user_id, challenge_id, created_at DESC);
+
+COMMIT;
+
+```
+
+```sql
+-- 003_postsAddColumn.sql
+-- post table에 posted_date_kst column 추가 (25-10-29)
+
+BEGIN;
+
+ALTER TABLE posts
+ADD posted_date_kst date
+NOT NULL
+DEFAULT (now() AT TIME ZONE 'Asia/Seoul')::date;
+
+ALTER TABLE posts
+ADD CONSTRAINT uq_posts_user_chal_kstday
+UNIQUE (user_id, challenge_id, posted_date_kst);
+
+COMMIT;
+
+```
+
+```sql
+-- 004_reportsAddUnique.sql
+-- reports table에 unique 제약 추가
+
+BEGIN;
+
+ALTER TABLE reports
+ADD CONSTRAINT uq_reports_reporter_target_type_id
+UNIQUE (reporter_id, target_type, target_id);
+
+COMMIT;
+
+```
