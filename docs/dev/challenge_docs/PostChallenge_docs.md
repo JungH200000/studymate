@@ -12,7 +12,10 @@
 ```http
 {
     "title": "한국사검정능력시험 1급",
-    "content": null,
+    "content": {
+      "description": "한국사 공부",
+      "tags": ["tag1", "tag2"]
+    },
     "frequency_type": "daily",
     "target_per_week": null,
     "start_date": "2025-10-24",
@@ -27,15 +30,18 @@
   "ok": true,
   "message": "challenge가 생성되었습니다.",
   "challenge": {
-    "challenge_id": "2f6923c0-cd88-4cbe-84dd-3b06f8e8f70a",
+    "challenge_id": "cb841157-33e8-4bdd-a21e-fe66c314d9fc",
     "title": "한국사검정능력시험 1급",
-    "content": null,
+    "content": {
+      "tags": ["tag1", "tag2"],
+      "description": "한국사 공부"
+    },
     "frequency_type": "daily",
     "target_per_week": null,
     "start_date": "2025-10-24",
     "end_date": null,
-    "created_at": "2025-10-24T02:21:09.932Z",
-    "creator_id": "b325aaf3-10d2-44b7-9f3a-75c41ec8174d"
+    "created_at": "2025-11-10T06:10:18.345Z",
+    "creator_id": "af1f4830-8e7a-48a9-90f3-66227cf40c2a"
   }
 }
 ```
@@ -47,7 +53,10 @@
 ```http
 {
     "title": "한국사검정능력시험 1급",
-    "content": "아아아아아",
+    "content": {
+      "description": "한국사 공부",
+      "tags": ["tag1", "tag2"]
+    },
     "frequency_type": "weekly",
     "target_per_week": 5,
     "start_date": "2025-10-24",
@@ -64,7 +73,10 @@
   "challenge": {
     "challenge_id": "45d733a0-82b0-4703-b5d6-b2404c81eddc",
     "title": "한국사검정능력시험 1급",
-    "content": "아아아아아",
+    "content": {
+      "tags": ["tag1", "tag2"],
+      "description": "한국사 공부"
+    },
     "frequency_type": "weekly",
     "target_per_week": 5,
     "start_date": "2025-10-24",
