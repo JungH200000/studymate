@@ -26,6 +26,9 @@
 
 - `/api/challenges`
 
+- `sort = newest || recommendation`
+- 페이지네이션 대비 `page=?&limit=?` / 기본 `page=1&limit=20`
+
 ### POST : 좋아요 버튼 클릭, 참여 버튼 클릭
 
 - 참여 : `/api/challenges/:id/participants`
