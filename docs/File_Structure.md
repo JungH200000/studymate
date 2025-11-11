@@ -16,14 +16,16 @@ studymate/server/
 │ │ │ ├─ 001_init.sql
 │ │ │ ├─ 002_postsIndex.sql
 │ │ │ ├─ 003_postsAddColumn.sql
-│ │ │ └─ 004_reportsAddUnique.sql
+│ │ │ ├─ 004_reportsAddUnique.sql
+│ │ │ └─ 005_tags.sql
 │ │ │
 │ │ ├─ auth.db.js
 │ │ ├─ challenge.db.js
 │ │ ├─ pool.js
 │ │ ├─ post.db.js
 │ │ ├─ report.db.js
-│ │ └─ user.db.js
+│ │ ├─ user.db.js
+│ │ └─ userTag.db.js
 │ │
 │ ├─ middleware/
 │ │ ├─ challenge.validators.js
@@ -41,6 +43,7 @@ studymate/server/
 │ ├─ services/
 │ │ ├─ auth.service.js
 │ │ ├─ challenge.service.js
+│ │ ├─ checkAbuse.service.js
 │ │ ├─ post.service.js
 │ │ ├─ report.service.js
 │ │ └─ user.service.js
@@ -48,8 +51,14 @@ studymate/server/
 │ ├─ utils/
 │ │ ├─ asyncHandler.js
 │ │ ├─ auth.validators.js
+│ │ ├─ extractionText.js
+│ │ ├─ geminiAPI.js
+│ │ ├─ geminiSchema.js
 │ │ ├─ jwt.js
 │ │ └─ rankCache.js
+│ │
+│ ├─ worker/
+│ │ └─ geminiWorker.js
 │ │
 │ ├─ env.js
 │ └─ server.js
