@@ -1,5 +1,7 @@
 // src/services/post.service.js
 import * as postDB from '../db/post.db.js';
+import { extractionText } from '../utils/extractionText.js';
+import { checkAbuseWithGemini } from './checkAbuse.service.js';
 
 /** 인증글 등록 */
 export async function createPost({ content, user_id, challenge_id }) {
@@ -24,6 +26,18 @@ export async function createPost({ content, user_id, challenge_id }) {
   /** 오늘 해당 챌린지에 이미 인증글을 등록했는지 확인 */
   const isDuplicated = await postDB.duplicatedDailyPost({ user_id, challenge_id });
   if (!isDuplicated) {
+    /** JSON에서 하나의 텍스트로 */
+    const extraction = extractionText(content);
+    /** 욕설·비방 검증 With Gemini */
+    const verification = await checkAbuseWithGemini(extraction);
+    if (verification.abuse) {
+      const error = new Error('욕설·비방이 포함된 인증글은 등록할 수 없습니다.');
+      error.status = 422;
+      error.code = 'POST_REJECTED_ABUSE';
+      error.detail = { reasons: verification.reasons };
+      throw error;
+    }
+
     /** 인증글 등록 */
     const post = await postDB.createPost({ content, user_id, challenge_id });
     /** [총 인증글 수/내가 등록한 모든 인증글 수/내가 일주일간 등록한 인증글 수] */
