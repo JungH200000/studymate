@@ -301,19 +301,21 @@ export default function Home() {
                     </button>
                 )}
             </div>
+                        <div className="challenge-content">
+                            {challenge.content?.description && (
+                                <p className="challenge-description">{challenge.content.description}</p>
+                            )}
 
-            {challenge.content && (
-                <div className="card-content">
-                    {challenge.content.description && <p>{challenge.content.description}</p>}
-                    {Array.isArray(challenge.content.tags) && (
-                    <ul>
-                        {challenge.content.tags.map((tag, idx) => (
-                        <li key={idx}>{tag}</li>
-                        ))}
-                    </ul>
-                    )}
-                </div>
-                )}
+                            {Array.isArray(challenge.content?.tags) && challenge.content.tags.length > 0 && (
+                                <div className="challenge-tags">
+                                {challenge.content.tags.map((tag, idx) => (
+                                    <span key={idx} className="tag">
+                                    #{tag}
+                                    </span>
+                                ))}
+                                </div>
+                            )}
+                        </div>
 
             <div className="card-info">
                 <span className={challenge.frequency_type === 'daily' ? 'frequency-daily' : 'frequency-weekly'}>

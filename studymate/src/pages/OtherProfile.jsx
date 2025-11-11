@@ -190,8 +190,19 @@ export default function OtherProfile() {
                             }`}
                             onClick={() => handleChallengeClick(challenge.challenge_id)}
                         >
-                            <h4>{challenge.title}</h4>
-                            <p>{challenge.content}</p>
+                        <h4>{challenge.title}</h4>
+                        {challenge.content && (
+                            <div className="card-content">
+                                {challenge.content.description && <p>{challenge.content.description}</p>}
+                                {Array.isArray(challenge.content.tags) && (
+                                    <ul>
+                                        {challenge.content.tags.map((tag, idx) => (
+                                        <li key={idx}>{tag}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
 
                             <div className="challenge-icons">
                                 <FontAwesomeIcon
