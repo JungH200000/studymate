@@ -1,0 +1,5 @@
+// src/utils/geminiAPI.js
+import { GoogleGenAI } from '@google/genai';
+
+export const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+export const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
