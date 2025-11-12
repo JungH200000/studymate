@@ -57,9 +57,9 @@ export default function LikeList() {
             </div>
 
             {/* 챌린지 제목 */}
-            <div className="challenge-title">
+            {/* <div className="challenge-title">
                 <h3>{challengeTitle}</h3>
-            </div>
+            </div> */}
 
             {/* 목록 */}
             <div className="follow-list-content">

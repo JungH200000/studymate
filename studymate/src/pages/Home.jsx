@@ -41,13 +41,14 @@ export default function Home() {
     };
 
     // 챌린지 검색/로딩 함수
-    const loadChallenges = useCallback(async (query = '') => {
+    const loadChallenges = useCallback(async (query = '', sort = 'newest') => {
         setIsLoading(true);
         try {
             const params = new URLSearchParams();
             if (query) params.append('q', query);
             params.append('page', '1');
             params.append('limit', '20');
+            params.append('sort', sort);
 
             const url = `${API_BASE}/api/challenges?${params.toString()}`;
             const res = await fetchWithAuth(url);
@@ -100,11 +101,17 @@ export default function Home() {
         const query = searchQuery.trim();
 
         if (searchType === 'challenge') {
-            loadChallenges(query);
+            // 기본 챌린지 검색
+            loadChallenges(query, 'newest');
             setUsers([]);
         } else if (searchType === 'user') {
+            // 사용자 검색
             loadUsers(query);
             setChallenges([]);
+        } else if (searchType === 'recommendation') {
+            // 추천 챌린지 불러오기
+            loadChallenges(query, 'recommendation');
+            setUsers([]);
         }
     }, [searchQuery, searchType, loadChallenges, loadUsers]);
 
@@ -126,6 +133,8 @@ export default function Home() {
             loadChallenges('');
         } else if (searchType === 'user') {
             loadUsers('');
+        } else if (searchType === 'recommendation') {
+            loadChallenges('', 'recommendation');
         }
     }, [searchType, loadChallenges, loadUsers]);
 
@@ -226,64 +235,32 @@ export default function Home() {
     };
 
     // 챌린지 신고
-    // 챌린지 신고
     const handleReportChallenge = async (challengeId, e) => {
         e.stopPropagation();
         if (!userId) return alert('로그인이 필요합니다.');
 
-        const reason = prompt('챌린지 신고 사유를 입력해주세요 (5~500자)');
-
-        // 🌟 1. 프런트엔드 유효성 검사 추가 (prompt는 취소 시 null을 반환합니다)
-        if (!reason || reason.trim().length < 5 || reason.trim().length > 500) {
-            if (reason !== null) {
-                // 사용자가 취소한 경우가 아닐 때만 경고
-                return alert('신고 사유는 5~500자여야 합니다.');
-            }
-            return;
-        }
+        const reason = prompt('신고 사유를 입력해주세요:');
+        if (!reason || !reason.trim()) return;
 
         try {
-            const res = await fetchWithAuth(`${API_BASE}/api/reports/challenges/${challengeId}`, {
+            await fetchWithAuth(`${API_BASE}/api/reports/challenges/${challengeId}`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: reason.trim() }),
             });
-
-            // 2. 응답이 성공(2xx)이거나, fetchWithAuth에서 에러가 던져지지 않은 경우
-            if (res?.ok) {
-                alert('챌린지가 신고되었습니다.');
-            } else {
-                // fetchWithAuth가 상태 코드와 관계없이 응답 본문을 반환했을 경우의 처리
-                switch (res?.code) {
-                    case 'ERR_ALREADY_REPORTED':
-                        alert('이미 신고한 챌린지입니다.');
-                        break;
-                    case 'INVALID_REPORT_INPUT':
-                        alert('신고 사유는 5~500자여야 합니다.');
-                        break;
-                    default:
-                        alert(res?.message || '신고 처리 중 오류가 발생했습니다.');
-                }
-            }
+            alert('신고가 접수되었습니다.');
         } catch (err) {
-            console.error('챌린지 신고 실패:', err);
-
-            // 🌟🌟 3. catch 블록에서 HTTP 상태 코드를 확인하여 409를 처리합니다.
-            const statusCode = err.response?.status;
-
-            if (statusCode === 409) {
-                // 409 Conflict 에러 처리: 이미 신고한 경우
-                alert('이미 신고한 챌린지입니다.');
-            } else {
-                // 그 외 모든 오류 처리 (400, 500 등)
-                alert(err.response?.data?.message || '신고 요청 중 오류가 발생했습니다.');
-            }
+            console.error('신고 실패:', err);
+            alert(`신고 처리에 실패했습니다.\n에러: ${err.response?.data?.message || err.message}`);
         }
     };
 
     const handleRefresh = () => window.location.reload();
 
     const placeholderText =
-        searchType === 'challenge' ? '제목 또는 사용자를 검색해보세요.' : '사용자 이름을 검색해보세요';
+        searchType === 'challenge' || searchType === 'recommendation'
+            ? '제목을 검색해보세요.'
+            : '사용자 이름을 검색해보세요';
 
     // 사용자 카드 렌더링 함수
     const renderUserCard = (user) => (
@@ -337,17 +314,12 @@ export default function Home() {
             </div>
             <div className="challenge-content">
                 {challenge.content?.description && (
-                    // 🚨 1. 챌린지 본문 <p> 태그에 'challenge-description' 클래스 추가
-                    // 이 클래스를 Home.css에서 margin: 0; 처리하여 불필요한 기본 여백을 제거합니다.
                     <p className="challenge-description">{challenge.content.description}</p>
                 )}
 
                 {Array.isArray(challenge.content?.tags) && challenge.content.tags.length > 0 && (
-                    // 🚨 2. 태그 목록 <div> 태그에 'challenge-tags' 클래스 추가
                     <div className="challenge-tags">
                         {challenge.content.tags.map((tag, idx) => (
-                            // 🚨 3. 개별 태그 <span> 태그에 'tag' 클래스 추가
-                            // 이 클래스가 Home.css에서 캡슐 디자인을 적용하는 핵심 요소입니다.
                             <span key={idx} className="tag">
                                 #{tag}
                             </span>
@@ -365,6 +337,7 @@ export default function Home() {
                     {challenge.end_date ? ` ~ ${formatDate(challenge.end_date)}` : ''}
                 </span>
             </div>
+
             <div className="like-section">
                 <FontAwesomeIcon
                     icon={likes[challenge.challenge_id]?.liked ? solidThumbsUp : regularThumbsUp}
@@ -433,7 +406,13 @@ export default function Home() {
                         className={`search-tab ${searchType === 'challenge' ? 'active' : ''}`}
                         onClick={() => setSearchType('challenge')}
                     >
-                        챌린지 검색
+                        최신 챌린지
+                    </button>
+                    <button
+                        className={`search-tab ${searchType === 'recommendation' ? 'active' : ''}`}
+                        onClick={() => setSearchType('recommendation')}
+                    >
+                        추천 챌린지
                     </button>
                     <button
                         className={`search-tab ${searchType === 'user' ? 'active' : ''}`}
@@ -451,10 +430,13 @@ export default function Home() {
                     </div>
                 ) : (
                     <div className="post-list">
-                        {searchType === 'challenge' && challenges.length > 0 && challenges.map(renderChallengeCard)}
+                        {(searchType === 'challenge' || searchType === 'recommendation') &&
+                            challenges.length > 0 &&
+                            challenges.map(renderChallengeCard)}
+
                         {searchType === 'user' && users.length > 0 && users.map(renderUserCard)}
 
-                        {searchType === 'challenge' && challenges.length === 0 && (
+                        {(searchType === 'challenge' || searchType === 'recommendation') && challenges.length === 0 && (
                             <p className="tab-message">
                                 {searchQuery
                                     ? `'${searchQuery}'에 해당하는 챌린지가 없습니다.`
