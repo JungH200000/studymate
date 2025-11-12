@@ -130,7 +130,6 @@ export default function OtherProfile() {
                 <div className="profile-info">
                     <span className="profile-name">{nickname}</span>
                     {/* 이메일은 상대방 프로필에서 보통 제거 (비공개 정보) */}
-                    <span className="profile-id">@{nickname}</span> {/* 임시로 @닉네임 표시 */}
                     {/* 팔로우 통계 (Profile.jsx와 동일한 스타일 적용) */}
                     <div className="profile-stats">
                         {/* 상대방 프로필에서는 클릭 이벤트 제거 */}

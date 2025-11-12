@@ -310,11 +310,15 @@ export default function ChallengeDetail() {
         if (!Object.keys(content).length) return alert('내용을 하나 이상 입력해주세요.');
 
         try {
+            setIsLoading(true);
+
             const payload = { content };
             const res = await fetchWithAuth(`${API_BASE}/api/challenges/${id}/posts`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
+
+            setIsLoading(false);
 
             if (res?.ok && res.post) {
                 const newPost = {
@@ -360,6 +364,8 @@ export default function ChallengeDetail() {
                     );
                 }
             } else {
+                setIsLoading(false);
+
                 switch (res?.code) {
                     case 'CHALLENGE_NOT_FOUND':
                         alert('챌린지를 찾을 수 없습니다.');
@@ -373,11 +379,37 @@ export default function ChallengeDetail() {
                     case 'ERR_ALREADY_POSTED_TODAY':
                         alert('오늘은 이미 인증글을 작성하셨습니다. 내일 다시 작성해주세요!');
                         break;
+                    case 'POST_REJECTED_ABUSE':
+                        const reasons = res?.detail?.reasons;
+                        const reasonText =
+                            Array.isArray(reasons) && reasons.length > 0 ? reasons.join(', ') : '욕설 또는 비방 표현';
+
+                        alert(
+                            `🚫 인증글에 부적절한 표현이 포함되어 등록이 거부되었습니다.\n\n` +
+                                `❗ 검출된 문제 유형: ${reasonText}\n\n` +
+                                `🙅‍♀️ 욕설, 비방, 모욕, 위협적 표현은 포함될 수 없습니다.\n` +
+                                `내용을 수정한 후 다시 시도해주세요.`
+                        );
+                        setFormData({
+                            title: '',
+                            goalsText: '',
+                            summary: '',
+                            takeaways: '',
+                            textbookName: '',
+                            textbookPageStart: '',
+                            textbookPageEnd: '',
+                            studyHours: '',
+                            studyMinutesInput: '',
+                            nextStepsText: '',
+                            tagsText: '',
+                        });
+                        break;
                     default:
                         alert(res?.message || '인증글 작성에 실패했습니다.');
                 }
             }
         } catch (err) {
+            setIsLoading(false);
             console.error('작성 실패:', err);
             alert('인증글 작성 중 오류가 발생했습니다.');
         }

@@ -3,6 +3,7 @@
     min-height: 100vh;
     width: 100vw;
     background: #fef5f5;
+    margin-top: 70px;
 }
 
 /* 기존 .achievement-card 스타일 (차트 아래 목록 등에 사용될 수 있음) */
@@ -30,63 +31,39 @@
 
 /* ✅ 1. 상단 헤더 바 (뒤로가기 버튼과 제목을 수평으로 정렬) */
 .header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(255, 123, 123, 0.2);
     display: flex;
-    align-items: center; /* 수직 중앙 정렬 */
-    gap: 15px; /* 버튼과 제목 사이 간격 */
-    margin-bottom: 20px;
-    height: 60px;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    height: 70px;
 }
 
 /* ✅ 2. 페이지 제목 스타일 (왼쪽 버튼 옆에 자연스럽게 배치) */
 .page-title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    flex-grow: 0;
-    text-align: left;
-    transform: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    flex: 1;
 }
 
 /* 3. 뒤로가기 버튼 스타일 */
 .back-button {
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-    border: 2px solid #ffb3ba;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
-    color: #ff6b7a;
+    font-size: 24px;
+    color: white;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 107, 122, 0.15);
-    /* ✅ 수정: Flexbox 배치에 맞게 하단 마진 제거 */
-    margin-bottom: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.back-icon {
-    display: inline-block;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s;
 }
 
 .back-button:hover {
-    background: linear-gradient(135deg, #ffe8e8 0%, #ffd4d8 100%);
-    border-color: #ff8fa3;
-    box-shadow: 0 6px 20px rgba(255, 107, 122, 0.25);
-    transform: translateY(-2px);
-}
-
-.back-button:hover .back-icon {
     transform: translateX(-3px);
-}
-
-.back-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(255, 107, 122, 0.2);
 }
 
 /* ✅ 4. 통계 카드 Grid 컨테이너 */

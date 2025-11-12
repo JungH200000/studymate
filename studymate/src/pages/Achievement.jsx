@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../api/auth';
 import { useParams, useNavigate } from 'react-router-dom';
 import AchievementChart from '../components/AchievementChart';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { API_BASE } from '../api/config';
 import './Achievement.css';
 
@@ -57,7 +59,7 @@ export default function Achievement() {
         loadAchievementRates();
     }, [userId]);
 
-    const handleGoBack = () => {
+    const handleBack = () => {
         navigate(-1);
     };
 
@@ -65,10 +67,9 @@ export default function Achievement() {
         <div className="achievement-container">
             {/* 상단 헤더 바: 뒤로가기 버튼과 제목 배치 */}
             <div className="header-bar">
-                <button className="back-button" onClick={handleGoBack}>
-                    <span className="back-icon">←</span>
-                </button>
+                <FontAwesomeIcon icon={faArrowLeft} className="back-button" onClick={handleBack} />
                 <h2 className="page-title">📊 내 챌린지 기록</h2>
+                <div style={{ width: '36px' }}></div>
             </div>
 
             <div className="rate-stats-grid">

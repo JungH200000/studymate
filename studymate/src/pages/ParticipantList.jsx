@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { API_BASE } from '../api/config';
 import './FollowList.css'; // 기존 스타일 재사용
 
@@ -64,7 +64,9 @@ export default function ParticipantList() {
             {/* 목록 */}
             <div className="follow-list-content">
                 {loading ? (
-                    <p className="loading-message">로딩 중...</p>
+                    <div className="loading-spinner">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                    </div>
                 ) : participants.length === 0 ? (
                     <p className="empty-message">참가자가 없습니다.</p>
                 ) : (

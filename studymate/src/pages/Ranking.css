@@ -1,0 +1,209 @@
+/* src/pages/Ranking.css */
+
+/* -------------------- 페이지 컨테이너 -------------------- */
+.ranking-container {
+    padding-top: 0;
+    padding-bottom: 70px;
+    min-height: 100vh;
+    width: 100%;
+    margin-top: 70px;
+    background: linear-gradient(to bottom right, #fff6f7, #ffeef0);
+}
+
+/* -------------------- 헤더 (ranking-header) -------------------- */
+.ranking-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(255, 123, 123, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+}
+
+.ranking-header .back-button {
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.back-button:hover {
+    transform: translateX(-3px);
+}
+
+.ranking-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    flex-grow: 1; /* h2가 가운데 공간을 차지하게 하고 */
+}
+
+/* -------------------- 목록 컨테이너 (ranking-list-content) -------------------- */
+.ranking-list-content {
+    width: 90%;
+    max-width: 600px;
+    margin: 70px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 20px;
+}
+
+/* -------------------- 랭킹 아이템 (ranking-item) -------------------- */
+.ranking-item {
+    background: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+
+    display: flex; /* <-- 항목을 수평으로 배치 */
+    align-items: center;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 1~3위 항목 강조 (강조 색상 및 대비 강화) */
+
+.ranking-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.25);
+}
+
+/* -------------------- 순위 번호 (ranking-item-rank) -------------------- */
+.ranking-item-rank {
+    font-size: 20px;
+    font-weight: 800;
+    color: #999;
+    width: 40px;
+    text-align: center;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* 순위 칸이 줄어들지 않게 함 */
+}
+
+.ranking-item-rank.top {
+    font-size: 24px;
+    color: #ff9a9e;
+    width: 40px;
+}
+
+.ranking-item:first-child {
+    margin-top: 15px;
+}
+
+/* -------------------- 정보 (ranking-item-info) -------------------- */
+.ranking-item-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+    /* ✨ 레이아웃 안정화 코드 */
+    min-width: 0;
+}
+
+.ranking-item-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+/* 순위 변동 텍스트 */
+.delta-text {
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+.delta-up {
+    color: #4caf50;
+}
+.delta-down {
+    color: #f44336;
+}
+.delta-none {
+    color: #aaa;
+}
+
+/* 최근 30일 달성 요약 */
+.ranking-item-summary {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+    margin-bottom: 5px;
+}
+
+/* -------------------- 달성률 시각화 (Progress Bar) -------------------- */
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff9a9e, #ff8c8f);
+    transition: width 0.5s ease-out;
+}
+
+/* -------------------- 달성률 % 텍스트 (ranking-item-rate) -------------------- */
+.ranking-item-rate {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ff6b6b;
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0; /* 달성률% 영역도 줄어들지 않도록 설정 */
+}
+
+/* 빈 목록 메시지 및 애니메이션 */
+.loading-message,
+.empty-message {
+    text-align: center;
+    color: #ff9a9e;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 40px 20px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* -------------------- 반응형 -------------------- */
+@media (max-width: 480px) {
+    .ranking-list-content {
+        width: 95%;
+        margin-top: 70px;
+    }
+
+    .ranking-header h2 {
+        font-size: 16px;
+    }
+
+    .ranking-header .back-button {
+        /* 특정성 유지 */
+        font-size: 22px;
+    }
+}
