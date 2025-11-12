@@ -1,15 +1,25 @@
 # server
 
+## 라이브러리 설치
+
 ```terminal
 cd server
 npm install
 ```
 
+## 실행 방법
+
+- 서로 다른 터미널에서 실행
+
 ```terminal
 npm run dev
 ```
 
-routes -> db(repo) -> controller -> service(DB) -> controller 응답 -> route 반환
+```terminal
+npm run worker
+```
+
+routes -> db(repo) -> controller -> service(DB) -> controller 응답 -> routes 반환
 
 ## Frontend Settings
 

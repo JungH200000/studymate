@@ -48,7 +48,7 @@ export const getChallenges = async (req, res) => {
   }
 
   const qSafe = typeof q === 'string' ? q.trim() : '';
-  const allowedSort = new Set(['newest']);
+  const allowedSort = new Set(['newest', 'recommendation']);
   const sortSafe = allowedSort.has(sort) ? sort : 'newest';
 
   /** 챌린지 목록 가져오기 */

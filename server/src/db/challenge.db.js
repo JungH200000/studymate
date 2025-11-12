@@ -14,7 +14,7 @@ export async function createChallenge({
 }) {
   const sql = `
     INSERT INTO challenges (title, content, frequency_type, target_per_week, start_date, end_date, creator_id)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    VALUES ($1, $2::jsonb, $3, $4, $5, $6, $7)
     RETURNING challenge_id, title, content, frequency_type, target_per_week, to_char(start_date, 'YYYY-MM-DD') AS start_date, to_char(end_date, 'YYYY-MM-DD') AS end_date, created_at, creator_id`;
   const params = [title, content, frequency_type, target_per_week, start_date, end_date, creator_id];
 
@@ -23,38 +23,34 @@ export async function createChallenge({
   return rows[0];
 }
 
-/** Challenge 목록 가져오기 */
-export async function getChallenges({ q, sort, limit, offset }) {
-  let sql;
+/** 공용 Challenge 목록 가져오기 */
+export async function getNewest({ q, limit, offset }) {
   if (!q) {
-    if (sort === 'newest') {
-      sql = `
-      SELECT c.*, u.user_id AS author_id, u.username AS author_username
+    const sql = `
+      SELECT 
+        c.*, 
+        u.user_id AS author_id, 
+        u.username AS author_username
       FROM challenges c
       LEFT JOIN users u ON c.creator_id = u.user_id
       ORDER BY c.created_at DESC
       LIMIT $1 OFFSET $2`;
-    } else {
-      sql = `
-      SELECT c.*, u.user_id AS author_id, u.username AS author_username
-      FROM challenges c
-      LEFT JOIN users u ON c.creator_id = u.user_id
-      ORDER BY c.created_at DESC
-      LIMIT $1 OFFSET $2`;
-    }
+
     const params = [limit, offset];
-
     const { rows } = await query(sql, params);
-
+    console.log(rows);
     return rows;
   } else {
     // q(검색어)가 존재할 때
     const raw = (q ?? '').trim();
-    const esc = raw.replace(/[%_]/g, (m) => '\\' + m);
+    const esc = raw.replace(/[%_]/g, (m) => '\\' + m); // 100% row_ -> 100\% row\_
     const searchWord = `%${esc}%`;
 
-    sql = `
-      SELECT c.*, u.user_id AS author_id, u.username AS author_username
+    const sql = `
+      SELECT 
+        c.*, 
+        u.user_id AS author_id, 
+        u.username AS author_username
       FROM challenges c
       LEFT JOIN users u ON c.creator_id = u.user_id
       WHERE c.title ILIKE $1 ESCAPE '\\'
@@ -66,6 +62,51 @@ export async function getChallenges({ q, sort, limit, offset }) {
 
     return rows;
   }
+}
+
+/** AI 추천 Challenge 가져오기 */
+async function getRecommendation({ user_id, limit, offset }) {
+  if (!user_id) return getNewest({ limit, offset });
+
+  const sql = `
+    WITH my AS (
+      SELECT tag, weight
+      FROM user_tags
+      WHERE user_id = $1
+    )
+    SELECT 
+      c.*, 
+      u.user_id AS author_id,
+      u.username AS author_username,
+      COALESCE(SUM(my.weight), 0) AS personal_score
+    FROM challenges c
+    LEFT JOIN users u ON c.creator_id = u.user_id
+    LEFT JOIN LATERAL jsonb_array_elements_text(COALESCE(c.content->'tags', '[]'::jsonb)) AS ct(tag) ON TRUE
+    LEFT JOIN my ON my.tag = ct.tag
+    GROUP BY c.challenge_id, u.user_id, u.username
+    ORDER BY personal_score DESC, c.created_at DESC
+    LIMIT $2 OFFSET $3`;
+  const params = [user_id, limit, offset];
+  const { rows } = await query(sql, params);
+
+  // 전부 0점이면 신뢰도 낮음 -> 최신순으로 정렬
+  if (rows.length && rows.every((r) => Number(r.personal_score) === 0)) {
+    return getNewest({ limit, offset });
+  }
+  // console.log(rows);
+
+  return rows;
+}
+
+/** Challenge 목록 가져오기 */
+export async function getChallenges({ user_id, q, sort, limit, offset }) {
+  // `sort = recommendation`일 경우
+  if (sort === 'recommendation' && !q) {
+    return getRecommendation({ user_id, limit, offset });
+  }
+
+  // 기본
+  return getNewest({ q, limit, offset });
 }
 
 /** 사용자가 참여한 challenge의 challenge_id 가져오기 */
