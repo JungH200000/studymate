@@ -1,6 +1,7 @@
 // src/db/post.db.js
 // db query 처리
 import { query } from './pool.js';
+import pool from './pool.js';
 
 /** 챌린지 확인 */
 export async function verifyChallenge({ challenge_id }) {
@@ -47,15 +48,28 @@ export async function duplicatedDailyPost({ user_id, challenge_id }) {
 
 /** 인증글 등록 */
 export async function createPost({ content, user_id, challenge_id }) {
-  const sql = `
-    INSERT INTO posts (content, user_id, challenge_id)
-    VALUES ($1::jsonb, $2, $3)
-    RETURNING post_id, content, user_id, challenge_id, created_at`;
-  const params = [content, user_id, challenge_id];
+  const client = await pool.connect(); // transaction 사용을 위해
+  try {
+    await client.query('BEGIN');
 
-  const { rows } = await query(sql, params);
+    const p = await client.query(
+      `INSERT INTO posts (content, user_id, challenge_id)
+       VALUES ($1::jsonb, $2, $3)
+       RETURNING post_id, content, user_id, challenge_id, created_at`,
+      [content, user_id, challenge_id]
+    );
 
-  return rows[0];
+    await client.query(`INSERT INTO tag_jobs (post_id, user_id) VALUES ($1, $2)`, [p.rows[0].post_id, user_id]);
+
+    await client.query('COMMIT');
+
+    return p.rows[0];
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 /** 챌린지 인증글 수 가져오기 */

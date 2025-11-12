@@ -20,3 +20,11 @@ export const ABUSE_OBJECT_SCHEMA = {
   required: ['abuse', 'reasons'],
   additionalProperties: false,
 };
+
+/** tag 추출 Gemini API Schema */
+export const TAG_SCHEMA = {
+  type: 'array',
+  description: '학습 인증글에서 추출한 관련 태그 목록',
+  items: { type: 'string', description: '예: 한국사, 세계사, 기하와 벡터, 수학 I, 현우진' },
+  maxItems: 5,
+};
