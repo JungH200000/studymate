@@ -41,13 +41,14 @@ export default function Home() {
     };
 
     // 챌린지 검색/로딩 함수
-    const loadChallenges = useCallback(async (query = '') => {
+    const loadChallenges = useCallback(async (query = '', sort = 'newest') => {
         setIsLoading(true);
         try {
             const params = new URLSearchParams();
             if (query) params.append('q', query);
             params.append('page', '1');
             params.append('limit', '20');
+            params.append('sort', sort);
 
             const url = `${API_BASE}/api/challenges?${params.toString()}`;
             const res = await fetchWithAuth(url);
@@ -100,11 +101,17 @@ export default function Home() {
         const query = searchQuery.trim();
 
         if (searchType === 'challenge') {
-            loadChallenges(query);
+            // 기본 챌린지 검색
+            loadChallenges(query, 'newest'); 
             setUsers([]);
         } else if (searchType === 'user') {
+            // 사용자 검색
             loadUsers(query);
             setChallenges([]);
+        } else if (searchType === 'recommendation') {
+            // 추천 챌린지 불러오기
+            loadChallenges(query, 'recommendation');
+            setUsers([]);
         }
     }, [searchQuery, searchType, loadChallenges, loadUsers]);
 
@@ -126,6 +133,9 @@ export default function Home() {
             loadChallenges('');
         } else if (searchType === 'user') {
             loadUsers('');
+        }
+        else if (searchType === 'recommendation') {
+            loadChallenges('', 'recommendation');
         }
     }, [searchType, loadChallenges, loadUsers]);
 
@@ -403,6 +413,12 @@ export default function Home() {
                     >
                         사용자 검색
                     </button>
+                    <button
+                        className={`search-tab ${searchType === 'recommendation' ? 'active' : ''}`}
+                        onClick={() => setSearchType('recommendation')}
+                    >
+                        추천 챌린지
+                    </button>
                 </div>
             </header>
 
@@ -413,25 +429,29 @@ export default function Home() {
                     </div>
                 ) : (
                     <div className="post-list">
-                        {searchType === 'challenge' && challenges.length > 0 && challenges.map(renderChallengeCard)}
+                        {(searchType === 'challenge' || searchType === 'recommendation') &&
+                            challenges.length > 0 &&
+                            challenges.map(renderChallengeCard)}
+
                         {searchType === 'user' && users.length > 0 && users.map(renderUserCard)}
 
-                        {searchType === 'challenge' && challenges.length === 0 && (
+                        {(searchType === 'challenge' || searchType === 'recommendation') &&
+                            challenges.length === 0 && (
                             <p className="tab-message">
                                 {searchQuery
-                                    ? `'${searchQuery}'에 해당하는 챌린지가 없습니다.`
-                                    : '등록된 챌린지가 없습니다.'}
+                                ? `'${searchQuery}'에 해당하는 챌린지가 없습니다.`
+                                : '등록된 챌린지가 없습니다.'}
                             </p>
-                        )}
+                            )}
 
                         {searchType === 'user' && users.length === 0 && (
                             <p className="tab-message">
-                                {searchQuery
-                                    ? `'${searchQuery}'에 해당하는 사용자가 없습니다.`
-                                    : '등록된 사용자가 없습니다.'}
+                            {searchQuery
+                                ? `'${searchQuery}'에 해당하는 사용자가 없습니다.`
+                                : '등록된 사용자가 없습니다.'}
                             </p>
                         )}
-                    </div>
+                        </div>
                 )}
             </main>
 
