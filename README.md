@@ -115,7 +115,7 @@ npm run worker
 
 ## 7. 시스템 구조
 
-<img src="" width=700px>
+<img src="./docs/images/Architecture.png" width=800px>
 
 ---
 
