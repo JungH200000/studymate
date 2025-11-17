@@ -116,7 +116,7 @@
 
 ### 예상 슬라이드 내용
 
-- 박정현 : UI·UX 설계, Server 설계 및 구현, DB 설계 및 구현, PPT 제작
+- 박정현 : UI·UX 설계, Server와 DB 설계 및 구현, Gemini 연동, PPT 제작
 - 김지훈 : UI·UX 설계, Frontend 구현, UI·UX 구현
 - 한진환 : UI·UX 설계, Frontend 구현
 - 아딜렛 : 자료조사
