@@ -700,8 +700,16 @@ export default function ChallengeDetail() {
                                                     onClick={() => toggleCheer(post.post_id, post.cheer_by_me)}
                                                     className={`cheer-icon ${post.cheer_by_me ? 'cheered' : ''}`}
                                                 />
-                                                <span className="cheer-count">{post.cheer_count}</span>
+                                                <span className="cheer-count"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // 상위 클릭 이벤트 방지
+                                                        navigate(`/challenges/${post.challenge_id}/posts/${post.post_id}/cheer`);
+
+                                                    }}>
+                                                    {post.cheer_count}
+                                                </span>
                                             </div>
+
                                         </div>
                                     </div>
                                 );
