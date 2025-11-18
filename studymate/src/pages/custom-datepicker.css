@@ -1,0 +1,66 @@
+/* 달력 전체 컨테이너 */
+.react-datepicker {
+    font-family: 'Noto Sans KR', sans-serif;
+    border-radius: 14px;
+    border: 1px solid #ffebe6;
+    box-shadow: 0 4px 16px rgba(255, 123, 123, 0.15);
+}
+
+/* 헤더 (월/년도 표시 부분) */
+.react-datepicker__header {
+    background: linear-gradient(135deg, #fff9f7 0%, #fef5f5 100%);
+    border-bottom: 1px solid #ffebe6;
+    padding: 8px 0;
+}
+
+/* 월/년도 텍스트 */
+.react-datepicker__current-month {
+    font-weight: 700;
+    color: #ff7b7b;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+/* 요일 헤더 */
+.react-datepicker__day-name {
+    color: #ff7b7b;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* 날짜 셀 */
+.react-datepicker__day {
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+/* hover 시 */
+.react-datepicker__day:hover {
+    background: #ffe0e0;
+    color: #2d2d2d;
+}
+
+/* 선택된 날짜 */
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+    background: linear-gradient(135deg, #ff7b7b 0%, #ffb199 100%);
+    color: white;
+    font-weight: 700;
+}
+
+/* 오늘 날짜 표시 */
+.react-datepicker__day--today {
+    border: 1px solid #ff7b7b;
+    font-weight: 600;
+    color: #ff7b7b;
+}
+
+.react-datepicker__input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
+    background: linear-gradient(135deg, #fff9f7 0%, #fef5f5 100%);
+    border-radius: 14px;
+    border: 1px solid #ffebe6;
+}

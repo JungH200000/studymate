@@ -164,6 +164,7 @@ body {
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+    display: flex;
 }
 
 /* White box inputs inside the pink group (select, date, tags) */
@@ -180,6 +181,7 @@ input[type='date'],
     color: #2d2d2d;
     font-weight: 500;
     font-family: 'Noto Sans KR', sans-serif;
+    display: flex;
 }
 
 select:focus,

@@ -4,6 +4,9 @@ import axios from 'axios';
 import './Write.css';
 import { fetchWithAuth } from '../api/auth';
 import { API_BASE } from '../api/config';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import './custom-datepicker.css';
 
 export default function Write() {
     const navigate = useNavigate();
@@ -116,14 +119,28 @@ export default function Write() {
                     )}
                 </div>
 
-                <div className="write-dates">
+                <div className="write-tag-group">
                     <div className="date-field">
                         <label>시작일</label>
-                        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                        <DatePicker
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="날짜 선택"
+                            className="write-tags"
+                            withPortal
+                        />
                     </div>
                     <div className="date-field">
                         <label>종료일</label>
-                        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                        <DatePicker
+                            selected={endDate}
+                            onChange={(date) => setEndDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="날짜 선택"
+                            className="write-tags"
+                            withPortal
+                        />
                     </div>
                 </div>
 
