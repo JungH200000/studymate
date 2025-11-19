@@ -1,0 +1,116 @@
+.achievement-container {
+    padding: 20px;
+    min-height: 100vh;
+    width: 100vw;
+    background: #fef5f5;
+    margin-top: 70px;
+}
+
+/* 기존 .achievement-card 스타일 (차트 아래 목록 등에 사용될 수 있음) */
+.achievement-card {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-card h3 {
+    margin-bottom: 8px;
+}
+
+.achievement-card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.achievement-card li {
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+/* ✅ 1. 상단 헤더 바 (뒤로가기 버튼과 제목을 수평으로 정렬) */
+.header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(255, 123, 123, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    height: 70px;
+}
+
+/* ✅ 2. 페이지 제목 스타일 (왼쪽 버튼 옆에 자연스럽게 배치) */
+.page-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    flex: 1;
+}
+
+/* 3. 뒤로가기 버튼 스타일 */
+.back-button {
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.back-button:hover {
+    transform: translateX(-3px);
+}
+
+/* ✅ 4. 통계 카드 Grid 컨테이너 */
+.rate-stats-grid {
+    display: grid;
+    /* 3개의 카드를 가로로 배치 (반응형) */
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+/* ✅ 5. 통계 개별 카드 스타일 */
+.stat-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 15px 10px;
+    box-shadow: 0 4px 8px rgba(255, 107, 122, 0.05);
+    text-align: center;
+    border: 1px solid #ffe8e8;
+    transition: all 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+    box-shadow: 0 6px 15px rgba(255, 107, 122, 0.1);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #a8a8a8;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ff6b7a; /* 핑크색 강조 */
+    line-height: 1.2;
+}
+
+/* 개별 카드 좌측에 포인트 색상 추가 */
+.stat-card.weekly {
+    border-left: 5px solid #ffab91;
+}
+.stat-card.day30 {
+    border-left: 5px solid #ffdfa1;
+}
+.stat-card.total {
+    border-left: 5px solid #b39ddb;
+}
