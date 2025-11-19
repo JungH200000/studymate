@@ -10,7 +10,7 @@
 
 - 시연 영상: [YouTube 링크](https://www.youtube.com/watch?v=56meGnLQRFo)
 
-<img src="./docs/images/screenshots.png" width=500px style="display: block; margin: 0 auto;">
+<img src="./docs/images/screenshots.png" width=700px style="display: block; margin: 0 auto;">
 
 ---
 
