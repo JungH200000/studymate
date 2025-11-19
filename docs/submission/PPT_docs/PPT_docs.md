@@ -64,9 +64,6 @@
   - 공부는 구체적인 단위로 수행되지만 기존 앱은 총 시간으로만 퉁쳐서 기록
   - 단순 시간 랭킹외에는 구체적인 학습 인증과 상호작용(피드백) 부족
 
-<img src="./image/ADHD_statistics.png" width=400px>
-<img src="./image/smart_phone_statistics.png" width=300px>
-
 ---
 
 ## 4 슬라이드 : 프로젝트 개요-활용 목적 및 타겟 오디언스
