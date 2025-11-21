@@ -219,10 +219,10 @@
 
 ## 11 슬라이드 : 시스템 개발 내용-서비스별 설명-학습 인증 및 AI 검증
 
-<img src="./image" width=250px>
-<img src="./image" width=250px>
-<img src="./image" width=250px>
-<img src="./image" width=250px>
+<img src="./image/11-1. 인증글 작성.png" width=250px>
+<img src="./image/11-2. AI 유해 표현 필터링.png" width=250px>
+<img src="./image/11-3. 1일 1회 제한.png" width=250px>
+<img src="./image/11-4. 인증글 목록.png" width=250px>
 
 1. 인증글 작성
    - 학습 내용 기록
@@ -249,9 +249,9 @@
 
 ## 12 슬라이드 : 시스템 개발 내용-서비스별 설명-AI 추천 챌린지
 
-<img src="./image" width=250px>
-<img src="./image" width=250px>
-<img src="./image" width=250px>
+<img src="./image/12-1. 데이터 확보.png" width=250px>
+<img src="./image/12-2. 관심사 분석.png" width=250px>
+<img src="./image/12-3. 추천 챌린지 목록.png" width=250px>
 
 1. 데이터 확보
    - AI 태그 추출
@@ -270,7 +270,9 @@
 
 ## 13 슬라이드 : 시스템 개발 내용-서비스별 설명-성과 확인 및 경쟁
 
-<img src="./image" width=250px>
+<img src="./image/13-1. GitHub 잔디형 캘린더.png" width=250px>
+<img src="./image/13-2. 주간·누적 달성률 시각화.png" width=250px>
+<img src="./image/13-3. 팔로우 기반 실시간 랭킹.png" width=250px>
 
 1. GitHub 잔디형 캘린더
    - 학습 패턴 시각화
