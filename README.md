@@ -8,7 +8,7 @@
 
 ## 2. 시연 영상 & Screenshots
 
-- 시연 영상: [YouTube 링크](https://www.youtube.com/watch?v=56meGnLQRFo)
+- 시연 영상: [YouTube 링크](https://www.youtube.com/watch?v=s2FxH0UBylc)
 
 <img src="./docs/images/screenshots.png" width=700px style="display: block; margin: 0 auto;">
 
