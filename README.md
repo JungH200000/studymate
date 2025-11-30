@@ -140,9 +140,9 @@ npm run worker
 
 ## 8. 역할 분담
 
-- 박정현 : UI/UX 설계, Server 설계 및 구현, DB 설계 및 구현, PPT 제작
-- 김지훈 : UI/UX 설계, Frontend 구현, UI/UX 구현
-- 한진환 : UI/UX 설계, Frontend 구현
+- [박정현](https://github.com/JungH200000) : UI/UX 설계, Server 설계 및 구현, DB 설계 및 구현, PPT 제작
+- [김지훈](https://github.com/kjh100912) : UI/UX 설계, Frontend 구현, UI/UX 구현
+- [한진환](https://github.com/jinhwan12345) : UI/UX 설계, Frontend 구현
 
 ---
 
